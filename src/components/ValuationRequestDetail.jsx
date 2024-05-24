@@ -1,7 +1,11 @@
+import CustomBreadCrumb from "./common/BreadCrumb.jsx";
+import { useParams } from "react-router-dom";
+
 export default function ValuationRequestDetail() {
+  const param = useParams();
   return (
     <div>
-      <h1>Valuation Request Detail</h1>
+      <CustomBreadCrumb level={param.id} />
     </div>
   );
 }

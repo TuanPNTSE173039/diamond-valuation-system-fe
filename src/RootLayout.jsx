@@ -212,7 +212,9 @@ export default function RootLayout() {
               <NavLink
                 to={link}
                 key={text}
-                className={(isActive) => (isActive ? "color: red" : undefined)}
+                isActive={(match, location) => {
+                  return match;
+                }}
               >
                 <ListItem disablePadding sx={{ display: "block" }}>
                   <ListItemButton
@@ -220,7 +222,6 @@ export default function RootLayout() {
                       minHeight: 48,
                       justifyContent: open ? "initial" : "center",
                       px: 2.5,
-                      color: text === selectedItem ? "blue" : "primary",
                     }}
                     onClick={() => handleListItemClick(text)}
                   >
@@ -238,7 +239,10 @@ export default function RootLayout() {
                     </ListItemIcon>
                     <ListItemText
                       primary={text}
-                      sx={{ opacity: open ? 1 : 0 }}
+                      sx={{
+                        opacity: open ? 1 : 0,
+                        color: text === selectedItem ? "blue" : "primary",
+                      }}
                     />
                   </ListItemButton>
                 </ListItem>
