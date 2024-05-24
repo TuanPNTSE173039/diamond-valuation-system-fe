@@ -22,10 +22,9 @@ import MailIcon from "@mui/icons-material/Mail";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import DiamondIcon from "@mui/icons-material/Diamond";
-import { alpha, InputBase, Tab, Tabs } from "@mui/material";
+import { alpha, InputBase } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import CustomTabPanel from "./components/CustomeTabPanel.jsx";
-import EnhancedTable from "./components/table/EnhancedTable.jsx";
+import BasicTabs from "./components/common/BasicTabs.jsx";
 
 const drawerWidth = 240;
 
@@ -275,119 +274,7 @@ export default function App() {
 
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
-        <Box sx={{ width: "100%" }}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-            >
-              <Tab label="Item One" {...a11yProps(0)} />
-              <Tab label="Item Two" {...a11yProps(1)} />
-              <Tab label="Item Three" {...a11yProps(2)} />
-            </Tabs>
-          </Box>
-          <CustomTabPanel value={value} index={0}>
-            Item One
-            <EnhancedTable />
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
-            Item Two
-            <Typography paragraph>
-              Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-              ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-              elementum integer enim neque volutpat ac tincidunt. Ornare
-              suspendisse sed nisi lacus sed viverra tellus. Purus sit amet
-              volutpat consequat mauris. Elementum eu facilisis sed odio morbi.
-              Euismod lacinia at quis risus sed vulputate odio. Morbi tincidunt
-              ornare massa eget egestas purus viverra accumsan in. In hendrerit
-              gravida rutrum quisque non tellus orci ac. Pellentesque nec nam
-              aliquam sem et tortor. Habitant morbi tristique senectus et.
-              Adipiscing elit duis tristique sollicitudin nibh sit. Ornare
-              aenean euismod elementum nisi quis eleifend. Commodo viverra
-              maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin
-              aliquam ultrices sagittis orci a.
-            </Typography>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={2}>
-            Item Three
-            <Typography paragraph>
-              Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-              ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-              elementum integer enim neque volutpat ac tincidunt. Ornare
-              suspendisse sed nisi lacus sed viverra tellus. Purus sit amet
-              volutpat consequat mauris. Elementum eu facilisis sed odio morbi.
-              Euismod lacinia at quis risus sed vulputate odio. Morbi tincidunt
-              ornare massa eget egestas purus viverra accumsan in. In hendrerit
-              gravida rutrum quisque non tellus orci ac. Pellentesque nec nam
-              aliquam sem et tortor. Habitant morbi tristique senectus et.
-              Adipiscing elit duis tristique sollicitudin nibh sit. Ornare
-              aenean euismod elementum nisi quis eleifend. Commodo viverra
-              maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin
-              aliquam ultrices sagittis orci a. Lorem ipsum dolor sit amet,
-              consectetur adipisicing elit. Accusamus beatae blanditiis delectus
-              ea, earum eligendi enim error eum fuga ipsum iste labore magnam
-              maiores officia officiis quasi, quod suscipit. Blanditiis
-              consectetur ducimus ea eaque earum expedita facere labore
-              laboriosam laborum mollitia non obcaecati odio perspiciatis quam
-              qui quibusdam quod recusandae sapiente soluta unde ut, veritatis
-              voluptates. Eaque earum nobis similique ullam? Consectetur et iure
-              labore nam sapiente? Amet assumenda aut autem commodi cum delectus
-              deserunt earum est exercitationem fugiat laboriosam libero nostrum
-              pariatur perferendis, quae quaerat quo sequi sint suscipit tempore
-              ut vero voluptas voluptates? Adipisci alias asperiores delectus
-              dolores doloribus ipsum maiores, natus nobis pariatur praesentium
-              quod ratione repellat! Ipsam provident qui repellat saepe!
-              Cupiditate ducimus error ex facere fugit ipsum nulla quaerat rerum
-              sint vero? Aut, consectetur cum cumque dignissimos distinctio
-              exercitationem, fuga harum laboriosam possimus, quibusdam quos rem
-              repellendus ullam! A, adipisci deleniti dicta doloribus ea ipsam
-              itaque labore magnam molestias nemo nulla obcaecati officiis
-              perferendis quae rem repellat soluta sunt unde voluptatem
-              voluptatibus! A ad aliquam facilis hic ut. Ab at blanditiis
-              consequatur fugit optio quis saepe. Ab accusantium architecto
-              asperiores aut blanditiis corporis distinctio ea eos expedita
-              facilis impedit ipsam, labore nemo nobis odit perferendis quo
-              saepe, sapiente sed tempora? Ab ad aliquam aspernatur autem
-              consequatur consequuntur dicta exercitationem magnam maxime minima
-              mollitia nihil nisi odio omnis sapiente totam ullam ut velit,
-              veniam vitae. Aperiam dolorum est hic in itaque iusto odit
-              repudiandae tempora tempore veniam. A ab accusantium amet aperiam
-              autem blanditiis delectus doloribus esse eveniet illum incidunt
-              iure laborum molestiae necessitatibus neque nesciunt quae
-              similique sit totam veniam veritatis voluptatem, voluptatibus.
-              Aspernatur assumenda beatae ducimus eaque esse fuga maxime
-              nostrum, quibusdam tenetur vitae! Commodi consectetur cumque
-              cupiditate ducimus laboriosam officia pariatur placeat quibusdam.
-              A asperiores dolorem iusto laboriosam nostrum odit pariatur, ut
-              voluptatem. Aliquam aliquid consectetur cum, cumque dicta
-              laudantium provident repudiandae. Dignissimos doloribus eius iure
-              mollitia necessitatibus nesciunt qui quo, sint? Ab aliquam
-              assumenda aut commodi debitis dicta et expedita, in iusto magni
-              modi molestiae odit repellendus sequi sunt ut vitae. Autem
-              consequuntur dolore eveniet libero? A asperiores at aut culpa
-              deleniti dolorum, eos esse facere fugiat harum, in ipsa nobis
-              officia officiis porro provident quod repudiandae similique sint
-              sit vero voluptates voluptatum! Laboriosam minus reiciendis rerum
-              veniam. Accusamus dolore est explicabo fugit ipsum magnam minus
-              necessitatibus nemo nisi quisquam. Aperiam architecto autem cumque
-              delectus dolore dolorem esse ex incidunt ipsa maxime mollitia,
-              nisi nulla quisquam totam veniam veritatis vero voluptatem!
-              Exercitationem id ipsum nemo odio quas quibusdam quidem sapiente
-              sint soluta vero? Animi aspernatur autem deserunt, distinctio
-              dolore doloribus ea, eveniet exercitationem fugit hic id labore
-              maiores minus nam necessitatibus nihil porro saepe similique,
-              totam vel. At earum eius eum exercitationem laudantium molestias
-              mollitia nam odit, qui rerum. Aperiam consequuntur explicabo
-              laudantium molestiae qui tempore, temporibus unde. Accusamus
-              consequatur deserunt hic incidunt mollitia neque, optio.
-              Asperiores consequatur ea eaque et fugiat inventore nam officia
-              reprehenderit tempora unde. Amet consectetur earum fugiat in
-              necessitatibus perspiciatis, qui quibusdam repellendus rerum
-              totam. Incidunt, quos!
-            </Typography>
-          </CustomTabPanel>
-        </Box>
+        <BasicTabs />
       </Box>
     </Box>
   );

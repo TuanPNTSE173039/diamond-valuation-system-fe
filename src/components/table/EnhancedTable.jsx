@@ -209,7 +209,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Nutrition
+          {/*Nutrition*/}
         </Typography>
       )}
 
