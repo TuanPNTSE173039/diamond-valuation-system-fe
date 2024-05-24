@@ -13,11 +13,11 @@ function handleClick(event) {
 
 export default function CustomBreadCrumb({ level }) {
   const breadcrumbs = [
-    <Link to={".."} relative="path">
+    <Link key="0" to={".."} relative="path">
       Requests
     </Link>,
 
-    <Typography key="3" color="text.primary">
+    <Typography key="1" color="text.primary">
       {level}
     </Typography>,
   ];

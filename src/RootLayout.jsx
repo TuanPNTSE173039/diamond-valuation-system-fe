@@ -209,13 +209,7 @@ export default function RootLayout() {
             const link =
               index === 0 ? "/" : index === 1 ? "/requests" : "/diamond";
             return (
-              <NavLink
-                to={link}
-                key={text}
-                isActive={(match, location) => {
-                  return match;
-                }}
-              >
+              <NavLink to={link} key={text}>
                 <ListItem disablePadding sx={{ display: "block" }}>
                   <ListItemButton
                     sx={{
