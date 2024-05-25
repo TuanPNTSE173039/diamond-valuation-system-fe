@@ -71,7 +71,7 @@ export default function BasicTabs() {
         <BasicDateTimeRangePicker />
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <EnhancedTable />
+        <EnhancedTable heading="Valuation Requests" />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <EnhancedTable />

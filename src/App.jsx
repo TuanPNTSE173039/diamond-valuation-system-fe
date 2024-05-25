@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import BasicTabs from "./components/common/BasicTabs.jsx";
 import ValuationRequestDetail from "./components/valuation-request/ValuationRequestDetail.jsx";
 import RootLayout from "./RootLayout.jsx";
+import ValuationNote from "./pages/ValuationNote.jsx";
 
 const router = createBrowserRouter([
   {
@@ -9,16 +10,25 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        path: "/",
+        index: true,
         element: <div>Dashboard</div>,
       },
       {
-        path: "/requests",
-        element: <BasicTabs />,
-      },
-      {
-        path: "/requests/:id",
-        element: <ValuationRequestDetail />,
+        path: "requests",
+        children: [
+          {
+            index: true,
+            element: <BasicTabs />,
+          },
+          {
+            path: ":requestId",
+            element: <ValuationRequestDetail />,
+          },
+          {
+            path: ":requestId/:diamondId",
+            element: <ValuationNote />,
+          },
+        ],
       },
     ],
   },

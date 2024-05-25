@@ -19,9 +19,10 @@ import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import { Link } from "react-router-dom";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -179,7 +180,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
+  const { numSelected, heading } = props;
 
   return (
     <Toolbar
@@ -211,7 +212,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          {/*Nutrition*/}
+          {heading}
         </Typography>
       )}
 
@@ -223,9 +224,12 @@ function EnhancedTableToolbar(props) {
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
+          {/*<IconButton>*/}
+          {/*  <FilterListIcon />*/}
+          {/*</IconButton>*/}
+          <Button variant="contained" size="large" endIcon={<AddIcon />}>
+            Add
+          </Button>
         </Tooltip>
       )}
     </Toolbar>
@@ -236,7 +240,7 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable() {
+export default function EnhancedTable({ heading }) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -307,9 +311,9 @@ export default function EnhancedTable() {
   );
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", mt: 3 }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} heading={heading} />
 
         <TableContainer>
           <Table
