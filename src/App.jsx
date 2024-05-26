@@ -1,13 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import BasicTabs from "./components/common/BasicTabs.jsx";
+import BasicTabs from "./components/UI/BasicTabs.jsx";
 import ValuationRequestDetail from "./components/valuation-request/ValuationRequestDetail.jsx";
-import RootLayout from "./screens/RootLayout.jsx";
+import ScreenAppLayout from "./screens/AppLayout.jsx";
 import ValuationNote from "./screens/ValuationNote.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout />,
+    element: <ScreenAppLayout />,
     children: [
       {
         index: true,

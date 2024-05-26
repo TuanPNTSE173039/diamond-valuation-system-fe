@@ -1,16 +1,10 @@
-import Box from "@mui/material/Box";
-import Header from "../components/common/Header.jsx";
-import Button from "@mui/material/Button";
-import ValuationNoteItem from "../components/valuation-note/ValuationNoteItem.jsx";
-import * as React from "react";
-import ValuationNoteUserInfo from "../components/valuation-note/ValuationNoteUserInfo.jsx";
-import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
+import AddIcon from "@mui/icons-material/Add";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import EmailIcon from "@mui/icons-material/Email";
 import LabelIcon from "@mui/icons-material/Label";
-import PersonIcon from "@mui/icons-material/Person";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import Typography from "@mui/material/Typography";
+import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
+import PersonIcon from "@mui/icons-material/Person";
 import {
   Avatar,
   AvatarGroup,
@@ -24,11 +18,17 @@ import {
   styled,
   TextField,
 } from "@mui/material";
-import BasicDatePicker from "../components/common/BasicDatePicker.jsx";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Checkbox from "@mui/material/Checkbox";
-import AddIcon from "@mui/icons-material/Add";
+import Typography from "@mui/material/Typography";
+import * as React from "react";
+import BasicDatePicker from "../components/UI/BasicDatePicker.jsx";
+import Header from "../components/UI/Header.jsx";
+import ValuationNoteItem from "../components/valuation-note/ValuationNoteItem.jsx";
+import ValuationNoteUserInfo from "../components/valuation-note/ValuationNoteUserInfo.jsx";
 
 const imagesData = [
   {

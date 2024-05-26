@@ -1,11 +1,11 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import EnhancedTable from "../table/EnhancedTable.jsx";
-import BasicDateTimeRangePicker from "../table/BasicDateTimeRangePicker.jsx";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Typography from "@mui/material/Typography";
+import PropTypes from "prop-types";
+import * as React from "react";
+import BasicDateTimeRangePicker from "./BasicDateTimeRangePicker.jsx";
+import EnhancedTable from "./EnhancedTable.jsx";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
