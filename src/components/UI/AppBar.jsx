@@ -1,4 +1,4 @@
-import MenuIcon from "@mui/icons-material/Menu.js";
+import MenuIcon from "@mui/icons-material/Menu";
 import MuiAppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -27,9 +27,9 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const UIAppBar = ({ handleDrawerOpen, ...props }) => {
+const UIAppBar = ({ handleDrawerOpen, open }) => {
   return (
-    <AppBar position="fixed" {...props}>
+    <AppBar position="fixed" open={open}>
       <Toolbar>
         <IconButton
           color="inherit"
