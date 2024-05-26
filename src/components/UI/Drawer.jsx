@@ -1,10 +1,5 @@
-import AssignmentIcon from "@mui/icons-material/Assignment.js";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft.js";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight.js";
-import DashboardIcon from "@mui/icons-material/Dashboard.js";
-import DiamondIcon from "@mui/icons-material/Diamond.js";
-import MailIcon from "@mui/icons-material/Mail.js";
-import InboxIcon from "@mui/icons-material/MoveToInbox.js";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Divider from "@mui/material/Divider";
 import MuiDrawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
@@ -17,6 +12,7 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { NavLink } from "react-router-dom";
+import { checkRole } from "../../utilities/DrawerItemByRole.jsx";
 
 const drawerWidth = 240;
 
@@ -87,11 +83,10 @@ const UIDrawer = ({ theme, handleDrawerClose, ...props }) => {
       </DrawerHeader>
       <Divider />
       <List>
-        {["Dashboard", "Valuation Requests", "Diamond"].map((text, index) => {
-          const link =
-            index === 0 ? "/" : index === 1 ? "/requests" : "/diamond";
+        {checkRole(1).map((item) => {
+          const link = item.link;
           return (
-            <NavLink to={link} key={text}>
+            <NavLink to={link} key={item.id}>
               <ListItem disablePadding sx={{ display: "block" }}>
                 <ListItemButton
                   sx={{
@@ -107,12 +102,10 @@ const UIDrawer = ({ theme, handleDrawerClose, ...props }) => {
                       justifyContent: "center",
                     }}
                   >
-                    {index === 0 && <DashboardIcon />}
-                    {index === 1 && <AssignmentIcon />}
-                    {index === 2 && <DiamondIcon />}
+                    {item.icon}
                   </ListItemIcon>
                   <ListItemText
-                    primary={text}
+                    primary={item.name}
                     sx={{
                       opacity: open ? 1 : 0,
                     }}
@@ -122,31 +115,6 @@ const UIDrawer = ({ theme, handleDrawerClose, ...props }) => {
             </NavLink>
           );
         })}
-      </List>
-      <Divider />
-      <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? "initial" : "center",
-                px: 2.5,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : "auto",
-                  justifyContent: "center",
-                }}
-              >
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
-        ))}
       </List>
     </Drawer>
   );

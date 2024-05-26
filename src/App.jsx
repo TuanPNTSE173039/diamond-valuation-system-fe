@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import BasicTabs from "./components/UI/BasicTabs.jsx";
 import ValuationRequestDetail from "./components/valuation-request/ValuationRequestDetail.jsx";
 import ScreenAppLayout from "./screens/AppLayout.jsx";
 import ValuationNote from "./screens/ValuationNote.jsx";
+import ScreenValuationRequestList from "./screens/ValuationRequest/List.jsx";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +18,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <BasicTabs />,
+            element: <ScreenValuationRequestList />,
           },
           {
             path: ":requestId",

@@ -1,3 +1,4 @@
+import { Container } from "@mui/material";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useTheme } from "@mui/material/styles";
@@ -32,8 +33,10 @@ export default function AppLayout() {
       />
 
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader />
-        <Outlet />
+        <Container>
+          <DrawerHeader />
+          <Outlet />
+        </Container>
       </Box>
     </Box>
   );

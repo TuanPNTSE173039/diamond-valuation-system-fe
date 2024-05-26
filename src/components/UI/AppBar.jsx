@@ -47,7 +47,10 @@ const UIAppBar = ({ handleDrawerOpen, open }) => {
           Dashboard
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
+        {/* Use redux to search here*/}
         <UISearch />
+
+        {/* Missing userAccount, Notification*/}
       </Toolbar>
     </AppBar>
   );
