@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import BasicTabs from "./components/common/BasicTabs.jsx";
 import ValuationRequestDetail from "./components/valuation-request/ValuationRequestDetail.jsx";
-import RootLayout from "./RootLayout.jsx";
-import ValuationNote from "./pages/ValuationNote.jsx";
+import RootLayout from "./screens/RootLayout.jsx";
+import ValuationNote from "./screens/ValuationNote.jsx";
 
 const router = createBrowserRouter([
   {
