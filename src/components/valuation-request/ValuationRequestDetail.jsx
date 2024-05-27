@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
-import EnhancedTable from "../UI/EnhancedTable.jsx";
 import Header from "../UI/Header.jsx";
+import UITable from "../UI/Table.jsx";
 import RecordList from "./RecordList.jsx";
 import ValuationRequestUserInfo from "./ValuationRequestUserInfo.jsx";
 
@@ -13,7 +13,7 @@ export default function ValuationRequestDetail() {
       <Header title={"Valuation Request Detail"} />
       <ValuationRequestUserInfo />
       <RecordList />
-      <EnhancedTable heading="Diamonds" />
+      <UITable heading="Diamonds" />
     </>
   );
 }

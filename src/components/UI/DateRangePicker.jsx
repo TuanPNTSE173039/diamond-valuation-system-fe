@@ -11,9 +11,14 @@ export default function UIDateRangePicker() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer components={["DatePicker", "DatePicker"]}>
-        <DatePicker label="From Date" defaultValue={dayjs("2022-04-17")} />
+        <DatePicker
+          sx={{ width: "100px" }}
+          label="From Date"
+          defaultValue={dayjs("2022-04-17")}
+        />
         <DatePicker
           label="To Date"
+          sx={{ width: "100px" }}
           value={value}
           onChange={(newValue) => setValue(newValue)}
         />

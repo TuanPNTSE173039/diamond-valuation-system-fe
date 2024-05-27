@@ -3,9 +3,10 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
+import { headCells, rows } from "../../dataset/ValuationRequests.js";
 import { valuationRequestStatus } from "../../utilities/Status.js";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
-import EnhancedTable from "../UI/EnhancedTable.jsx";
+import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
 function a11yProps(index) {
@@ -14,7 +15,6 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-
 const ValuationRequestList = () => {
   const [statusIndex, setStatusIndex] = useState(0);
 
@@ -39,11 +39,12 @@ const ValuationRequestList = () => {
             onChange={handleChange}
             aria-label="valuation requests status"
           >
-            {valuationRequestStatus.map((status) => (
+            <Tab label="All Requests" {...a11yProps(0)} />
+            {valuationRequestStatus.map((status, index) => (
               <Tab
                 key={status.id}
                 label={status.name}
-                {...a11yProps(status.id)}
+                {...a11yProps(index + 1)}
               />
             ))}
           </Tabs>
@@ -51,9 +52,23 @@ const ValuationRequestList = () => {
         <UIDateRangePicker />
       </Box>
 
-      {valuationRequestStatus.map((status) => (
-        <UITabPanel index={status.id} value={statusIndex}>
-          <EnhancedTable />
+      <UITabPanel index={0} value={statusIndex}>
+        <UITable heading="All Requests" headCells={headCells} rows={rows} />
+      </UITabPanel>
+
+      {valuationRequestStatus.map((status, index) => (
+        <UITabPanel index={index + 1} value={statusIndex}>
+          <UITable
+            heading={
+              statusIndex === index + 1 ? `${status.name} Valuations` : ""
+            }
+            headCells={headCells}
+            rows={
+              statusIndex === index + 1
+                ? rows.filter((row) => row.status === status.name)
+                : []
+            }
+          />
         </UITabPanel>
       ))}
     </Box>
