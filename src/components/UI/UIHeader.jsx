@@ -1,13 +1,13 @@
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useState } from "react";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-export default function Header({ title }) {
+export default function UIHeader({ title }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -39,13 +39,6 @@ export default function Header({ title }) {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
-          // sx={{
-          //   fontSize: 18,
-          //   fontWeight: 600,
-          //   textTransform: "none",
-          //   border: 1,
-          //   px: 3,
-          // }}
           variant="contained"
           endIcon={<ExpandMoreIcon />}
         >

@@ -1,11 +1,11 @@
-import Box from "@mui/material/Box";
 import { Card, CardActions, CardContent } from "@mui/material";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 
 export default function RecordItem({ title, creationDate }) {
   return (
-    <Box sx={{ mb: 0.5, minWidth: "275px" }}>
+    <Paper elevation={3} sx={{ mb: 0.5, minWidth: "275px" }}>
       <Card variant="outlined">
         <CardContent>
           <Typography
@@ -25,6 +25,6 @@ export default function RecordItem({ title, creationDate }) {
           <Button size="small">Create</Button>
         </CardActions>
       </Card>
-    </Box>
+    </Paper>
   );
 }

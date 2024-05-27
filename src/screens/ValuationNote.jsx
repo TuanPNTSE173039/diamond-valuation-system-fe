@@ -26,7 +26,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import BasicDatePicker from "../components/UI/BasicDatePicker.jsx";
-import Header from "../components/UI/Header.jsx";
+import UIHeader from "../components/UI/UIHeader.jsx";
 import ValuationNoteItem from "../components/valuation-note/ValuationNoteItem.jsx";
 import ValuationNoteUserInfo from "../components/valuation-note/ValuationNoteUserInfo.jsx";
 
@@ -102,7 +102,7 @@ export default function ValuationNote() {
           justifyContent: "space-between",
         }}
       >
-        <Header title={"Valuation Note"} />
+        <UIHeader title={"Valuation Note"} />
         <Button variant="contained" color="primary">
           Sealing Record
         </Button>
