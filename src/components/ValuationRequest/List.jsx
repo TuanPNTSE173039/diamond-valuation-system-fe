@@ -40,13 +40,15 @@ const ValuationRequestList = () => {
             aria-label="valuation requests status"
           >
             <Tab label="All Requests" {...a11yProps(0)} />
-            {valuationRequestStatus.map((status, index) => (
-              <Tab
-                key={status.id}
-                label={status.name}
-                {...a11yProps(index + 1)}
-              />
-            ))}
+            {valuationRequestStatus
+              .filter((status, index) => index !== 0)
+              .map((status, index) => (
+                <Tab
+                  key={status.id}
+                  label={status.name}
+                  {...a11yProps(index + 1)}
+                />
+              ))}
           </Tabs>
         </Box>
         <UIDateRangePicker />
@@ -56,21 +58,23 @@ const ValuationRequestList = () => {
         <UITable heading="All Requests" headCells={headCells} rows={rows} />
       </UITabPanel>
 
-      {valuationRequestStatus.map((status, index) => (
-        <UITabPanel index={index + 1} value={statusIndex}>
-          <UITable
-            heading={
-              statusIndex === index + 1 ? `${status.name} Valuations` : ""
-            }
-            headCells={headCells}
-            rows={
-              statusIndex === index + 1
-                ? rows.filter((row) => row.status === status.name)
-                : []
-            }
-          />
-        </UITabPanel>
-      ))}
+      {valuationRequestStatus
+        .filter((status, index) => index !== 0)
+        .map((status, index) => (
+          <UITabPanel index={index + 1} value={statusIndex}>
+            <UITable
+              heading={
+                statusIndex === index + 1 ? `${status.name} Valuations` : ""
+              }
+              headCells={headCells}
+              rows={
+                statusIndex === index + 1
+                  ? rows.filter((row) => row.status === status.name)
+                  : []
+              }
+            />
+          </UITabPanel>
+        ))}
     </Box>
   );
 };
