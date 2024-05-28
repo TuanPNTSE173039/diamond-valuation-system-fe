@@ -25,6 +25,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { useState } from "react";
 import BasicDatePicker from "../components/UI/BasicDatePicker.jsx";
 import UIHeader from "../components/UI/UIHeader.jsx";
 import ValuationNoteItem from "../components/valuation-note/ValuationNoteItem.jsx";
@@ -92,8 +93,140 @@ const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
   },
 }));
 export default function ValuationNote() {
+  const [diamondInfor, setDiamondInfor] = useState({
+    giaCertDate: null,
+    giaReportNumber: "",
+    diamondOrigin: "",
+    caratWeight: 0,
+    colorGrade: "",
+    clarityGrade: "",
+    cutGrade: "",
+    shape: "",
+    symmetry: "",
+    polish: "",
+    fluorescence: "",
+    proportions: "",
+    clarityCharacteristics: "",
+  });
+  const [detailState, setDetailState] = useState({
+    previous: "assessing",
+    current: "draft-assessing",
+  });
+
+  function handleAssessing() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: prevState.previous,
+        current: "assessing",
+      };
+    });
+  }
+
+  function handleCancelAssessing() {
+    setDetailState((prevState) => {
+      if (prevState.previous === "pending") {
+        return {
+          ...prevState,
+          current: "pending",
+        };
+      }
+      return {
+        ...prevState,
+        previous: "assessing",
+        current: "draft-assessing",
+      };
+    });
+  }
+  function handleSaveAssessing() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "assessing",
+        current: "draft-assessing",
+      };
+    });
+  }
+
+  function handleEditAssessment() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: prevState.previous,
+        current: "assessing",
+      };
+    });
+  }
+
+  function handleConfirmAssessment() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "",
+        current: "assessed",
+      };
+    });
+  }
+
+  function handleValuating() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "assessed",
+        current: "valuating",
+      };
+    });
+  }
+
+  function handleCancelValuating() {
+    setDetailState((prevState) => {
+      if (prevState.previous === "assessed") {
+        return {
+          ...prevState,
+          current: "assessed",
+        };
+      }
+      return {
+        ...prevState,
+        previous: "valuating",
+        current: "draft-valuating",
+      };
+    });
+  }
+
+  function handleSaveValuation() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "valuating",
+        current: "draft-valuating",
+      };
+    });
+  }
+
+  function handleEditValuation() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: prevState.previous,
+        current: "valuating",
+      };
+    });
+  }
+
+  function handleConfirmValuation() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "",
+        current: "valuated",
+      };
+    });
+  }
+
   return (
     <>
+      {/*HEADING*/}
       <Box
         sx={{
           display: "flex",
@@ -102,354 +235,420 @@ export default function ValuationNote() {
           justifyContent: "space-between",
         }}
       >
-        <UIHeader title={"Valuation Note"} />
-        <Button variant="contained" color="primary">
-          Sealing Record
-        </Button>
+        <UIHeader title={"Valuation Request Detail"} />
+
+        {detailState.current === "pending" && (
+          <Button variant={"contained"} onClick={handleAssessing}>
+            Assessing
+          </Button>
+        )}
+        {detailState.current === "assessing" && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button variant={"outlined"} onClick={handleCancelAssessing}>
+              Cancel
+            </Button>
+            <Button variant={"contained"} onClick={handleSaveAssessing}>
+              Save
+            </Button>
+          </Box>
+        )}
+        {detailState.current === "draft-assessing" && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button variant={"outlined"} onClick={handleEditAssessment}>
+              Edit
+            </Button>
+            <Button variant={"contained"} onClick={handleConfirmAssessment}>
+              Confirm
+            </Button>
+          </Box>
+        )}
+        {detailState.current === "assessed" && (
+          <Button variant={"contained"} onClick={handleValuating}>
+            Valuate
+          </Button>
+        )}
+        {detailState.current === "valuating" && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button variant={"outlined"} onClick={handleCancelValuating}>
+              Cancel
+            </Button>
+            <Button variant={"contained"} onClick={handleSaveValuation}>
+              Save
+            </Button>
+          </Box>
+        )}
+        {detailState.current === "draft-valuating" && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button variant={"outlined"} onClick={handleEditValuation}>
+              Edit
+            </Button>
+            <Button variant={"contained"} onClick={handleConfirmValuation}>
+              Confirm
+            </Button>
+          </Box>
+        )}
       </Box>
+
+      {/*CONTENT*/}
       <Box
         sx={{
           display: "flex",
           flexDirection: "row",
           gap: 4,
+          mt: 2.5,
         }}
       >
-        <Box sx={{ width: "50%" }}>
-          <ValuationNoteItem title="Description">
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 2,
-              }}
-            >
-              <Box sx={{ width: "50%" }}>
-                <ValuationNoteUserInfo icon={<PersonIcon />} title="Customer">
-                  Tuan Pham
-                </ValuationNoteUserInfo>
-                <ValuationNoteUserInfo icon={<LocalPhoneIcon />} title="Phone">
-                  0367304351
-                </ValuationNoteUserInfo>
-                <ValuationNoteUserInfo icon={<EmailIcon />} title="Email">
-                  tuanpntse173039@fpt.edu.vn
-                </ValuationNoteUserInfo>
-                <ValuationNoteUserInfo icon={<LabelIcon />} title="Status">
-                  Processing
-                </ValuationNoteUserInfo>
-                <ValuationNoteUserInfo
-                  icon={<LocalAtmIcon />}
-                  title="Fair Price Estimate"
-                >
-                  &7.000
-                </ValuationNoteUserInfo>
+        {/*Description*/}
+        <ValuationNoteItem title="Description" sx={{ width: "50%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 1,
+              minHeight: 328,
+            }}
+          >
+            <Box sx={{ width: "50%" }}>
+              <ValuationNoteUserInfo icon={<PersonIcon />} title="Customer">
+                Tuan Pham
+              </ValuationNoteUserInfo>
+              <ValuationNoteUserInfo icon={<LocalPhoneIcon />} title="Phone">
+                0367304351
+              </ValuationNoteUserInfo>
+              <ValuationNoteUserInfo icon={<EmailIcon />} title="Email">
+                tuanpntse173039@fpt.edu.vn
+              </ValuationNoteUserInfo>
+              <ValuationNoteUserInfo icon={<LabelIcon />} title="Status">
+                Processing
+              </ValuationNoteUserInfo>
+              <ValuationNoteUserInfo
+                icon={<LocalAtmIcon />}
+                title="Fair Price Estimate"
+              >
+                &7.000
+              </ValuationNoteUserInfo>
 
-                <ValuationNoteUserInfo
-                  icon={<LocalAtmIcon />}
-                  title="Estimate Range"
-                >
-                  4.500 - 7.000
-                </ValuationNoteUserInfo>
-                <ValuationNoteUserInfo
-                  icon={<CalendarMonthIcon />}
-                  title="Effect Date"
-                >
-                  10/10/2022
-                </ValuationNoteUserInfo>
-              </Box>
-              <Box
-                sx={{ width: "50%", textAlign: "center", position: "relative" }}
+              <ValuationNoteUserInfo
+                icon={<LocalAtmIcon />}
+                title="Estimate Range"
               >
-                <Typography sx={{ fontSize: "1rem" }}>Final price</Typography>
-                <Typography sx={{ fontSize: "3rem" }}>27$</Typography>
-                <AvatarGroup
-                  max={3}
-                  sx={{
-                    position: "absolute",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <Avatar alt="Remy Sharp" src="" />
-                  <Avatar alt="Travis Howard" src="" />
-                  <Avatar alt="Cindy Baker" src="" />
-                </AvatarGroup>
-                <Typography sx={{ fontSize: "1.5rem", mt: 5.5 }}>
-                  Tuan
-                </Typography>
-                <Typography sx={{ fontSize: "0.8rem", px: 3 }}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Asperiores dignissimos dolor, doloremque et explicabo harum
-                  itaque molestias natus neque perspiciatis quam qui quod
-                </Typography>
-              </Box>
-            </Box>
-          </ValuationNoteItem>
-          <ValuationNoteItem title="GIA Report Detail">
-            <BasicDatePicker />
-            <Box
-              sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
-            >
-              <TextField
-                label="GIA Report Number"
-                id="outlined-start-adornment"
-                sx={{ width: "50%" }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">GIA</InputAdornment>
-                  ),
-                }}
-              />
-              <FormControl sx={{ width: "50%" }}>
-                <FormLabel id="demo-row-radio-buttons-group-label">
-                  Diamond Origin
-                </FormLabel>
-                <RadioGroup
-                  row
-                  aria-labelledby="demo-row-radio-buttons-group-label"
-                  name="row-radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="Natural"
-                    control={<Radio />}
-                    label="Natural"
-                  />
-                  <FormControlLabel
-                    value="LabGrown"
-                    control={<Radio />}
-                    label="Lab Grown"
-                  />
-                </RadioGroup>
-              </FormControl>
-            </Box>
-          </ValuationNoteItem>
-          <ValuationNoteItem title="Grading Result">
-            <Box
-              sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
-            >
-              <TextField
-                label="Carat Weight"
-                id="carat-weight"
-                sx={{ width: "50%" }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">ct.</InputAdornment>
-                  ),
-                }}
-              />
-              <TextField
-                id="color-grade"
-                select
-                label="Color Grade"
-                defaultValue="EUR"
-                sx={{ width: "50%" }}
+                4.500 - 7.000
+              </ValuationNoteUserInfo>
+              <ValuationNoteUserInfo
+                icon={<CalendarMonthIcon />}
+                title="Effect Date"
               >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
+                10/10/2022
+              </ValuationNoteUserInfo>
             </Box>
             <Box
-              sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
+              sx={{ width: "50%", textAlign: "center", position: "relative" }}
             >
-              <TextField
-                id="clarity-grade"
-                select
-                label="Clarity Grade"
-                defaultValue="EUR"
-                sx={{ width: "50%" }}
-              >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                id="cut-grade"
-                select
-                label="Cut Grade"
-                defaultValue="EUR"
-                sx={{ width: "50%" }}
-              >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-          </ValuationNoteItem>
-          <ValuationNoteItem title="Additional Grading Information">
-            <Box
-              sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
-            >
-              <TextField
-                id="shape"
-                select
-                label="Shape"
-                defaultValue="EUR"
-                sx={{ width: "50%" }}
-              >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                id="symmetry"
-                select
-                label="Symmetry"
-                defaultValue="EUR"
-                sx={{ width: "50%" }}
-              >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-            <Box
-              sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
-            >
-              <TextField
-                id="polish"
-                select
-                label="Polish"
-                defaultValue="EUR"
-                sx={{ width: "50%" }}
-              >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                id="fluorescence"
-                select
-                label="Fluorescence"
-                defaultValue="EUR"
-                sx={{ width: "50%" }}
-              >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-          </ValuationNoteItem>
-        </Box>
-        <Box sx={{ width: "50%" }}>
-          <Box sx={{ position: "relative" }}>
-            <ValuationNoteItem title="Diamond Image">
-              <ImageList
-                sx={{ width: "100%", height: 328, rowGap: "10px" }}
-                cols={3}
-                rowHeight={164}
-              >
-                {imagesData.map((item) => (
-                  <ImageListItem key={item.img}>
-                    <img
-                      srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                      src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                      alt={item.title}
-                      loading="lazy"
-                      style={{ height: "164px", objectFit: "cover" }}
-                    />
-                    <CustomCheckbox
-                      sx={{
-                        position: "absolute",
-                        bottom: 0,
-                        right: 0,
-                      }}
-                    />
-                  </ImageListItem>
-                ))}
-              </ImageList>
-            </ValuationNoteItem>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => {
-                console.log("Hello");
-              }}
-              size="small"
-              sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
-              endIcon={<AddIcon />}
-            >
-              Add
-            </Button>
-          </Box>
-          <Box sx={{ position: "relative" }}>
-            <ValuationNoteItem title="Proportions">
-              <img
-                srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                // alt={item.title}
-                loading="lazy"
-                style={{ height: 250, width: "100%", objectFit: "cover" }}
-              />
-              <CustomCheckbox
+              <Typography sx={{ fontSize: "1rem" }}>Final price</Typography>
+              <Typography sx={{ fontSize: "3rem" }}>27$</Typography>
+              <AvatarGroup
+                max={3}
                 sx={{
                   position: "absolute",
-                  bottom: 0,
-                  right: 0,
+                  left: "50%",
+                  transform: "translateX(-50%)",
                 }}
-              />
-            </ValuationNoteItem>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => {
-                console.log("Hello");
-              }}
-              size="small"
-              sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
-              endIcon={<AddIcon />}
-            >
-              Add
-            </Button>
-          </Box>
-          <Box sx={{ position: "relative" }}>
-            <ValuationNoteItem title="Clarity Characteristics">
-              <img
-                srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                // alt={item.title}
-                loading="lazy"
-                style={{ height: 250, width: "100%", objectFit: "cover" }}
-              />
-              <CustomCheckbox
-                sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                }}
-              />
-            </ValuationNoteItem>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => {
-                console.log("Hello");
-              }}
-              size="small"
-              sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
-              endIcon={<AddIcon />}
-            >
-              Add
-            </Button>
-            <Box>
-              <Box></Box>
+              >
+                <Avatar alt="Remy Sharp" src="" />
+                <Avatar alt="Travis Howard" src="" />
+                <Avatar alt="Cindy Baker" src="" />
+              </AvatarGroup>
+              <Typography sx={{ fontSize: "1.5rem", mt: 5.5 }}>Tuan</Typography>
+              <Typography sx={{ fontSize: "0.8rem", px: 3 }}>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                Asperiores dignissimos dolor, doloremque et explicabo harum
+                itaque molestias natus neque perspiciatis quam qui quod
+              </Typography>
             </Box>
           </Box>
+        </ValuationNoteItem>
+        {/*Diamond Image*/}
+        <Box sx={{ position: "relative", width: "50%" }}>
+          <ValuationNoteItem title="Diamond Image">
+            <ImageList
+              sx={{ width: "100%", height: 328, rowGap: "10px" }}
+              cols={3}
+              rowHeight={164}
+            >
+              {imagesData.map((item) => (
+                <ImageListItem key={item.img}>
+                  <img
+                    srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                    src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                    alt={item.title}
+                    loading="lazy"
+                    style={{ height: "164px", objectFit: "cover" }}
+                  />
+                  <CustomCheckbox
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      right: 0,
+                    }}
+                  />
+                </ImageListItem>
+              ))}
+            </ImageList>
+          </ValuationNoteItem>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              console.log("Hello");
+            }}
+            size="small"
+            sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
+            endIcon={<AddIcon />}
+          >
+            Add
+          </Button>
         </Box>
       </Box>
+
+      {detailState.current !== "pending" && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 4,
+            mt: 2,
+          }}
+        >
+          <Box sx={{ width: "50%" }}>
+            <ValuationNoteItem title="GIA Report Detail">
+              <BasicDatePicker />
+              <Box
+                sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
+              >
+                <TextField
+                  label="GIA Report Number"
+                  id="outlined-start-adornment"
+                  sx={{ width: "50%" }}
+                  disabled
+                  value={"12345"}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">GIA</InputAdornment>
+                    ),
+                  }}
+                />
+                <FormControl sx={{ width: "50%" }}>
+                  <FormLabel id="demo-row-radio-buttons-group-label">
+                    Diamond Origin
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="row-radio-buttons-group"
+                  >
+                    <FormControlLabel
+                      value="Natural"
+                      control={<Radio />}
+                      label="Natural"
+                    />
+                    <FormControlLabel
+                      value="LabGrown"
+                      control={<Radio />}
+                      label="Lab Grown"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
+            </ValuationNoteItem>
+            <ValuationNoteItem title="Grading Result">
+              <Box
+                sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
+              >
+                <TextField
+                  label="Carat Weight"
+                  id="carat-weight"
+                  sx={{ width: "50%" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">ct.</InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  id="color-grade"
+                  select
+                  label="Color Grade"
+                  defaultValue="EUR"
+                  sx={{ width: "50%" }}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+              <Box
+                sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
+              >
+                <TextField
+                  id="clarity-grade"
+                  select
+                  label="Clarity Grade"
+                  defaultValue="EUR"
+                  sx={{ width: "50%" }}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  id="cut-grade"
+                  select
+                  label="Cut Grade"
+                  defaultValue="EUR"
+                  sx={{ width: "50%" }}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+            </ValuationNoteItem>
+            <ValuationNoteItem title="Additional Grading Information">
+              <Box
+                sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
+              >
+                <TextField
+                  id="shape"
+                  select
+                  label="Shape"
+                  defaultValue="EUR"
+                  sx={{ width: "50%" }}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  id="symmetry"
+                  select
+                  label="Symmetry"
+                  defaultValue="EUR"
+                  sx={{ width: "50%" }}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+              <Box
+                sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
+              >
+                <TextField
+                  id="polish"
+                  select
+                  label="Polish"
+                  defaultValue="EUR"
+                  sx={{ width: "50%" }}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  id="fluorescence"
+                  select
+                  label="Fluorescence"
+                  defaultValue="EUR"
+                  sx={{ width: "50%" }}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+            </ValuationNoteItem>
+          </Box>
+          <Box sx={{ width: "50%" }}>
+            <Box sx={{ position: "relative" }}>
+              <ValuationNoteItem title="Proportions">
+                <img
+                  srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                  src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                  // alt={item.title}
+                  loading="lazy"
+                  style={{ height: 250, width: "100%", objectFit: "cover" }}
+                />
+                <CustomCheckbox
+                  sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                  }}
+                />
+              </ValuationNoteItem>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  console.log("Hello");
+                }}
+                size="small"
+                sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
+                endIcon={<AddIcon />}
+              >
+                Add
+              </Button>
+            </Box>
+            <Box sx={{ position: "relative" }}>
+              <ValuationNoteItem title="Clarity Characteristics">
+                <img
+                  srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                  src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                  // alt={item.title}
+                  loading="lazy"
+                  style={{ height: 250, width: "100%", objectFit: "cover" }}
+                />
+                <CustomCheckbox
+                  sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                  }}
+                />
+              </ValuationNoteItem>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  console.log("Hello");
+                }}
+                size="small"
+                sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
+                endIcon={<AddIcon />}
+              >
+                Add
+              </Button>
+              <Box>
+                <Box></Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      )}
     </>
   );
 }

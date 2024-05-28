@@ -1,8 +1,8 @@
 function createValuationRequestDetail(
   id,
-  creationDate,
-  size,
+  returnedDate,
   service,
+  size,
   servicePrice,
   GIACertificate,
   diamondOrigin,
@@ -12,9 +12,9 @@ function createValuationRequestDetail(
 ) {
   return {
     id,
-    creationDate,
-    size,
+    returnedDate,
     service,
+    size,
     servicePrice,
     GIACertificate,
     diamondOrigin,
@@ -28,8 +28,8 @@ export const rows = [
   createValuationRequestDetail(
     1,
     "2021-10-01",
-    "1.5",
     "Fast - 3h",
+    "1.5",
     100,
     "N/A",
     "N/A",
@@ -40,10 +40,10 @@ export const rows = [
   createValuationRequestDetail(
     2,
     "2021-10-01",
-    "1.5",
     "Normal - 7d",
+    "1.5",
     100,
-    "123456789",
+    "1234567891011",
     "N/A",
     "N/A",
     "N/A",
@@ -60,10 +60,16 @@ export const headCells = [
   },
 
   {
-    id: "creationDate",
+    id: "returnedDate",
+    numeric: false,
+    disablePadding: false,
+    label: "Returned Date",
+  },
+  {
+    id: "service",
     numeric: false,
     disablePadding: true,
-    label: "Date",
+    label: "Service",
   },
   {
     id: "size",
@@ -71,16 +77,11 @@ export const headCells = [
     disablePadding: false,
     label: "Size",
   },
-  {
-    id: "service",
-    numeric: false,
-    disablePadding: false,
-    label: "Service",
-  },
+
   {
     id: "servicePrice",
     numeric: true,
-    disablePadding: false,
+    disablePadding: true,
     label: "Service Price",
   },
   {
@@ -92,7 +93,7 @@ export const headCells = [
   {
     id: "diamondOrigin",
     numeric: false,
-    disablePadding: false,
+    disablePadding: true,
     label: "Origin",
   },
   {
@@ -104,7 +105,7 @@ export const headCells = [
   {
     id: "valuationPrice",
     numeric: true,
-    disablePadding: false,
+    disablePadding: true,
     label: "Valuation Price",
   },
   {

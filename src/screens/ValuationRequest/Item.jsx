@@ -1,7 +1,7 @@
 import ValuationRequestItem from "../../components/ValuationRequest/Item.jsx";
 
-const ScreenValuationRequestDetail = () => {
+const ScreenValuationRequestItem = () => {
   return <ValuationRequestItem />;
 };
 
-export default ScreenValuationRequestDetail;
+export default ScreenValuationRequestItem;

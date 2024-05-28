@@ -90,7 +90,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, heading } = props;
+  const { numSelected, heading, handleClick } = props;
 
   return (
     <Toolbar
@@ -137,7 +137,12 @@ function EnhancedTableToolbar(props) {
           {/*<IconButton>*/}
           {/*  <FilterListIcon />*/}
           {/*</IconButton>*/}
-          <Button variant="contained" size="large" endIcon={<AddIcon />}>
+          <Button
+            onClick={handleClick}
+            variant="contained"
+            size="large"
+            endIcon={<AddIcon />}
+          >
             Add
           </Button>
         </Tooltip>
@@ -150,7 +155,12 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function UITable({ heading, rows = [], headCells = [] }) {
+export default function UITable({
+  heading,
+  rows = [],
+  headCells = [],
+  handleAddClick,
+}) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -223,7 +233,11 @@ export default function UITable({ heading, rows = [], headCells = [] }) {
   return (
     <Box sx={{ width: "100%", mt: 3 }}>
       <Paper elevation={3} sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} heading={heading} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          heading={heading}
+          handleClick={handleAddClick}
+        />
 
         <TableContainer>
           <Table

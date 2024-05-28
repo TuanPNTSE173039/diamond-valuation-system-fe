@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ScreenAppLayout from "./screens/AppLayout.jsx";
-import ValuationNote from "./screens/ValuationNote.jsx";
-import ScreenValuationRequestDetail from "./screens/ValuationRequest/Detail.jsx";
+import ScreenValuationRequestItem from "./screens/ValuationRequest/Item.jsx";
 import ScreenValuationRequestList from "./screens/ValuationRequest/List.jsx";
+import ScreenValuationRequestDetailItem from "./screens/ValuationRequestDetail/Item.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,11 +22,11 @@ const router = createBrowserRouter([
           },
           {
             path: ":requestId",
-            element: <ScreenValuationRequestDetail />,
+            element: <ScreenValuationRequestItem />,
           },
           {
-            path: ":requestId/:diamondId",
-            element: <ValuationNote />,
+            path: ":requestId/:detailId",
+            element: <ScreenValuationRequestDetailItem />,
           },
         ],
       },

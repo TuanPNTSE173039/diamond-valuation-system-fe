@@ -21,7 +21,7 @@ import { useState } from "react";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
 
-const ValuationRequestGeneral = ({ valuationRequest }) => {
+const ValuationRequestGeneral = () => {
   const [open, setOpen] = useState(false);
   const [consultant, setConsultant] = useState(null);
 
@@ -70,7 +70,9 @@ const ValuationRequestGeneral = ({ valuationRequest }) => {
               {consultant ? (
                 consultant.label
               ) : (
-                <Link onClick={handleClickOpen}>Assign Consultant</Link>
+                <Link onClick={handleClickOpen} sx={{ cursor: "pointer" }}>
+                  Assign Consultant
+                </Link>
               )}
               <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Assign Consultant</DialogTitle>
