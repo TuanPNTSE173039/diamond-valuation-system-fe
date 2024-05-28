@@ -1,10 +1,6 @@
 import Box from "@mui/material/Box";
 
-export default function ValuationRequestUserInfoItem({
-  icon,
-  title,
-  children,
-}) {
+export default function ValuationRequestUserInfor({ icon, title, children }) {
   return (
     <Box
       sx={{

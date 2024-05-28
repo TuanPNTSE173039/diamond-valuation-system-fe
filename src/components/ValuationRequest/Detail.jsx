@@ -4,7 +4,7 @@ import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
 import UITable from "../UI/Table.jsx";
 import UIHeader from "../UI/UIHeader.jsx";
 import RecordList from "../valuation-request/RecordList.jsx";
-import ValuationRequestUserInfo from "../valuation-request/ValuationRequestUserInfo.jsx";
+import ValuationRequestGeneral from "./General.jsx";
 
 const ValuationRequestDetail = () => {
   const param = useParams();
@@ -12,7 +12,7 @@ const ValuationRequestDetail = () => {
     <>
       <CustomBreadCrumb level={param.requestId} />
       <UIHeader title={"Valuation Request Detail"} />
-      <ValuationRequestUserInfo />
+      <ValuationRequestGeneral />
       <RecordList />
       <UITable heading="Diamonds" />
       <AssignmentConsultant />
