@@ -24,9 +24,10 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
+import dayjs from "dayjs";
 import * as React from "react";
 import { useState } from "react";
-import BasicDatePicker from "../components/UI/BasicDatePicker.jsx";
+import UIDatePicker from "../components/UI/DatePicker.jsx";
 import UIHeader from "../components/UI/UIHeader.jsx";
 import ValuationNoteItem from "../components/valuation-note/ValuationNoteItem.jsx";
 import ValuationNoteUserInfo from "../components/valuation-note/ValuationNoteUserInfo.jsx";
@@ -94,10 +95,10 @@ const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
 }));
 export default function ValuationNote() {
   const [diamondInfor, setDiamondInfor] = useState({
-    giaCertDate: null,
+    giaCertDate: dayjs(new Date()),
     giaReportNumber: "",
-    diamondOrigin: "",
-    caratWeight: 0,
+    diamondOrigin: "Natural",
+    caratWeight: undefined,
     colorGrade: "",
     clarityGrade: "",
     cutGrade: "",
@@ -109,8 +110,8 @@ export default function ValuationNote() {
     clarityCharacteristics: "",
   });
   const [detailState, setDetailState] = useState({
-    previous: "assessing",
-    current: "draft-assessing",
+    previous: "pending",
+    current: "pending",
   });
 
   function handleAssessing() {
@@ -166,6 +167,7 @@ export default function ValuationNote() {
         current: "assessed",
       };
     });
+    console.log(diamondInfor);
   }
 
   function handleValuating() {
@@ -421,16 +423,33 @@ export default function ValuationNote() {
         >
           <Box sx={{ width: "50%" }}>
             <ValuationNoteItem title="GIA Report Detail">
-              <BasicDatePicker />
+              <UIDatePicker
+                label="GIA Certificate Date"
+                value={diamondInfor.giaCertDate}
+                disabled={detailState.current !== "assessing"}
+                onChange={(newValue) =>
+                  setDiamondInfor((prevState) => ({
+                    ...prevState,
+                    giaCertDate: newValue,
+                  }))
+                }
+              />
               <Box
                 sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}
               >
                 <TextField
                   label="GIA Report Number"
-                  id="outlined-start-adornment"
+                  id="gia-report-number"
+                  type="number"
                   sx={{ width: "50%" }}
-                  disabled
-                  value={"12345"}
+                  value={diamondInfor.giaReportNumber}
+                  disabled={detailState.current !== "assessing"}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      giaReportNumber: e.target.value,
+                    }));
+                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">GIA</InputAdornment>
@@ -438,22 +457,29 @@ export default function ValuationNote() {
                   }}
                 />
                 <FormControl sx={{ width: "50%" }}>
-                  <FormLabel id="demo-row-radio-buttons-group-label">
-                    Diamond Origin
-                  </FormLabel>
+                  <FormLabel id="diamond-origin">Diamond Origin</FormLabel>
                   <RadioGroup
                     row
-                    aria-labelledby="demo-row-radio-buttons-group-label"
-                    name="row-radio-buttons-group"
+                    aria-labelledby="diamond-origin"
+                    name="diamond-origin"
+                    value={diamondInfor.diamondOrigin}
+                    onChange={(e) => {
+                      setDiamondInfor((prevState) => ({
+                        ...prevState,
+                        diamondOrigin: e.target.value,
+                      }));
+                    }}
                   >
                     <FormControlLabel
                       value="Natural"
                       control={<Radio />}
+                      disabled={detailState.current !== "assessing"}
                       label="Natural"
                     />
                     <FormControlLabel
                       value="LabGrown"
                       control={<Radio />}
+                      disabled={detailState.current !== "assessing"}
                       label="Lab Grown"
                     />
                   </RadioGroup>
@@ -467,19 +493,35 @@ export default function ValuationNote() {
                 <TextField
                   label="Carat Weight"
                   id="carat-weight"
+                  type="number"
                   sx={{ width: "50%" }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">ct.</InputAdornment>
                     ),
                   }}
+                  disabled={detailState.current !== "assessing"}
+                  value={diamondInfor.caratWeight}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      caratWeight: e.target.value,
+                    }));
+                  }}
                 />
                 <TextField
                   id="color-grade"
                   select
                   label="Color Grade"
-                  defaultValue="EUR"
+                  disabled={detailState.current !== "assessing"}
                   sx={{ width: "50%" }}
+                  value={diamondInfor.colorGrade}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      colorGrade: e.target.value,
+                    }));
+                  }}
                 >
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -495,8 +537,15 @@ export default function ValuationNote() {
                   id="clarity-grade"
                   select
                   label="Clarity Grade"
-                  defaultValue="EUR"
+                  disabled={detailState.current !== "assessing"}
                   sx={{ width: "50%" }}
+                  value={diamondInfor.clarityGrade}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      clarityGrade: e.target.value,
+                    }));
+                  }}
                 >
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -508,8 +557,15 @@ export default function ValuationNote() {
                   id="cut-grade"
                   select
                   label="Cut Grade"
-                  defaultValue="EUR"
+                  disabled={detailState.current !== "assessing"}
                   sx={{ width: "50%" }}
+                  value={diamondInfor.cutGrade}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      cutGrade: e.target.value,
+                    }));
+                  }}
                 >
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -529,6 +585,14 @@ export default function ValuationNote() {
                   label="Shape"
                   defaultValue="EUR"
                   sx={{ width: "50%" }}
+                  value={diamondInfor.shape}
+                  disabled={detailState.current !== "assessing"}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      shape: e.target.value,
+                    }));
+                  }}
                 >
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -541,7 +605,15 @@ export default function ValuationNote() {
                   select
                   label="Symmetry"
                   defaultValue="EUR"
+                  disabled={detailState.current !== "assessing"}
                   sx={{ width: "50%" }}
+                  value={diamondInfor.symmetry}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      symmetry: e.target.value,
+                    }));
+                  }}
                 >
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -558,7 +630,15 @@ export default function ValuationNote() {
                   select
                   label="Polish"
                   defaultValue="EUR"
+                  disabled={detailState.current !== "assessing"}
                   sx={{ width: "50%" }}
+                  value={diamondInfor.polish}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      polish: e.target.value,
+                    }));
+                  }}
                 >
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -571,7 +651,15 @@ export default function ValuationNote() {
                   select
                   label="Fluorescence"
                   defaultValue="EUR"
+                  disabled={detailState.current !== "assessing"}
                   sx={{ width: "50%" }}
+                  value={diamondInfor.fluorescence}
+                  onChange={(e) => {
+                    setDiamondInfor((prevState) => ({
+                      ...prevState,
+                      fluorescence: e.target.value,
+                    }));
+                  }}
                 >
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
