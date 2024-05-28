@@ -3,7 +3,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
-import { headCells, rows } from "../../dataset/ValuationRequests.js";
+import { headCells, rows } from "../../dataset/ValuationRequest.js";
 import { valuationRequestStatus } from "../../utilities/Status.js";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UITable from "../UI/Table.jsx";

@@ -50,7 +50,7 @@ export const headCells = [
     id: "requestNumber",
     numeric: false,
     disablePadding: true,
-    label: "Request Number",
+    label: "Number",
   },
   {
     id: "status",

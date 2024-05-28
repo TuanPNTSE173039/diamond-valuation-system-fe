@@ -83,9 +83,9 @@ export default function UIHeader({ title }) {
             "aria-labelledby": "basic-button",
           }}
         >
-          <MenuItem onClick={handleShowAssignConsultantModal}>
-            Assign Consultant
-          </MenuItem>
+          {/*<MenuItem onClick={handleShowAssignConsultantModal}>*/}
+          {/*  Assign Consultant*/}
+          {/*</MenuItem>*/}
           <MenuItem onClick={handleCancelValuationRequest}>
             Cancel this request
           </MenuItem>
