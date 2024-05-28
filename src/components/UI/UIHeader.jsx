@@ -6,6 +6,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { userProgressActions } from "../../store/index.js";
 
 export default function UIHeader({ title }) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -15,6 +17,11 @@ export default function UIHeader({ title }) {
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const dispatch = useDispatch();
+  const handleShowAssignConsultantModal = () => {
+    dispatch(userProgressActions.showConsultantAssign());
   };
   return (
     <>
@@ -53,7 +60,9 @@ export default function UIHeader({ title }) {
             "aria-labelledby": "basic-button",
           }}
         >
-          <MenuItem onClick={handleClose}>Action 1</MenuItem>
+          <MenuItem onClick={handleShowAssignConsultantModal}>
+            Assign Consultant
+          </MenuItem>
           <MenuItem onClick={handleClose}>Action 2</MenuItem>
           <MenuItem onClick={handleClose}>Action 3</MenuItem>
         </Menu>

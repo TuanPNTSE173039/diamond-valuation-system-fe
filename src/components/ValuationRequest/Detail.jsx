@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import AssignmentConsultant from "../Assignment/Consultant.jsx";
 import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
 import UITable from "../UI/Table.jsx";
 import UIHeader from "../UI/UIHeader.jsx";
@@ -14,6 +15,7 @@ const ValuationRequestDetail = () => {
       <ValuationRequestUserInfo />
       <RecordList />
       <UITable heading="Diamonds" />
+      <AssignmentConsultant />
     </>
   );
 };
