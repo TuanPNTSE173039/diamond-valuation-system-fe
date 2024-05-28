@@ -1,8 +1,14 @@
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useState } from "react";
@@ -11,6 +17,8 @@ import { userProgressActions } from "../../store/index.js";
 
 export default function UIHeader({ title }) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [reason, setReason] = useState("");
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -23,6 +31,21 @@ export default function UIHeader({ title }) {
   const handleShowAssignConsultantModal = () => {
     dispatch(userProgressActions.showConsultantAssign());
   };
+
+  const handleCancelValuationRequest = () => {
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelDialogClose = () => {
+    setCancelDialogOpen(false);
+  };
+
+  const handleCancelDialogSave = () => {
+    // Save the reason here
+    // Then close the dialog
+    setCancelDialogOpen(false);
+  };
+
   return (
     <>
       <Box
@@ -63,9 +86,30 @@ export default function UIHeader({ title }) {
           <MenuItem onClick={handleShowAssignConsultantModal}>
             Assign Consultant
           </MenuItem>
-          <MenuItem onClick={handleClose}>Action 2</MenuItem>
+          <MenuItem onClick={handleCancelValuationRequest}>
+            Cancel this request
+          </MenuItem>
           <MenuItem onClick={handleClose}>Action 3</MenuItem>
         </Menu>
+        <Dialog open={cancelDialogOpen} onClose={handleCancelDialogClose}>
+          <DialogTitle>Cancel Request</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="reason"
+              label="Reason"
+              type="text"
+              fullWidth
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancelDialogClose}>Cancel</Button>
+            <Button onClick={handleCancelDialogSave}>Save</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </>
   );

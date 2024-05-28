@@ -11,7 +11,7 @@ const ValuationRequestDetail = () => {
   return (
     <>
       <CustomBreadCrumb level={param.requestId} />
-      <UIHeader title={"Valuation Request Detail"} />
+      <UIHeader title={"Valuation Request"} />
       <ValuationRequestGeneral />
       <RecordList />
       <UITable heading="Diamonds" />
