@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,11 +9,30 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { useState } from "react";
 import { rows } from "../../dataset/DiamondValuation.js";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
 const DiamondValuationAssignTable = ({ detailState }) => {
+  const [valuationMode, setValuationMode] = useState("One");
+  const [switches, setSwitches] = useState(
+    rows.map((row, index) => index === 0),
+  ); // Enable the first switch by default
+
+  const handleValuationModeChange = (event) => {
+    setValuationMode(event.target.checked ? "Average" : "One");
+    setSwitches(switches.map((val, i) => i === 0)); // Enable the first switch when valuation mode changes
+  };
+
+  const handleSwitchChange = (index) => {
+    if (valuationMode === "One") {
+      setSwitches(switches.map((val, i) => i === index)); // Enable only the selected switch
+    } else {
+      setSwitches(switches.map((val, i) => (i === index ? !val : val)));
+    }
+  };
   return (
     <DiamondValuationFieldGroup
       title="Diamond Valuation Assignment"
@@ -53,7 +73,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {rows.map((row, index) => (
               <TableRow
                 key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -68,8 +88,8 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                 <TableCell align="left">{row.status}</TableCell>
                 <TableCell align="center">
                   <Switch
-                    checked={false}
-                    // onChange={handleChange}
+                    checked={switches[index]}
+                    onChange={() => handleSwitchChange(index)}
                     inputProps={{ "aria-label": "controlled" }}
                   />
                 </TableCell>
@@ -91,7 +111,21 @@ const DiamondValuationAssignTable = ({ detailState }) => {
         )}
 
         {detailState.current === "valuated" && (
-          <Button variant={"contained"}>Approve</Button>
+          <Stack direction="row" spacing={3}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography sx={{ mr: 3, fontWeight: 600, color: "#3f51b5" }}>
+                Choose Valuation Mode:{" "}
+              </Typography>
+              <Typography>One</Typography>
+              <Switch
+                checked={valuationMode === "Average"}
+                onChange={handleValuationModeChange}
+                inputProps={{ "aria-label": "controlled" }}
+              />
+              <Typography>Average</Typography>
+            </Stack>
+            <Button variant={"contained"}>Approve</Button>
+          </Stack>
         )}
       </Box>
     </DiamondValuationFieldGroup>
