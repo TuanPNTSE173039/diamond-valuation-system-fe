@@ -1,4 +1,5 @@
-import AddIcon from "@mui/icons-material/Add";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   FormControl,
   FormLabel,
@@ -11,12 +12,34 @@ import {
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
+
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import * as React from "react";
+import CrystalImage from "../../assets/images/crystal.png";
+import FeatherImage from "../../assets/images/feather.png";
+import NeedleImage from "../../assets/images/needle.png";
+import PinpointImage from "../../assets/images/pinpoint.png";
 import UIDatePicker from "../UI/DatePicker.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 const currencies = [
   {
     value: "USD",
@@ -49,6 +72,17 @@ const DiamondValuationAssessment = ({
   setDiamondInfor,
   detailState,
 }) => {
+  const [open, setOpen] = React.useState(false);
+  const [selectedImage, setSelectedImage] = React.useState(null);
+
+  const handleClickOpen = (image) => {
+    setSelectedImage(image);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <Box
       sx={{
@@ -301,73 +335,186 @@ const DiamondValuationAssessment = ({
         </DiamondValuationFieldGroup>
       </Box>
       <Box sx={{ width: "50%" }}>
-        <Box sx={{ position: "relative" }}>
-          <DiamondValuationFieldGroup title="Proportions" sx={{ mt: 0.5 }}>
-            <img
-              srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-              src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-              alt={"a"}
-              loading="lazy"
-              style={{ height: 250, width: "100%", objectFit: "cover" }}
-            />
-            <CustomCheckbox
+        <DiamondValuationFieldGroup title="Proportions" sx={{ mt: 0.5 }}>
+          {diamondInfor.proportions && (
+            <Button
+              component="label"
+              role={undefined}
+              variant="outlined"
+              tabIndex={-1}
+              startIcon={<CloudUploadIcon />}
+              sx={{ height: 240, width: "100%" }}
+            >
+              Upload file
+              <VisuallyHiddenInput type="file" />
+            </Button>
+          )}
+          {!diamondInfor.proportions && (
+            <Box sx={{ position: "relative" }}>
+              <img
+                srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                alt={"a"}
+                loading="lazy"
+                style={{
+                  height: 240,
+                  width: "100%",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+                onClick={() =>
+                  handleClickOpen(
+                    "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2",
+                  )
+                }
+              />
+              <IconButton
+                aria-label="delete"
+                size="large"
+                sx={{
+                  position: "absolute",
+                  bottom: 7,
+                  right: 7,
+                  bgcolor: "white",
+                  "&:hover": {
+                    bgcolor: "red",
+                  },
+                  p: 0.5,
+                }}
+              >
+                <DeleteIcon
+                  sx={{ color: "red", "&:hover": { color: "white" } }}
+                />
+              </IconButton>
+            </Box>
+          )}
+        </DiamondValuationFieldGroup>
+        <DiamondValuationFieldGroup
+          title="Clarity Characteristics"
+          sx={{ mt: 2.5 }}
+        >
+          {diamondInfor.clarityCharacteristics && (
+            <Button
+              component="label"
+              role={undefined}
+              variant="outlined"
+              tabIndex={-1}
+              startIcon={<CloudUploadIcon />}
+              sx={{ height: 220, width: "100%" }}
+            >
+              Upload file
+              <VisuallyHiddenInput type="file" />
+            </Button>
+          )}
+          {!diamondInfor.clarityCharacteristics && (
+            <Box sx={{ position: "relative" }}>
+              <img
+                srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                // alt={item.title}
+                loading="lazy"
+                style={{
+                  height: 250,
+                  width: "100%",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+                onClick={() =>
+                  handleClickOpen(
+                    "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2",
+                  )
+                }
+              />
+              <IconButton
+                aria-label="delete"
+                size="large"
+                sx={{
+                  position: "absolute",
+                  bottom: 7,
+                  right: 7,
+                  bgcolor: "white",
+                  "&:hover": {
+                    bgcolor: "red",
+                  },
+                  p: 0.5,
+                }}
+              >
+                <DeleteIcon
+                  sx={{ color: "red", "&:hover": { color: "white" } }}
+                />
+              </IconButton>
+            </Box>
+          )}
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ justifyContent: "space-evenly", mt: 1 }}
+          >
+            <Stack
+              direction="row"
               sx={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
+                alignItems: "center",
+                height: 30,
+                p: "2px",
               }}
-            />
-          </DiamondValuationFieldGroup>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              console.log("Hello");
-            }}
-            size="small"
-            sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
-        </Box>
-        <Box sx={{ position: "relative" }}>
-          <DiamondValuationFieldGroup
-            title="Clarity Characteristics"
-            sx={{ mt: 2.5 }}
-          >
-            <img
-              srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-              src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-              // alt={item.title}
-              loading="lazy"
-              style={{ height: 250, width: "100%", objectFit: "cover" }}
-            />
-            <CustomCheckbox
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-              }}
-            />
-          </DiamondValuationFieldGroup>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              console.log("Hello");
-            }}
-            size="small"
-            sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
-          <Box>
-            <Box></Box>
-          </Box>
-        </Box>
+            >
+              <img
+                src={CrystalImage}
+                alt="Crystal"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+              <Typography sx={{ color: "gray" }}>Crystal</Typography>
+            </Stack>
+            <Stack
+              direction="row"
+              sx={{ alignItems: "center", height: 30, p: "2px" }}
+            >
+              <img
+                src={FeatherImage}
+                alt="Feather"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+              <Typography sx={{ color: "gray", pl: 2 }}>Feather</Typography>
+            </Stack>
+            <Stack
+              direction="row"
+              sx={{ alignItems: "center", height: 30, p: "2px" }}
+            >
+              <img
+                src={NeedleImage}
+                alt="Needle"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+              <Typography sx={{ color: "gray", pl: 1 }}>Needle</Typography>
+            </Stack>
+            <Stack
+              direction="row"
+              sx={{ alignItems: "center", height: 30, p: "2px" }}
+            >
+              <img
+                src={PinpointImage}
+                alt="Pinpoint"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+              <Typography sx={{ color: "gray" }}>Pinpoint</Typography>
+            </Stack>
+          </Stack>
+        </DiamondValuationFieldGroup>
       </Box>
+
+      {/*Dialog for full image*/}
+      <Dialog open={open} onClose={handleClose}>
+        <DialogContent sx={{ height: "80vh" }}>
+          <img
+            src={selectedImage}
+            alt="Selected"
+            style={{ width: "auto", height: "100%", objectFit: "contain" }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -1,14 +1,10 @@
-import AddIcon from "@mui/icons-material/Add";
-import {
-  Avatar,
-  AvatarGroup,
-  ImageList,
-  ImageListItem,
-  styled,
-} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Avatar, AvatarGroup, ImageList, ImageListItem } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
+import IconButton from "@mui/material/IconButton";
+import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import * as React from "react";
@@ -19,6 +15,17 @@ import DiamondValuationFieldGroup from "../DiamondValuation/FieldGroup.jsx";
 import DiamondValuationUserInfor from "../DiamondValuation/UserInfor.jsx";
 import UIHeader from "../UI/UIHeader.jsx";
 
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 const imagesData = [
   {
     img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
@@ -71,15 +78,6 @@ const currencies = [
     label: "¥",
   },
 ];
-const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
-  color: "#fff", // default color
-  "&.Mui-checked": {
-    color: "#fff", // checked color
-  },
-  "&.MuiCheckbox-colorSecondary.Mui-checked:hover": {
-    backgroundColor: "transparent", // remove the hover effect
-  },
-}));
 const ValuationRequestDetailItem = ({ item }) => {
   const [diamondInfor, setDiamondInfor] = useState({
     giaCertDate: dayjs(new Date()),
@@ -349,8 +347,39 @@ const ValuationRequestDetailItem = ({ item }) => {
               cols={3}
               rowHeight={164}
             >
+              <ImageListItem>
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="outlined"
+                  tabIndex={-1}
+                  startIcon={<CloudUploadIcon />}
+                  sx={{ height: 164 }}
+                >
+                  Upload file
+                  <VisuallyHiddenInput type="file" />
+                </Button>
+              </ImageListItem>
               {imagesData.map((item) => (
-                <ImageListItem key={item.img}>
+                <ImageListItem key={item.img} sx={{ position: "relative" }}>
+                  <IconButton
+                    aria-label="delete"
+                    size="large"
+                    sx={{
+                      position: "absolute",
+                      bottom: 7,
+                      right: 7,
+                      bgcolor: "white",
+                      "&:hover": {
+                        bgcolor: "red",
+                      },
+                      p: 0.5,
+                    }}
+                  >
+                    <DeleteIcon
+                      sx={{ color: "red", "&:hover": { color: "white" } }}
+                    />
+                  </IconButton>
                   <img
                     srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
                     src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
@@ -358,29 +387,10 @@ const ValuationRequestDetailItem = ({ item }) => {
                     loading="lazy"
                     style={{ height: "164px", objectFit: "cover" }}
                   />
-                  <CustomCheckbox
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      right: 0,
-                    }}
-                  />
                 </ImageListItem>
               ))}
             </ImageList>
           </DiamondValuationFieldGroup>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              console.log("Hello");
-            }}
-            size="small"
-            sx={{ position: "absolute", right: 0, top: 0, fontSize: 12 }}
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
         </Box>
       </Box>
 
