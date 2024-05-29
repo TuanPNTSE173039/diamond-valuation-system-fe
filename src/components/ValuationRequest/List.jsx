@@ -1,4 +1,6 @@
+import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
@@ -21,6 +23,10 @@ const ValuationRequestList = () => {
   const handleChange = (event, newValue) => {
     setStatusIndex(newValue);
   };
+
+  function handleAddValuationRequest() {
+    console.log("Add Valuation Request");
+  }
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -55,7 +61,16 @@ const ValuationRequestList = () => {
       </Box>
 
       <UITabPanel index={0} value={statusIndex}>
-        <UITable heading="All Requests" headCells={headCells} rows={rows} />
+        <UITable heading="All Requests" headCells={headCells} rows={rows}>
+          <Button
+            onClick={handleAddValuationRequest}
+            variant="contained"
+            size="large"
+            endIcon={<AddIcon />}
+          >
+            Add
+          </Button>
+        </UITable>
       </UITabPanel>
 
       {valuationRequestStatus

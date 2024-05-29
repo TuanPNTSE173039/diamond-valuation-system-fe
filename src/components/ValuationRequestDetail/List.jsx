@@ -1,3 +1,4 @@
+import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -31,12 +32,15 @@ const ValuationRequestDetailList = () => {
 
   return (
     <>
-      <UITable
-        heading="Details"
-        headCells={headCells}
-        rows={rows}
-        handleAddClick={handleAddClick}
-      />
+      <UITable heading="Details" headCells={headCells} rows={rows}>
+        <Button
+          onClick={handleAddClick}
+          variant={"contained"}
+          endIcon={<AddIcon />}
+        >
+          Add
+        </Button>
+      </UITable>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Valuation Request Detail</DialogTitle>
         <DialogContent>

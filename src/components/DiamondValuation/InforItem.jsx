@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 
-export default function ValuationNoteUserInfo({ icon, title, children }) {
+export default function DiamondValuationInforItem({ icon, title, children }) {
   return (
     <Box
       sx={{

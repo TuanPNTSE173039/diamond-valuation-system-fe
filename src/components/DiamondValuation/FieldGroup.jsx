@@ -1,7 +1,11 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-export default function ValuationNoteItem({ title, children, ...props }) {
+export default function DiamondValuationFieldGroup({
+  title,
+  children,
+  ...props
+}) {
   return (
     <Box {...props}>
       <Typography variant="h6" sx={{ fontWeight: "600", color: "#333" }}>

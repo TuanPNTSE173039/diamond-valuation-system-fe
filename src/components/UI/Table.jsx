@@ -1,7 +1,5 @@
-import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
@@ -90,7 +88,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, heading, handleClick } = props;
+  const { numSelected, heading, buttons } = props;
 
   return (
     <Toolbar
@@ -137,14 +135,7 @@ function EnhancedTableToolbar(props) {
           {/*<IconButton>*/}
           {/*  <FilterListIcon />*/}
           {/*</IconButton>*/}
-          <Button
-            onClick={handleClick}
-            variant="contained"
-            size="large"
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
+          {buttons}
         </Tooltip>
       )}
     </Toolbar>
@@ -159,7 +150,7 @@ export default function UITable({
   heading,
   rows = [],
   headCells = [],
-  handleAddClick,
+  children,
 }) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -236,7 +227,7 @@ export default function UITable({
         <EnhancedTableToolbar
           numSelected={selected.length}
           heading={heading}
-          handleClick={handleAddClick}
+          buttons={children}
         />
 
         <TableContainer>
@@ -254,46 +245,57 @@ export default function UITable({
               rowCount={rows.length}
               headCells={headCells}
             />
-
             <TableBody>
-              {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
-
-                return (
-                  <TableRow
-                    hover
-                    onClick={(event) => handleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: "pointer" }}
+              {rows.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    align="center"
+                    colSpan={headCells.length}
+                    sx={{ p: 3, fontSize: 20 }}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          "aria-labelledby": labelId,
-                        }}
-                      />
-                    </TableCell>
-                    {headCells.map((headCell) => (
-                      <TableCell
-                        key={headCell.id}
-                        align={headCell.numeric ? "right" : "left"}
-                        padding={headCell.disablePadding ? "none" : "normal"}
-                      >
-                        <Link to={`${row.requestNumber}`}>
-                          {row[headCell.id]}
-                        </Link>
+                    There are no items is shown in this table
+                  </TableCell>
+                </TableRow>
+              ) : (
+                visibleRows.map((row, index) => {
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
+
+                  return (
+                    <TableRow
+                      hover
+                      onClick={(event) => handleClick(event, row.id)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            "aria-labelledby": labelId,
+                          }}
+                        />
                       </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
+                      {headCells.map((headCell) => (
+                        <TableCell
+                          key={headCell.id}
+                          align={headCell.numeric ? "right" : "left"}
+                          padding={headCell.disablePadding ? "none" : "normal"}
+                        >
+                          <Link to={`${row.requestNumber}`}>
+                            {row[headCell.id]}
+                          </Link>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })
+              )}
               {emptyRows > 0 && (
                 <TableRow
                   style={{
