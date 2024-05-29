@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ScreenAppLayout from "./screens/AppLayout.jsx";
+import ScreenDiamondValuationList from "./screens/DiamondValuation/List.jsx";
 import ScreenValuationRequestItem from "./screens/ValuationRequest/Item.jsx";
 import ScreenValuationRequestList from "./screens/ValuationRequest/List.jsx";
 import ScreenValuationRequestDetailItem from "./screens/ValuationRequestDetail/Item.jsx";
@@ -35,7 +36,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <div>Diamond Valuation List</div>,
+            element: <ScreenDiamondValuationList />,
           },
           {
             path: ":detailId",

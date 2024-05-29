@@ -9,7 +9,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import { checkRole } from "../../utilities/DrawerItemByRole.jsx";
@@ -73,9 +72,6 @@ const UIDrawer = ({ theme, handleDrawerClose, ...props }) => {
             <ChevronRightIcon />
           ) : (
             <>
-              <Typography variant="h6" noWrap component="div" sx={{ mr: 7 }}>
-                Diamond
-              </Typography>
               <ChevronLeftIcon />
             </>
           )}

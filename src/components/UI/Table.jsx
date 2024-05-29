@@ -269,7 +269,9 @@ export default function UITable({
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.id)}
+                      onClick={
+                        !readOnly ? (event) => handleClick(event, row.id) : null
+                      }
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
@@ -295,12 +297,9 @@ export default function UITable({
                           align={headCell.numeric ? "right" : "left"}
                           padding={headCell.disablePadding ? "none" : "normal"}
                         >
-                          {!readOnly && (
-                            <Link to={`${row.requestNumber}`}>
-                              {row[headCell.id]}
-                            </Link>
-                          )}
-                          {readOnly && row[headCell.id]}
+                          <Link to={`${row.requestNumber}`}>
+                            {row[headCell.id]}
+                          </Link>
                         </TableCell>
                       ))}
                     </TableRow>

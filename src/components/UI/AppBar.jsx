@@ -6,6 +6,8 @@ import { styled } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import Logo from "./../../assets/images/logo.png";
+import UIAccountMenu from "./AccountMenu.jsx";
 import UISearch from "./Search.jsx";
 
 const drawerWidth = 240;
@@ -43,14 +45,45 @@ const UIAppBar = ({ handleDrawerOpen, open }) => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" noWrap component="div">
-          Dashboard
+        <Box
+          sx={{
+            height: 45,
+            width: 45,
+            bgcolor: "white",
+            borderRadius: "50%",
+            position: "relative",
+          }}
+        >
+          <img
+            src={Logo}
+            alt="logo"
+            style={{
+              display: "block",
+              width: "auto",
+              height: "60%",
+              objectFit: "contain",
+              position: "absolute",
+              top: "53%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          />
+        </Box>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ ml: 2, fontWeight: 800 }}
+        >
+          H&T Diamond
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         {/* Use redux to search here*/}
         <UISearch />
 
+        <Box sx={{ flexGrow: 1 }} />
         {/* Missing userAccount, Notification*/}
+        <UIAccountMenu />
       </Toolbar>
     </AppBar>
   );

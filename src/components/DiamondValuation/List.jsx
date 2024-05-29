@@ -1,13 +1,10 @@
-import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
-import { headCells, rows } from "../../dataset/ValuationRequest.js";
-import { valuationRequestStatus } from "../../utilities/Status.js";
-import UIDateRangePicker from "../UI/DateRangePicker.jsx";
+import { headCells, rows } from "../../dataset/ValuationRequestDetail.js";
+import { diamondValuationStatus } from "../../utilities/Status.js";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
@@ -17,7 +14,7 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const ValuationRequestList = () => {
+const DiamondValuationList = () => {
   const [statusIndex, setStatusIndex] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -46,7 +43,7 @@ const ValuationRequestList = () => {
             aria-label="valuation requests status"
           >
             <Tab label="All" {...a11yProps(0)} />
-            {valuationRequestStatus
+            {diamondValuationStatus
               .filter((status, index) => index !== 0)
               .map((status, index) => (
                 <Tab
@@ -57,29 +54,24 @@ const ValuationRequestList = () => {
               ))}
           </Tabs>
         </Box>
-        <UIDateRangePicker />
       </Box>
 
       <UITabPanel index={0} value={statusIndex}>
-        <UITable heading="All Requests" headCells={headCells} rows={rows}>
-          <Button
-            onClick={handleAddValuationRequest}
-            variant="contained"
-            size="large"
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
-        </UITable>
+        <UITable
+          heading="All Valuations"
+          headCells={headCells}
+          rows={rows}
+          readOnly
+        />
       </UITabPanel>
 
-      {valuationRequestStatus
+      {diamondValuationStatus
         .filter((status, index) => index !== 0)
         .map((status, index) => (
           <UITabPanel index={index + 1} value={statusIndex}>
             <UITable
               heading={
-                statusIndex === index + 1 ? `${status.name} Requests` : ""
+                statusIndex === index + 1 ? `${status.name} Valuations` : ""
               }
               headCells={headCells}
               rows={
@@ -87,6 +79,7 @@ const ValuationRequestList = () => {
                   ? rows.filter((row) => row.status === status.name)
                   : []
               }
+              readOnly
             />
           </UITabPanel>
         ))}
@@ -94,4 +87,4 @@ const ValuationRequestList = () => {
   );
 };
 
-export default ValuationRequestList;
+export default DiamondValuationList;
