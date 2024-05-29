@@ -341,7 +341,7 @@ const ValuationRequestDetailItem = ({ item }) => {
         </DiamondValuationFieldGroup>
         {/*Diamond Image*/}
         <Box sx={{ position: "relative", width: "50%" }}>
-          <DiamondValuationFieldGroup title="Diamond Image">
+          <DiamondValuationFieldGroup title="Diamond Images">
             <ImageList
               sx={{ width: "100%", height: 328, rowGap: "10px" }}
               cols={3}
