@@ -8,7 +8,7 @@ export default function DiamondValuationFieldGroup({
 }) {
   return (
     <Box {...props}>
-      <Typography variant="h6" sx={{ fontWeight: "600", color: "#333" }}>
+      <Typography variant="h6" sx={{ fontWeight: "600", color: "#333", pb: 1 }}>
         {title}
       </Typography>
       <Box boxShadow={4} sx={{ p: 1 }}>

@@ -29,8 +29,8 @@ export const rows = [
     2,
     "Jane Doe",
     "2021-09-02",
-    2000,
-    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. In nemo, perspiciatis? Asperiores commodi consequuntur iste? Est ipsum minus officiis voluptas!",
+    "N/A",
+    "N/A",
     "Processing",
   ),
 ];
@@ -39,7 +39,7 @@ export const headCells = [
   {
     id: "id",
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: "Id",
   },
 

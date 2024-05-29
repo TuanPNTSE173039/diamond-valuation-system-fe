@@ -32,6 +32,7 @@ function EnhancedTableHead(props) {
     rowCount,
     onRequestSort,
     headCells,
+    readOnly,
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -40,17 +41,19 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
-        </TableCell>
+        {!readOnly && (
+          <TableCell padding="checkbox">
+            <Checkbox
+              color="primary"
+              indeterminate={numSelected > 0 && numSelected < rowCount}
+              checked={rowCount > 0 && numSelected === rowCount}
+              onChange={onSelectAllClick}
+              inputProps={{
+                "aria-label": "select all desserts",
+              }}
+            />
+          </TableCell>
+        )}
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -151,6 +154,7 @@ export default function UITable({
   rows = [],
   headCells = [],
   children,
+  readOnly = false,
 }) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -244,6 +248,7 @@ export default function UITable({
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
               headCells={headCells}
+              readOnly={readOnly}
             />
             <TableBody>
               {rows.length === 0 ? (
@@ -272,24 +277,30 @@ export default function UITable({
                       selected={isItemSelected}
                       sx={{ cursor: "pointer" }}
                     >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            "aria-labelledby": labelId,
-                          }}
-                        />
-                      </TableCell>
+                      {!readOnly && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            color="primary"
+                            checked={isItemSelected}
+                            inputProps={{
+                              "aria-labelledby": labelId,
+                            }}
+                          />
+                        </TableCell>
+                      )}
+
                       {headCells.map((headCell) => (
                         <TableCell
                           key={headCell.id}
                           align={headCell.numeric ? "right" : "left"}
                           padding={headCell.disablePadding ? "none" : "normal"}
                         >
-                          <Link to={`${row.requestNumber}`}>
-                            {row[headCell.id]}
-                          </Link>
+                          {!readOnly && (
+                            <Link to={`${row.requestNumber}`}>
+                              {row[headCell.id]}
+                            </Link>
+                          )}
+                          {readOnly && row[headCell.id]}
                         </TableCell>
                       ))}
                     </TableRow>
