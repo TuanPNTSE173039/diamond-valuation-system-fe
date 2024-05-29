@@ -23,9 +23,9 @@ const fakeListItem = [
   },
   {
     id: 3,
-    name: "Diamonds",
+    name: "Diamond Valuation",
     icon: <DiamondIcon />,
-    link: "/diamonds",
+    link: "/valuations",
     roles: [1, 2, 3],
   },
   {

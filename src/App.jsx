@@ -30,6 +30,19 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "valuations",
+        children: [
+          {
+            index: true,
+            element: <div>Diamond Valuation List</div>,
+          },
+          {
+            path: ":detailId",
+            element: <div>Valuation Item</div>,
+          },
+        ],
+      },
     ],
   },
 ]);
