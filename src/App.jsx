@@ -5,6 +5,7 @@ import ScreenDiamondValuationList from "./screens/DiamondValuation/List.jsx";
 import ScreenValuationRequestItem from "./screens/ValuationRequest/Item.jsx";
 import ScreenValuationRequestList from "./screens/ValuationRequest/List.jsx";
 import ScreenValuationRequestDetailItem from "./screens/ValuationRequestDetail/Item.jsx";
+import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
   {

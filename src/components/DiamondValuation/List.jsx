@@ -3,7 +3,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
-import { headCells, rows } from "../../dataset/ValuationRequestDetail.js";
+import { headCells } from "../../dataset/ValuationRequestDetail.js";
 import { diamondValuationStatus } from "../../utilities/Status.js";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
@@ -14,7 +14,7 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const DiamondValuationList = () => {
+const DiamondValuationList = ({ diamondValuations: rows }) => {
   const [statusIndex, setStatusIndex] = useState(0);
 
   const handleChange = (event, newValue) => {

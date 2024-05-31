@@ -1,0 +1,11 @@
+import { http } from "../config.js";
+
+export const getValuationRequestDetails = async () => {
+  const response = await http.get(`valuation-request-details`);
+  return response.data;
+};
+
+export const getValuationRequestDetail = async (id) => {
+  const response = await http.get(`valuation-request-details/${id}`);
+  return response.data;
+};

@@ -360,8 +360,8 @@ const ValuationRequestDetailItem = ({ item }) => {
                   <VisuallyHiddenInput type="file" />
                 </Button>
               </ImageListItem>
-              {imagesData.map((item) => (
-                <ImageListItem key={item.img} sx={{ position: "relative" }}>
+              {imagesData.map((item, index) => (
+                <ImageListItem key={index} sx={{ position: "relative" }}>
                   <IconButton
                     aria-label="delete"
                     size="large"

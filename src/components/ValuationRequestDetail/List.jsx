@@ -7,10 +7,10 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import * as React from "react";
 import { useState } from "react";
-import { headCells, rows } from "../../dataset/ValuationRequestDetail.js";
+import { headCells } from "../../dataset/ValuationRequestDetail.js";
 import UITable from "../UI/Table.jsx";
 
-const ValuationRequestDetailList = () => {
+const ValuationRequestDetailList = ({ details }) => {
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState({
     isDiamond: true,
@@ -32,7 +32,7 @@ const ValuationRequestDetailList = () => {
 
   return (
     <>
-      <UITable heading="Details" headCells={headCells} rows={rows}>
+      <UITable heading="Details" headCells={headCells} rows={details}>
         <Button
           onClick={handleAddClick}
           variant={"contained"}

@@ -1,3 +1,4 @@
+import { Avatar } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -428,12 +429,14 @@ const countries = [
   { code: "ZW", label: "Zimbabwe", phone: "263" },
 ];
 
-const UIAutocomplete = ({ list, value, onChange }) => {
+const UIAutocomplete = ({ value, onChange, data }) => {
   return (
     <Autocomplete
-      id="country-select-demo"
-      sx={{ width: 300, zIndex: "999" }}
-      options={countries}
+      id="staff-select"
+      sx={{ width: 500, zIndex: "999" }}
+      options={data}
+      value={value}
+      onChange={onChange}
       autoHighlight
       getOptionLabel={(option) => option.label}
       renderOption={(props, option) => (
@@ -442,20 +445,13 @@ const UIAutocomplete = ({ list, value, onChange }) => {
           sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
           {...props}
         >
-          <img
-            loading="lazy"
-            width="20"
-            srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-            src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-            alt=""
-          />
-          {option.label} ({option.code}) +{option.phone}
+          <Avatar sx={{ width: 40, height: 40, mr: 2 }}>{option.code}</Avatar>
+          {option.label} - {option.years} yrs
         </Box>
       )}
       renderInput={(params) => (
         <TextField
           {...params}
-          // label="Choose a country"
           inputProps={{
             ...params.inputProps,
             autoComplete: "new-password", // disable autocomplete and autofill

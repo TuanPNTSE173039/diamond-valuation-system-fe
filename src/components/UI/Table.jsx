@@ -275,7 +275,7 @@ export default function UITable({
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={index}
                       selected={isItemSelected}
                       sx={{ cursor: "pointer" }}
                     >
@@ -297,9 +297,7 @@ export default function UITable({
                           align={headCell.numeric ? "right" : "left"}
                           padding={headCell.disablePadding ? "none" : "normal"}
                         >
-                          <Link to={`${row.requestNumber}`}>
-                            {row[headCell.id]}
-                          </Link>
+                          <Link to={`${row.number}`}>{row[headCell.id]}</Link>
                         </TableCell>
                       ))}
                     </TableRow>

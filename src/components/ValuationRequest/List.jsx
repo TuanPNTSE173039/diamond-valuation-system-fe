@@ -3,15 +3,11 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
 import { headCells } from "../../dataset/ValuationRequest.js";
-import { getCustomers } from "../../services/Customer/api.js";
 import { getCustomerByID } from "../../services/Customer/utils.js";
-import { getValuationRequests } from "../../services/ValuationRequest/api.js";
 import { valuationRequestStatus } from "../../utilities/Status.js";
-import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
@@ -22,7 +18,7 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const ValuationRequestList = () => {
+const ValuationRequestList = ({ valuationRequests, customers }) => {
   const [statusIndex, setStatusIndex] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -33,36 +29,13 @@ const ValuationRequestList = () => {
     console.log("Add Valuation Request");
   }
 
-  const {
-    data: valuationRequests,
-    isLoading: isRequestLoading,
-    error: valuationRequestError,
-  } = useQuery({
-    queryKey: ["valuationRequests"],
-    queryFn: getValuationRequests,
-  });
-
-  const {
-    data: customers,
-    isLoading: isCustomerLoading,
-    error: customersError,
-  } = useQuery({
-    queryKey: ["Customer"],
-    queryFn: getCustomers,
-  });
-
-  if (isRequestLoading || isCustomerLoading) {
-    return <UICircularIndeterminate />;
-  }
-
-  const requestRows = valuationRequests.content.map((row, index) => {
+  const requestRows = valuationRequests.content.map((row) => {
     const customer = getCustomerByID(customers, row.customerID);
 
     const firstName = customer.firstName;
     const lastName = customer.lastName;
     return {
-      id: index,
-      requestNumber: row.id,
+      number: row.id,
       status: row.status,
       customerFirstName: firstName,
       customerLastName: lastName,

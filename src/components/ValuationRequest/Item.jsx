@@ -1,53 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { useParams } from "react-router-dom";
-import { getCustomers } from "../../services/Customer/api.js";
-import { getCustomerByID } from "../../services/Customer/utils.js";
-import { getStaffs } from "../../services/Staff/api.js";
-import { getStaffById } from "../../services/Staff/utils.jsx";
-import { getValuationRequest } from "../../services/ValuationRequest/api.js";
-import AssignmentConsultant from "../Assignment/Consultant.jsx";
 import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
-import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIHeader from "../UI/UIHeader.jsx";
 import ValuationRequestDetailList from "../ValuationRequestDetail/List.jsx";
 import ValuationRequestGeneral from "./General.jsx";
 import RecordList from "./Record/RecordList.jsx";
 
-const ValuationRequestItem = () => {
-  const { requestId } = useParams();
-  const {
-    data: valuationRequest,
-    isLoading: isValuationRequestLoading,
-    error,
-  } = useQuery({
-    queryKey: ["valuationRequest", requestId],
-    queryFn: () => getValuationRequest(requestId),
-  });
-
-  const {
-    data: staffs,
-    isLoading: isStaffLoading,
-    error: staffError,
-  } = useQuery({
-    queryKey: ["staffs"],
-    queryFn: getStaffs,
-  });
-  const {
-    data: customers,
-    isLoading: isCustomerLoading,
-    error: customerError,
-  } = useQuery({
-    queryKey: ["customers"],
-    queryFn: getCustomers,
-  });
-
-  if (isValuationRequestLoading || isStaffLoading || isCustomerLoading) {
-    return <UICircularIndeterminate />;
-  }
-
-  const customer = getCustomerByID(customers, valuationRequest?.customerID);
-  const staff = getStaffById(staffs, valuationRequest?.staffID);
+const ValuationRequestItem = ({
+  valuationRequest,
+  customer,
+  staff,
+  staffs,
+}) => {
   const generalInfo = {
     customerName: customer.firstName + " " + customer.lastName,
     cccd: customer.identityDocument.trim(),
@@ -62,15 +25,36 @@ const ValuationRequestItem = () => {
     totalFee: valuationRequest.totalServicePrice,
   };
 
-  console.log(generalInfo);
+  const valuationRequestDetails = valuationRequest.valuationRequestDetails.map(
+    (item) => {
+      return {
+        number: item.id,
+        returnedDate: valuationRequest.returnedDate,
+        service: valuationRequest.service.name,
+        size: item.size,
+        servicePrice: item.servicePrice,
+        GIACertificate: item.diamondValuationNote?.certificateId || "N/A",
+        diamondOrigin: item.diamondValuationNote?.diamondOrigin || "N/A",
+        caratWeight: item.diamondValuationNote?.caratWeight || "N/A",
+        valuationPrice:
+          item.valuationPrice === 0.0 ? "N/A" : item.valuationPrice,
+        status: item.status,
+      };
+    },
+  );
+
   return (
     <>
-      <CustomBreadCrumb level={requestId} />
+      <CustomBreadCrumb level={valuationRequest.id} />
       <UIHeader title={"Valuation Request"} />
-      <ValuationRequestGeneral valuationData={generalInfo} />
+      <ValuationRequestGeneral
+        valuationRequest={valuationRequest}
+        valuationData={generalInfo}
+        staffs={staffs}
+      />
       <RecordList />
-      <ValuationRequestDetailList />
-      <AssignmentConsultant />
+      <ValuationRequestDetailList details={valuationRequestDetails} />
+      {/*<AssignmentConsultant />*/}
     </>
   );
 };

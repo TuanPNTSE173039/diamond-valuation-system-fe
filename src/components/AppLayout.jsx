@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import * as React from "react";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import UIAppBar from "./UI/AppBar.jsx";
 import UIDrawer, { DrawerHeader } from "./UI/Drawer.jsx";
 
@@ -35,6 +36,7 @@ export default function AppLayout() {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Container>
           <DrawerHeader />
+          <ToastContainer />
           <Outlet />
         </Container>
       </Box>
