@@ -14,11 +14,10 @@ import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import UIReactQuill from "../UI/ReactQuill.jsx";
+import UIRichTextEditor from "../UI/RichTexEditor.jsx";
 import UIHeader from "../UI/UIHeader.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 import DiamondValuationInfor from "./ValuationInfor.jsx";
-import "react-quill/dist/quill.snow.css";
 
 const imagesData = [
   {
@@ -126,7 +125,7 @@ const DiamondValuationItem = () => {
                 </FormControl>
               </Box>
             </Stack>
-            <UIReactQuill title="Comments" />
+            <UIRichTextEditor />
           </Box>
         </DiamondValuationFieldGroup>
 

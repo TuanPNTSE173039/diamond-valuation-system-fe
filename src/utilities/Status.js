@@ -24,7 +24,7 @@ export const valuationRequestStatus = [
     name: "Sealed",
   },
   {
-    id: 5,
+    id: 6,
     name: "Cancelled",
   },
 ];
@@ -55,7 +55,7 @@ export const diamondValuationStatus = [
     name: "Valuated",
   },
   {
-    id: 5,
+    id: 6,
     name: "Approved",
   },
 ];

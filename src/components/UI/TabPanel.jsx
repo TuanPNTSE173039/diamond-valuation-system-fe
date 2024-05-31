@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import * as React from "react";
 
@@ -14,7 +13,7 @@ const UITabPanel = ({ children, value, index, ...other }) => {
     >
       {value === index && (
         <Box sx={{ p: 0 }}>
-          <Typography>{children}</Typography>
+          <Box>{children}</Box>
         </Box>
       )}
     </div>
