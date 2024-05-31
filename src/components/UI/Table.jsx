@@ -91,7 +91,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, heading, buttons } = props;
+  const { numSelected, heading, children } = props;
 
   return (
     <Toolbar
@@ -134,12 +134,7 @@ function EnhancedTableToolbar(props) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          {/*<IconButton>*/}
-          {/*  <FilterListIcon />*/}
-          {/*</IconButton>*/}
-          {buttons}
-        </Tooltip>
+        <Tooltip title="Filter list">{children || <Box></Box>}</Tooltip>
       )}
     </Toolbar>
   );
@@ -228,11 +223,9 @@ export default function UITable({
   return (
     <Box sx={{ width: "100%", mt: 3 }}>
       <Paper elevation={3} sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar
-          numSelected={selected.length}
-          heading={heading}
-          buttons={children}
-        />
+        <EnhancedTableToolbar numSelected={selected.length} heading={heading}>
+          {children}
+        </EnhancedTableToolbar>
 
         <TableContainer>
           <Table

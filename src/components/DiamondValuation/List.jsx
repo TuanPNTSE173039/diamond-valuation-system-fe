@@ -47,7 +47,7 @@ const DiamondValuationList = ({ diamondValuations: rows }) => {
               .filter((status, index) => index !== 0)
               .map((status, index) => (
                 <Tab
-                  key={status.id}
+                  key={index}
                   label={status.name}
                   {...a11yProps(index + 1)}
                 />
@@ -68,7 +68,7 @@ const DiamondValuationList = ({ diamondValuations: rows }) => {
       {diamondValuationStatus
         .filter((status, index) => index !== 0)
         .map((status, index) => (
-          <UITabPanel index={index + 1} value={statusIndex}>
+          <UITabPanel key={index} index={index + 1} value={statusIndex}>
             <UITable
               heading={
                 statusIndex === index + 1 ? `${status.name} Valuations` : ""

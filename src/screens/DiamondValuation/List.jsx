@@ -4,6 +4,7 @@ import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.j
 import { getValuationRequests } from "../../services/ValuationRequest/api.js";
 import { getValuationRequestById } from "../../services/ValuationRequest/utils.js";
 import { getValuationRequestDetails } from "../../services/ValuationRequestDetail/api.js";
+import { formatDateTime, formattedMoney } from "../../utilities/AppConfig.js";
 
 const ScreenDiamondValuationList = () => {
   const {
@@ -15,10 +16,6 @@ const ScreenDiamondValuationList = () => {
     queryFn: getValuationRequestDetails,
   });
 
-  if (isDiamondLoading) {
-    return <UICircularIndeterminate />;
-  }
-
   const {
     data: valuationRequests,
     isLoading: isRequestLoading,
@@ -28,7 +25,7 @@ const ScreenDiamondValuationList = () => {
     queryFn: getValuationRequests,
   });
 
-  if (isRequestLoading) {
+  if (isRequestLoading || isDiamondLoading) {
     return <UICircularIndeterminate />;
   }
 
@@ -39,19 +36,25 @@ const ScreenDiamondValuationList = () => {
     );
     return {
       number: item.id,
-      returnedDate: item.returnedDate,
+      returnedDate: item.returnedDate
+        ? "N/A"
+        : formatDateTime(valuationRequest.returnDate),
       service: valuationRequest.service.name,
       size: item.size,
-      servicePrice: item.servicePrice,
+      servicePrice:
+        item.servicePrice === "0.0" || item.servicePrice === null
+          ? "N/A"
+          : formattedMoney(item.servicePrice),
       GIACertificate: item.diamondValuationNote.certificateId || "N/A",
       diamondOrigin: item.diamondValuationNote.diamondOrigin || "N/A",
       caratWeight: item.diamondValuationNote.caratWeight || "N/A",
-      valuationPrice: item.valuationPrice,
+      valuationPrice:
+        item.valuationPrice === "0.0" || item.valuationPrice === null
+          ? "N/A"
+          : formattedMoney(item.valuationPrice),
       status: item.status,
     };
   });
-  console.log(diamondValuations);
-
   return <DiamondValuationList diamondValuations={diamondValuations} />;
 };
 
