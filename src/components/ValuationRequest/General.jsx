@@ -17,11 +17,13 @@ import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import * as React from "react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { http } from "../../services/config.js";
 import { assignConsultantStaff } from "../../services/ValuationRequest/api.js";
+import { formattedMoney } from "../../utilities/AppConfig.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
 
@@ -143,13 +145,19 @@ const ValuationRequestGeneral = ({
             icon={<CalendarMonthIcon />}
             title="Creation"
           >
-            {valuationData.creationDate}
+            {format(
+              new Date(valuationData.creationDate),
+              "yyyy/MM/dd - HH:mm:ss",
+            )}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor
             icon={<CalendarMonthIcon />}
             title="Returned"
           >
-            {valuationData.returnedDate}
+            {format(
+              new Date(valuationData.returnedDate),
+              "yyyy/MM/dd - HH:mm:ss",
+            )}
           </ValuationRequestUserInfor>
         </Grid>
         <Grid item xs={4} sx={{ position: "relative" }}>
@@ -165,7 +173,9 @@ const ValuationRequestGeneral = ({
             <Typography sx={{ fontSize: "1.2rem", color: "gray" }}>
               Total Fee
             </Typography>
-            <Box sx={{ fontSize: "4rem" }}>{valuationData.totalFee}$</Box>
+            <Box sx={{ fontSize: "4rem" }}>
+              {formattedMoney(valuationData.totalFee)}
+            </Box>
           </Box>
         </Grid>
       </Grid>

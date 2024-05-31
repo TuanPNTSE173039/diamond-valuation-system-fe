@@ -1,4 +1,5 @@
 import React from "react";
+import { formatDateTime, formattedMoney } from "../../utilities/AppConfig.js";
 import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
 import UIHeader from "../UI/UIHeader.jsx";
 import ValuationRequestDetailList from "../ValuationRequestDetail/List.jsx";
@@ -29,7 +30,7 @@ const ValuationRequestItem = ({
     (item) => {
       return {
         number: item.id,
-        returnedDate: valuationRequest.returnedDate,
+        returnedDate: formatDateTime(valuationRequest.returnDate),
         service: valuationRequest.service.name,
         size: item.size,
         servicePrice: item.servicePrice,
@@ -37,7 +38,9 @@ const ValuationRequestItem = ({
         diamondOrigin: item.diamondValuationNote?.diamondOrigin || "N/A",
         caratWeight: item.diamondValuationNote?.caratWeight || "N/A",
         valuationPrice:
-          item.valuationPrice === 0.0 ? "N/A" : item.valuationPrice,
+          item.valuationPrice === "0.0" || item.valuationPrice === null
+            ? "N/A"
+            : formattedMoney(item.valuationPrice),
         status: item.status,
       };
     },

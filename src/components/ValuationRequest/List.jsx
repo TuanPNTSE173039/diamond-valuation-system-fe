@@ -3,11 +3,12 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import { format } from "date-fns";
 import * as React from "react";
 import { useState } from "react";
 import { headCells } from "../../dataset/ValuationRequest.js";
 import { getCustomerByID } from "../../services/Customer/utils.js";
-import { valuationRequestStatus } from "../../utilities/Status.js";
+import { valuationRequestStatus } from "../../utilities/AppConfig.js";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
@@ -39,7 +40,7 @@ const ValuationRequestList = ({ valuationRequests, customers }) => {
       status: row.status,
       customerFirstName: firstName,
       customerLastName: lastName,
-      creationDate: row.creationDate,
+      creationDate: format(new Date(row.creationDate), "yyyy/MM/dd - HH:mm:ss"),
       diamondAmount: row.diamondAmount,
       service: row.service.name,
     };
