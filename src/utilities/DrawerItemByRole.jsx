@@ -46,7 +46,7 @@ const fakeListItem = [
     id: 6,
     name: "Customers Mgt",
     icon: <PersonIcon />,
-    link: "/customers",
+    link: "/Customer",
     roles: [1],
   },
 ];

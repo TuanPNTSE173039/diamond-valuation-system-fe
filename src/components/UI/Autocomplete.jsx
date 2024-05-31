@@ -428,7 +428,7 @@ const countries = [
   { code: "ZW", label: "Zimbabwe", phone: "263" },
 ];
 
-const UIAutocomplete = ({ value, onChange }) => {
+const UIAutocomplete = ({ list, value, onChange }) => {
   return (
     <Autocomplete
       id="country-select-demo"

@@ -21,10 +21,10 @@ import { useState } from "react";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
 
-const ValuationRequestGeneral = () => {
+const ValuationRequestGeneral = ({ valuationData }) => {
   const [open, setOpen] = useState(false);
-  const [consultant, setConsultant] = useState(null);
-
+  const [consultant, setConsultant] = useState(valuationData.staff);
+  console.log(consultant);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -44,22 +44,22 @@ const ValuationRequestGeneral = () => {
         <Grid container>
           <Grid item xs={4}>
             <ValuationRequestUserInfor icon={<PersonIcon />} title="Customer">
-              Tuan Pham
+              {valuationData.customerName}
             </ValuationRequestUserInfor>
             <ValuationRequestUserInfor
               icon={<AssignmentIndIcon />}
               title="CCCD"
             >
-              049203006602
+              {valuationData.cccd}
             </ValuationRequestUserInfor>
             <ValuationRequestUserInfor icon={<LocalPhoneIcon />} title="Phone">
-              0367304351
+              {valuationData.phone}
             </ValuationRequestUserInfor>
             <ValuationRequestUserInfor icon={<EmailIcon />} title="Email">
-              tuanpntse173039@fpt.edu.vn
+              {valuationData.email}
             </ValuationRequestUserInfor>
             <ValuationRequestUserInfor icon={<LocationOnIcon />} title="Adress">
-              District 9, Ho Chi Minh
+              {valuationData.address}
             </ValuationRequestUserInfor>
           </Grid>
           <Grid item xs={4}>
@@ -68,7 +68,7 @@ const ValuationRequestGeneral = () => {
               title="Assignee"
             >
               {consultant ? (
-                consultant.label
+                consultant.firstName + " " + consultant.lastName
               ) : (
                 <Link onClick={handleClickOpen} sx={{ cursor: "pointer" }}>
                   Assign Consultant
@@ -93,22 +93,22 @@ const ValuationRequestGeneral = () => {
               icon={<ElectricBoltIcon />}
               title="Service"
             >
-              Fast
+              {valuationData.service}
             </ValuationRequestUserInfor>
             <ValuationRequestUserInfor icon={<LabelIcon />} title="Status">
-              Processing
+              {valuationData.status}
             </ValuationRequestUserInfor>
             <ValuationRequestUserInfor
               icon={<CalendarMonthIcon />}
               title="Creation"
             >
-              20/10/2023 - 20:20:20
+              {valuationData.creationDate}
             </ValuationRequestUserInfor>
             <ValuationRequestUserInfor
               icon={<CalendarMonthIcon />}
               title="Returned"
             >
-              22/11/2023 - 10:20:20
+              {valuationData.returnedDate}
             </ValuationRequestUserInfor>
           </Grid>
           <Grid item xs={4} sx={{ position: "relative" }}>
@@ -117,14 +117,14 @@ const ValuationRequestGeneral = () => {
                 position: "absolute",
                 top: "50%",
                 left: "50%",
-                transform: "translate(-100%, -50%)",
+                transform: "translate(-50%, -50%)",
                 textAlign: "center",
               }}
             >
               <Typography sx={{ fontSize: "1.2rem", color: "gray" }}>
                 Total Fee
               </Typography>
-              <Box sx={{ fontSize: "4rem" }}>27$</Box>
+              <Box sx={{ fontSize: "4rem" }}>{valuationData.totalFee}$</Box>
             </Box>
           </Grid>
         </Grid>

@@ -3,10 +3,15 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
-import { headCells, rows } from "../../dataset/ValuationRequest.js";
+import { headCells } from "../../dataset/ValuationRequest.js";
+import { getCustomers } from "../../services/Customer/api.js";
+import { getCustomerByID } from "../../services/Customer/utils.js";
+import { getValuationRequests } from "../../services/ValuationRequest/api.js";
 import { valuationRequestStatus } from "../../utilities/Status.js";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
@@ -27,6 +32,45 @@ const ValuationRequestList = () => {
   function handleAddValuationRequest() {
     console.log("Add Valuation Request");
   }
+
+  const {
+    data: valuationRequests,
+    isLoading: isRequestLoading,
+    error: valuationRequestError,
+  } = useQuery({
+    queryKey: ["valuationRequests"],
+    queryFn: getValuationRequests,
+  });
+
+  const {
+    data: customers,
+    isLoading: isCustomerLoading,
+    error: customersError,
+  } = useQuery({
+    queryKey: ["Customer"],
+    queryFn: getCustomers,
+  });
+
+  if (isRequestLoading || isCustomerLoading) {
+    return <UICircularIndeterminate />;
+  }
+
+  const requestRows = valuationRequests.content.map((row, index) => {
+    const customer = getCustomerByID(customers, row.customerID);
+
+    const firstName = customer.firstName;
+    const lastName = customer.lastName;
+    return {
+      id: index,
+      requestNumber: row.id,
+      status: row.status,
+      customerFirstName: firstName,
+      customerLastName: lastName,
+      creationDate: row.creationDate,
+      diamondAmount: row.diamondAmount,
+      service: row.service.name,
+    };
+  });
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -61,7 +105,11 @@ const ValuationRequestList = () => {
       </Box>
 
       <UITabPanel index={0} value={statusIndex}>
-        <UITable heading="All Requests" headCells={headCells} rows={rows}>
+        <UITable
+          heading="All Requests"
+          headCells={headCells}
+          rows={requestRows}
+        >
           <Button
             onClick={handleAddValuationRequest}
             variant="contained"
@@ -84,7 +132,7 @@ const ValuationRequestList = () => {
               headCells={headCells}
               rows={
                 statusIndex === index + 1
-                  ? rows.filter((row) => row.status === status.name)
+                  ? requestRows.filter((row) => row.status === status.name)
                   : []
               }
             />
