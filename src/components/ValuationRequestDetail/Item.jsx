@@ -6,9 +6,12 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import * as React from "react";
 import { useState } from "react";
+import { updateDiamondNote } from "../../services/DiamondValuation/api.js";
+import { updateAssessStatus } from "../../services/ValuationRequestDetail/api.js";
 import DiamondValuationAssessment from "../DiamondValuation/Assessment.jsx";
 import DiamondValuationAssignTable from "../DiamondValuation/AssignTable.jsx";
 import DiamondValuationFieldGroup from "../DiamondValuation/FieldGroup.jsx";
@@ -60,38 +63,40 @@ const imagesData = [
     title: "Honey",
   },
 ];
-const currencies = [
-  {
-    value: "USD",
-    label: "$",
-  },
-  {
-    value: "EUR",
-    label: "€",
-  },
-  {
-    value: "BTC",
-    label: "฿",
-  },
-  {
-    value: "JPY",
-    label: "¥",
-  },
-];
+
 const ValuationRequestDetailItem = ({
   detail,
   valuationRequests,
   customer,
+  staffs,
 }) => {
+  const queryClient = useQueryClient();
+  const { mutate: mutateDetail } = useMutation({
+    mutationFn: (body) => {
+      return updateAssessStatus(detail.id, body);
+    },
+    onSuccess: (body) => {
+      queryClient.invalidateQueries(["valuationRequests"]);
+    },
+  });
+
+  const { mutate: mutateAssessment } = useMutation({
+    mutationFn: (body) => {
+      return updateDiamondNote(detail.diamondValuationNote.id, body);
+    },
+    onSuccess: (body) => {
+      queryClient.invalidateQueries(["valuationRequests"]);
+    },
+  });
   const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({
     giaCertDate: dayjs(new Date()),
-    giaReportNumber: serverDiamondInfor?.certificateId,
+    certificateId: serverDiamondInfor?.certificateId,
     diamondOrigin: serverDiamondInfor?.diamondOrigin,
     caratWeight: serverDiamondInfor?.caratWeight,
-    colorGrade: serverDiamondInfor?.colorGrade,
-    clarityGrade: serverDiamondInfor?.clarityGrade,
-    cutGrade: serverDiamondInfor?.cutGrade,
+    color: serverDiamondInfor?.color,
+    clarity: serverDiamondInfor?.clarity,
+    cut: serverDiamondInfor?.cut,
     shape: serverDiamondInfor?.shape,
     symmetry: serverDiamondInfor?.symmetry,
     polish: serverDiamondInfor?.polish,
@@ -99,9 +104,25 @@ const ValuationRequestDetailItem = ({
     proportions: serverDiamondInfor?.proportions,
     clarityCharacteristics: serverDiamondInfor?.clarityCharacteristic,
   });
+  const getPreviousStatus = (currentStatus) => {
+    switch (currentStatus) {
+      case "PENDING":
+        return "PENDING";
+      case "ASSESSING":
+        return "PENDING";
+      case "ASSESSED":
+        return "ASSESSING";
+      case "VALUATING":
+        return "ASSESSED";
+      case "VALUATED":
+        return "VALUATING";
+      case "APPROVED":
+        return "APPROVED";
+    }
+  };
   const [detailState, setDetailState] = useState({
-    previous: "pending",
-    current: "pending",
+    previous: getPreviousStatus(detail.status),
+    current: detail.status,
   });
 
   const infor = {
@@ -112,9 +133,10 @@ const ValuationRequestDetailItem = ({
     service: valuationRequests.service.name,
     servicePrice: detail.servicePrice,
     status: detail.status,
-    fairPriceEstimate: serverDiamondInfor?.fairPrice
-      ? "N/A"
-      : serverDiamondInfor?.fairPrice,
+    fairPriceEstimate:
+      serverDiamondInfor?.fairPrice === null
+        ? "N/A"
+        : serverDiamondInfor?.fairPrice,
     estimateRange:
       serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
   };
@@ -124,23 +146,23 @@ const ValuationRequestDetailItem = ({
       return {
         ...prevState,
         previous: prevState.previous,
-        current: "assessing",
+        current: "ASSESSING",
       };
     });
   }
 
   function handleCancelAssessing() {
     setDetailState((prevState) => {
-      if (prevState.previous === "pending") {
+      if (prevState.previous === "PENDING") {
         return {
           ...prevState,
-          current: "pending",
+          current: "PENDING",
         };
       }
       return {
         ...prevState,
-        previous: "assessing",
-        current: "draft-assessing",
+        previous: "ASSESSING",
+        current: "DRAFT_ASSESSING",
       };
     });
   }
@@ -149,10 +171,19 @@ const ValuationRequestDetailItem = ({
     setDetailState((prevState) => {
       return {
         ...prevState,
-        previous: "assessing",
-        current: "draft-assessing",
+        previous: "ASSESSING",
+        current: "DRAFT_ASSESSING",
       };
     });
+    const detailBody = {
+      ...detail,
+      status: "ASSESSING",
+    };
+    mutateDetail(detailBody);
+    const assessmentBody = {
+      ...diamondInfor,
+    };
+    mutateAssessment(assessmentBody);
   }
 
   function handleEditAssessment() {
@@ -160,7 +191,7 @@ const ValuationRequestDetailItem = ({
       return {
         ...prevState,
         previous: prevState.previous,
-        current: "assessing",
+        current: "ASSESSING",
       };
     });
   }
@@ -170,10 +201,14 @@ const ValuationRequestDetailItem = ({
       return {
         ...prevState,
         previous: "",
-        current: "assessed",
+        current: "ASSESSED",
       };
     });
-    console.log(diamondInfor);
+    const detailBody = {
+      ...detail,
+      status: "ASSESSED",
+    };
+    mutateDetail(detailBody);
   }
 
   function handleValuating() {
@@ -261,12 +296,12 @@ const ValuationRequestDetailItem = ({
       >
         <UIDetailHeader title={"Valuation Request Detail"} detail={detail} />
 
-        {detailState.current === "pending" && (
+        {detailState.current === "PENDING" && (
           <Button variant={"contained"} onClick={handleAssessing}>
             Assessing
           </Button>
         )}
-        {detailState.current === "assessing" && (
+        {detailState.current === "ASSESSING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button variant={"outlined"} onClick={handleCancelAssessing}>
               Cancel
@@ -276,7 +311,7 @@ const ValuationRequestDetailItem = ({
             </Button>
           </Box>
         )}
-        {detailState.current === "draft-assessing" && (
+        {detailState.current === "DRAFT_ASSESSING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button variant={"outlined"} onClick={handleEditAssessment}>
               Edit
@@ -286,7 +321,7 @@ const ValuationRequestDetailItem = ({
             </Button>
           </Box>
         )}
-        {detailState.current === "assessed" && (
+        {detailState.current === "ASSESSED" && (
           <Button variant={"contained"} onClick={handleValuating}>
             Valuate
           </Button>
@@ -414,18 +449,24 @@ const ValuationRequestDetailItem = ({
         </Box>
       </Box>
 
-      {detailState.current !== "pending" && (
+      {detailState.current !== "PENDING" && (
         <DiamondValuationAssessment
           diamondInfor={diamondInfor}
           setDiamondInfor={setDiamondInfor}
           detailState={detailState}
         />
       )}
-      {(detailState.current === "assessed" ||
-        detailState.current === "valuating" ||
-        detailState.current === "draft-valuating" ||
-        detailState.current === "valuated") && (
-        <DiamondValuationAssignTable detailState={detailState} />
+      {(detailState.current === "ASSESSED" ||
+        detailState.current === "VALUATING" ||
+        detailState.current === "DRAFT_VALUATING" ||
+        detailState.current === "VALUATED") && (
+        <>
+          <DiamondValuationAssignTable
+            detailState={detailState}
+            staffs={staffs}
+            detail={detail}
+          />
+        </>
       )}
     </>
   );

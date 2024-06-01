@@ -28,7 +28,7 @@ export default function UIDetailHeader({ title, detail }) {
     },
     onSuccess: (body) => {
       queryClient.invalidateQueries(["valuationRequests"]);
-      if (body.status === "CANCELLED") {
+      if (body.status === "CANCEL") {
         toast.error("This detail is not diamond");
       } else {
         toast.success("Diamond is checked");
@@ -75,7 +75,7 @@ export default function UIDetailHeader({ title, detail }) {
       ...detail,
       diamond: isDiamond === "yes",
       size: diamondSize && isDiamond === "yes" ? parseFloat(diamondSize) : 0,
-      status: isDiamond === "no" ? "CANCELLED" : "PENDING",
+      status: isDiamond === "no" ? "CANCEL" : "PENDING",
     };
     mutate(body);
     setCheckDiamondDialogOpen(false);

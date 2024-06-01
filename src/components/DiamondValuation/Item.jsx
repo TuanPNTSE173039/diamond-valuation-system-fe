@@ -14,8 +14,8 @@ import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { useRef, useState } from "react";
 import UIRichTextEditor from "../UI/RichTexEditor.jsx";
-import UIRequestHeader from "../UI/UIRequestHeader.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 import DiamondValuationInfor from "./ValuationInfor.jsx";
 
@@ -66,14 +66,44 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 const DiamondValuationItem = () => {
+  const [diamondInfor, setDiamondInfor] = useState(null);
+  const [detailState, setDetailState] = useState(null);
+  const [valuationPrice, setValuationPrice] = useState(null);
+  const editorRef = useRef();
+  const handleValuate = () => {
+    const editorContent = editorRef.current.getContent();
+    const body = {
+      valuationPrice,
+      comments: editorContent,
+    };
+    console.log(body);
+  };
+  const comment = "Ahihi Tuan Ne";
   return (
     <>
       <Stack
         direction="row"
         sx={{ alignItems: "center", justifyContent: "space-between" }}
       >
-        <UIRequestHeader title={"Diamond Valuation Detail"} />
-        <Button variant={"contained"}>Valuate</Button>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          <Typography
+            variant="h3"
+            component="p"
+            sx={{ fontSize: 24, fontWeight: 700, my: 1 }}
+          >
+            Diamond Valuation Detail
+          </Typography>
+        </Box>
+        <Button variant={"contained"} onClick={handleValuate}>
+          Valuate
+        </Button>
       </Stack>
 
       <Box
@@ -121,11 +151,15 @@ const DiamondValuationItem = () => {
                     }}
                     sx={{ fontSize: 28 }}
                     type="number"
+                    value={valuationPrice}
+                    onChange={(e) => {
+                      setValuationPrice(e.target.value);
+                    }}
                   />
                 </FormControl>
               </Box>
             </Stack>
-            <UIRichTextEditor />
+            <UIRichTextEditor ref={editorRef} value={comment} />
           </Box>
         </DiamondValuationFieldGroup>
 
@@ -183,7 +217,11 @@ const DiamondValuationItem = () => {
         </Box>
       </Box>
 
-      {/*<DiamondValuationAssessment />*/}
+      {/*<DiamondValuationAssessment*/}
+      {/*  diamondInfor={diamondInfor}*/}
+      {/*  setDiamondInfor={setDiamondInfor}*/}
+      {/*  detailState={detailState}*/}
+      {/*/>*/}
     </>
   );
 };

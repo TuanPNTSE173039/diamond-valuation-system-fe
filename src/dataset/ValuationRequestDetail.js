@@ -32,7 +32,7 @@ export const headCells = [
     label: "Service Price",
   },
   {
-    id: "GIACertificate",
+    id: "certificateId",
     numeric: false,
     disablePadding: false,
     label: "GIA",

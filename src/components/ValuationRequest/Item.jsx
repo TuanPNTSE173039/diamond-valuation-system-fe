@@ -37,7 +37,7 @@ const ValuationRequestItem = ({
         size: (item.size === 0 && "N/A") || item.size,
         servicePrice:
           item.servicePrice === 0 ? "N/A" : formattedMoney(item.servicePrice),
-        GIACertificate: item.diamondValuationNote?.certificateId || "N/A",
+        certificateId: item.diamondValuationNote?.certificateId || "N/A",
         diamondOrigin: item.diamondValuationNote?.diamondOrigin || "N/A",
         caratWeight: item.diamondValuationNote?.caratWeight || "N/A",
         valuationPrice:
@@ -48,6 +48,7 @@ const ValuationRequestItem = ({
       };
     },
   );
+  console.log(valuationRequestDetails);
 
   return (
     <>

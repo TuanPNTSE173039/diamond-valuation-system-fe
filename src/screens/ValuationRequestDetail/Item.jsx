@@ -5,6 +5,7 @@ import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.j
 import ValuationRequestDetailItem from "../../components/ValuationRequestDetail/Item.jsx";
 import { getCustomers } from "../../services/Customer/api.js";
 import { getCustomerByID } from "../../services/Customer/utils.js";
+import { getStaffs } from "../../services/Staff/api.js";
 import { getValuationRequest } from "../../services/ValuationRequest/api.js";
 import { getValuationRequestDetail } from "../../services/ValuationRequestDetail/api.js";
 
@@ -37,7 +38,21 @@ const ScreenValuationRequestDetailItem = () => {
     queryFn: getCustomers,
   });
 
-  if (isDetailLoading || isValuationRequestLoading || isCustomerLoading) {
+  const {
+    data: staffs,
+    isLoading: isStaffLoading,
+    error: staffError,
+  } = useQuery({
+    queryKey: ["staffs"],
+    queryFn: getStaffs,
+  });
+
+  if (
+    isDetailLoading ||
+    isValuationRequestLoading ||
+    isCustomerLoading ||
+    isStaffLoading
+  ) {
     return <UICircularIndeterminate />;
   }
 
@@ -48,6 +63,7 @@ const ScreenValuationRequestDetailItem = () => {
       detail={detail}
       valuationRequests={valuationRequest}
       customer={customer}
+      staffs={staffs}
     />
   );
 };

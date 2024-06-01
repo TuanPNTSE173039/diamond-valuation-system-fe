@@ -12,3 +12,6 @@ export const getValuationRequestDetail = async (id) => {
 
 export const checkDiamond = (id, body) =>
   http.put(`valuation-request-details/${id}`, body);
+
+export const updateAssessStatus = (id, body) =>
+  http.put(`valuation-request-details/${id}`, body);

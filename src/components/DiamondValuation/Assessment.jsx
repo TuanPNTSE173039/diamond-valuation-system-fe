@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
 
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -26,6 +25,7 @@ import CrystalImage from "../../assets/images/crystal.png";
 import FeatherImage from "../../assets/images/feather.png";
 import NeedleImage from "../../assets/images/needle.png";
 import PinpointImage from "../../assets/images/pinpoint.png";
+import { DiamondStatus } from "../../utilities/DiamondStatus.js";
 import UIDatePicker from "../UI/DatePicker.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
@@ -40,33 +40,10 @@ const VisuallyHiddenInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
-const currencies = [
-  {
-    value: "USD",
-    label: "$",
-  },
-  {
-    value: "EUR",
-    label: "€",
-  },
-  {
-    value: "BTC",
-    label: "฿",
-  },
-  {
-    value: "JPY",
-    label: "¥",
-  },
-];
-const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
-  color: "#fff", // default color
-  "&.Mui-checked": {
-    color: "#fff", // checked color
-  },
-  "&.MuiCheckbox-colorSecondary.Mui-checked:hover": {
-    backgroundColor: "transparent", // remove the hover effect
-  },
-}));
+
+const { origin, cut, clarity, color, shape, symmetry, polish, fluorescence } =
+  DiamondStatus;
+
 const DiamondValuationAssessment = ({
   diamondInfor,
   setDiamondInfor,
@@ -97,7 +74,7 @@ const DiamondValuationAssessment = ({
           <UIDatePicker
             label="GIA Certificate Date"
             value={diamondInfor.giaCertDate}
-            disabled={detailState.current !== "assessing"}
+            disabled={detailState.current !== "ASSESSING"}
             onChange={(newValue) =>
               setDiamondInfor((prevState) => ({
                 ...prevState,
@@ -111,8 +88,8 @@ const DiamondValuationAssessment = ({
               id="gia-report-number"
               type="number"
               sx={{ width: "50%" }}
-              value={diamondInfor.giaReportNumber}
-              disabled={detailState.current !== "assessing"}
+              value={diamondInfor.certificateId}
+              disabled={detailState.current !== "ASSESSING"}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
@@ -140,15 +117,15 @@ const DiamondValuationAssessment = ({
                 }}
               >
                 <FormControlLabel
-                  value="Natural"
+                  value="NATURAL"
                   control={<Radio />}
-                  disabled={detailState.current !== "assessing"}
+                  disabled={detailState.current !== "ASSESSING"}
                   label="Natural"
                 />
                 <FormControlLabel
-                  value="LabGrown"
+                  value="LAB_GROWN"
                   control={<Radio />}
-                  disabled={detailState.current !== "assessing"}
+                  disabled={detailState.current !== "ASSESSING"}
                   label="Lab Grown"
                 />
               </RadioGroup>
@@ -167,8 +144,8 @@ const DiamondValuationAssessment = ({
                   <InputAdornment position="end">ct.</InputAdornment>
                 ),
               }}
-              disabled={detailState.current !== "assessing"}
-              value={diamondInfor.caratWeight}
+              disabled={detailState.current !== "ASSESSING"}
+              value={diamondInfor.caratWeight || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
@@ -180,17 +157,17 @@ const DiamondValuationAssessment = ({
               id="color-grade"
               select
               label="Color Grade"
-              disabled={detailState.current !== "assessing"}
+              disabled={detailState.current !== "ASSESSING"}
               sx={{ width: "50%" }}
-              value={diamondInfor.colorGrade}
+              value={diamondInfor.color || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
-                  colorGrade: e.target.value,
+                  color: e.target.value,
                 }));
               }}
             >
-              {currencies.map((option) => (
+              {color.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -202,17 +179,17 @@ const DiamondValuationAssessment = ({
               id="clarity-grade"
               select
               label="Clarity Grade"
-              disabled={detailState.current !== "assessing"}
+              disabled={detailState.current !== "ASSESSING"}
               sx={{ width: "50%" }}
-              value={diamondInfor.clarityGrade}
+              value={diamondInfor.clarity || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
-                  clarityGrade: e.target.value,
+                  clarity: e.target.value,
                 }));
               }}
             >
-              {currencies.map((option) => (
+              {clarity.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -222,17 +199,17 @@ const DiamondValuationAssessment = ({
               id="cut-grade"
               select
               label="Cut Grade"
-              disabled={detailState.current !== "assessing"}
+              disabled={detailState.current !== "ASSESSING"}
               sx={{ width: "50%" }}
-              value={diamondInfor.cutGrade}
+              value={diamondInfor.cut || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
-                  cutGrade: e.target.value,
+                  cut: e.target.value,
                 }));
               }}
             >
-              {currencies.map((option) => (
+              {cut.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -249,10 +226,9 @@ const DiamondValuationAssessment = ({
               id="shape"
               select
               label="Shape"
-              defaultValue="EUR"
               sx={{ width: "50%" }}
-              value={diamondInfor.shape}
-              disabled={detailState.current !== "assessing"}
+              value={diamondInfor.shape || ""}
+              disabled={detailState.current !== "ASSESSING"}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
@@ -260,7 +236,7 @@ const DiamondValuationAssessment = ({
                 }));
               }}
             >
-              {currencies.map((option) => (
+              {shape.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -270,10 +246,9 @@ const DiamondValuationAssessment = ({
               id="symmetry"
               select
               label="Symmetry"
-              defaultValue="EUR"
-              disabled={detailState.current !== "assessing"}
+              disabled={detailState.current !== "ASSESSING"}
               sx={{ width: "50%" }}
-              value={diamondInfor.symmetry}
+              value={diamondInfor.symmetry || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
@@ -281,7 +256,7 @@ const DiamondValuationAssessment = ({
                 }));
               }}
             >
-              {currencies.map((option) => (
+              {symmetry.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -293,10 +268,9 @@ const DiamondValuationAssessment = ({
               id="polish"
               select
               label="Polish"
-              defaultValue="EUR"
-              disabled={detailState.current !== "assessing"}
+              disabled={detailState.current !== "ASSESSING"}
               sx={{ width: "50%" }}
-              value={diamondInfor.polish}
+              value={diamondInfor.polish || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
@@ -304,7 +278,7 @@ const DiamondValuationAssessment = ({
                 }));
               }}
             >
-              {currencies.map((option) => (
+              {polish.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -314,10 +288,9 @@ const DiamondValuationAssessment = ({
               id="fluorescence"
               select
               label="Fluorescence"
-              defaultValue="EUR"
-              disabled={detailState.current !== "assessing"}
+              disabled={detailState.current !== "ASSESSING"}
               sx={{ width: "50%" }}
-              value={diamondInfor.fluorescence}
+              value={diamondInfor.fluorescence || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
@@ -325,7 +298,7 @@ const DiamondValuationAssessment = ({
                 }));
               }}
             >
-              {currencies.map((option) => (
+              {fluorescence.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>

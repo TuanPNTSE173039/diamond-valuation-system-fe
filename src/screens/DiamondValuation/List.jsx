@@ -45,9 +45,9 @@ const ScreenDiamondValuationList = () => {
         item.servicePrice === "0.0" || item.servicePrice === null
           ? "N/A"
           : formattedMoney(item.servicePrice),
-      GIACertificate: item.diamondValuationNote.certificateId || "N/A",
-      diamondOrigin: item.diamondValuationNote.diamondOrigin || "N/A",
-      caratWeight: item.diamondValuationNote.caratWeight || "N/A",
+      GIACertificate: item.diamondValuationNote?.certificateId || "N/A",
+      diamondOrigin: item.diamondValuationNote?.diamondOrigin || "N/A",
+      caratWeight: item.diamondValuationNote?.caratWeight || "N/A",
       valuationPrice:
         item.valuationPrice === "0.0" || item.valuationPrice === null
           ? "N/A"
