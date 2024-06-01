@@ -17,22 +17,38 @@ import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { rows } from "../../dataset/DiamondValuation.js";
 import { assignValuationStaff } from "../../services/DiamondValuation/api.js";
 import { getStaffById } from "../../services/Staff/utils.jsx";
+import { updateDetail } from "../../services/ValuationRequestDetail/api.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
 const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
+  const { requestId, detailId } = useParams();
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate: assign } = useMutation({
     mutationFn: (data) => {
       return assignValuationStaff(data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries(["valuationRequests"]);
       toast.success("Valuation staff is assigned");
+    },
+  });
+  const { mutate: updateAssignStaff } = useMutation({
+    mutationFn: (body) => {
+      return updateDetail(detailId, body);
+    },
+    onSuccess: () => {
+      const body = {
+        staffId: valuationStaff.code,
+        valuationRequestDetailId: detail.id,
+      };
+      assign(body);
+      queryClient.invalidateQueries(["valuationRequests"]);
     },
   });
   const valuationAssignment = detail.diamondValuationAssigns.map((item) => {
@@ -66,11 +82,10 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
   };
   const handleSave = () => {
     setIsDialogOpen(false);
-    const body = {
-      staffId: valuationStaff.code,
-      valuationRequestDetailId: detail.id,
-    };
-    mutate(body);
+    updateAssignStaff({
+      ...detail,
+      status: "VALUATING",
+    });
   };
 
   const [switches, setSwitches] = useState(

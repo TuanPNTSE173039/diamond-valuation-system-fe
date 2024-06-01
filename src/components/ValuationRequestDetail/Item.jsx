@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import * as React from "react";
 import { useState } from "react";
 import { updateDiamondNote } from "../../services/DiamondValuation/api.js";
-import { updateAssessStatus } from "../../services/ValuationRequestDetail/api.js";
+import { updateDetail } from "../../services/ValuationRequestDetail/api.js";
 import DiamondValuationAssessment from "../DiamondValuation/Assessment.jsx";
 import DiamondValuationAssignTable from "../DiamondValuation/AssignTable.jsx";
 import DiamondValuationFieldGroup from "../DiamondValuation/FieldGroup.jsx";
@@ -73,7 +73,7 @@ const ValuationRequestDetailItem = ({
   const queryClient = useQueryClient();
   const { mutate: mutateDetail } = useMutation({
     mutationFn: (body) => {
-      return updateAssessStatus(detail.id, body);
+      return updateDetail(detail.id, body);
     },
     onSuccess: (body) => {
       queryClient.invalidateQueries(["valuationRequests"]);
