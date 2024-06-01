@@ -50,31 +50,47 @@ export const headCells = [
     disablePadding: false,
     label: "Id",
   },
-
   {
     id: "valuationStaffName",
     numeric: false,
     disablePadding: false,
-    label: "Valuation Staff",
+    label: "Staff",
   },
   {
-    id: "date",
+    id: "returnDate",
     numeric: false,
     disablePadding: true,
-    label: "Date",
+    label: "Deadline",
   },
   {
-    id: "price",
+    id: "service",
     numeric: true,
     disablePadding: false,
-    label: "Price",
+    label: "Service",
   },
-
   {
-    id: "comments",
+    id: "certificateId",
     numeric: false,
     disablePadding: true,
-    label: "Comments",
+    label: "GIA",
+  },
+  {
+    id: "diamondOrigin",
+    numeric: false,
+    disablePadding: true,
+    label: "Origin",
+  },
+  {
+    id: "caratWeight",
+    numeric: false,
+    disablePadding: true,
+    label: "Carat",
+  },
+  {
+    id: "valuationPrice",
+    numeric: false,
+    disablePadding: true,
+    label: "Price",
   },
   {
     id: "status",

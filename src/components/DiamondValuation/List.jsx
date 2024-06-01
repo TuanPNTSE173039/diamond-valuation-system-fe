@@ -3,7 +3,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
-import { headCells } from "../../dataset/ValuationRequestDetail.js";
+import { headCells } from "../../dataset/DiamondValuation.js";
 import { diamondValuationStatus } from "../../utilities/AppConfig.js";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
