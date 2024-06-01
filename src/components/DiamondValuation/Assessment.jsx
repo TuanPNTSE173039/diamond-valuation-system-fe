@@ -93,7 +93,7 @@ const DiamondValuationAssessment = ({
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
-                  giaReportNumber: e.target.value,
+                  certificateId: e.target.value,
                 }));
               }}
               InputProps={{
