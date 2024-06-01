@@ -37,24 +37,19 @@ const ScreenValuationRequestDetailItem = () => {
     queryFn: getCustomers,
   });
 
-  const customer = getCustomerByID(customers, valuationRequest?.customerID);
-
-  if (isDetailLoading) {
+  if (isDetailLoading || isValuationRequestLoading || isCustomerLoading) {
     return <UICircularIndeterminate />;
   }
-  console.log(detail);
-  console.log(valuationRequest);
-  console.log(customer);
 
-  // const generalInfor = {
-  //   customerName: customer.firstName + " " + customer.lastName,
-  //   phone: customer.phone.trim(),
-  //   email: customer.email.trim(),
-  //   status: detail.status,
-  //   fairPriceEstimate: detail.diamondValuationNote,
-  // };
+  const customer = getCustomerByID(customers, valuationRequest?.customerID);
 
-  return <ValuationRequestDetailItem />;
+  return (
+    <ValuationRequestDetailItem
+      detail={detail}
+      valuationRequests={valuationRequest}
+      customer={customer}
+    />
+  );
 };
 
 export default ScreenValuationRequestDetailItem;

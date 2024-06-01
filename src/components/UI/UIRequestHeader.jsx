@@ -12,10 +12,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { userProgressActions } from "../../store/index.js";
 
-export default function UIHeader({ title }) {
+export default function UIRequestHeader({ title }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [reason, setReason] = useState("");
@@ -27,11 +25,6 @@ export default function UIHeader({ title }) {
     setAnchorEl(null);
   };
 
-  const dispatch = useDispatch();
-  const handleShowAssignConsultantModal = () => {
-    dispatch(userProgressActions.showConsultantAssign());
-  };
-
   const handleCancelValuationRequest = () => {
     setCancelDialogOpen(true);
   };
@@ -41,8 +34,6 @@ export default function UIHeader({ title }) {
   };
 
   const handleCancelDialogSave = () => {
-    // Save the reason here
-    // Then close the dialog
     setCancelDialogOpen(false);
   };
 
@@ -83,13 +74,10 @@ export default function UIHeader({ title }) {
             "aria-labelledby": "basic-button",
           }}
         >
-          {/*<MenuItem onClick={handleShowAssignConsultantModal}>*/}
-          {/*  Assign Consultant*/}
-          {/*</MenuItem>*/}
           <MenuItem onClick={handleCancelValuationRequest}>
             Cancel this request
           </MenuItem>
-          <MenuItem onClick={handleClose}>Action 3</MenuItem>
+          <MenuItem onClick={handleClose}>Update Infor</MenuItem>
         </Menu>
         <Dialog open={cancelDialogOpen} onClose={handleCancelDialogClose}>
           <DialogTitle>Cancel Request</DialogTitle>

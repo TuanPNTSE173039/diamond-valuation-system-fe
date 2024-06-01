@@ -9,3 +9,6 @@ export const getValuationRequestDetail = async (id) => {
   const response = await http.get(`valuation-request-details/${id}`);
   return response.data;
 };
+
+export const checkDiamond = (id, body) =>
+  http.put(`valuation-request-details/${id}`, body);

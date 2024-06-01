@@ -3,31 +3,31 @@ import { format } from "date-fns";
 export const valuationRequestStatus = [
   {
     id: 0,
-    name: "All",
+    name: "ALL",
   },
   {
     id: 1,
-    name: "Pending",
+    name: "PENDING",
   },
   {
     id: 2,
-    name: "Processing",
+    name: "PROCESSING",
   },
   {
     id: 3,
-    name: "Received",
+    name: "RECEIVED",
   },
   {
     id: 4,
-    name: "Completed",
+    name: "COMPLETED",
   },
   {
     id: 5,
-    name: "Sealed",
+    name: "SEALED",
   },
   {
     id: 6,
-    name: "Cancelled",
+    name: "CANCELLED",
   },
 ];
 
@@ -38,27 +38,27 @@ export const diamondValuationStatus = [
   },
   {
     id: 1,
-    name: "Pending",
+    name: "PENDING",
   },
   {
     id: 2,
-    name: "Assessing",
+    name: "ASSESSING",
   },
   {
     id: 3,
-    name: "Assessed",
+    name: "ASSESSED",
   },
   {
     id: 4,
-    name: "Valuating",
+    name: "VALUATING",
   },
   {
     id: 5,
-    name: "Valuated",
+    name: "VALUATED",
   },
   {
     id: 6,
-    name: "Approved",
+    name: "APPROVED",
   },
 ];
 

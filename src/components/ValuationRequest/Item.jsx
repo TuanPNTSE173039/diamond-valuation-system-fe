@@ -1,7 +1,7 @@
 import React from "react";
 import { formatDateTime, formattedMoney } from "../../utilities/AppConfig.js";
 import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
-import UIHeader from "../UI/UIHeader.jsx";
+import UIRequestHeader from "../UI/UIRequestHeader.jsx";
 import ValuationRequestDetailList from "../ValuationRequestDetail/List.jsx";
 import ValuationRequestGeneral from "./General.jsx";
 import RecordList from "./Record/RecordList.jsx";
@@ -30,10 +30,13 @@ const ValuationRequestItem = ({
     (item) => {
       return {
         number: item.id,
-        returnedDate: formatDateTime(valuationRequest.returnDate),
+        returnedDate: valuationRequest.returnDate
+          ? formatDateTime(valuationRequest.returnDate)
+          : "N/A",
         service: valuationRequest.service.name,
-        size: item.size,
-        servicePrice: item.servicePrice,
+        size: (item.size === 0 && "N/A") || item.size,
+        servicePrice:
+          item.servicePrice === 0 ? "N/A" : formattedMoney(item.servicePrice),
         GIACertificate: item.diamondValuationNote?.certificateId || "N/A",
         diamondOrigin: item.diamondValuationNote?.diamondOrigin || "N/A",
         caratWeight: item.diamondValuationNote?.caratWeight || "N/A",
@@ -49,7 +52,8 @@ const ValuationRequestItem = ({
   return (
     <>
       <CustomBreadCrumb level={valuationRequest.id} />
-      <UIHeader title={"Valuation Request"} />
+      <UIRequestHeader title={"Valuation Request"} />
+
       <ValuationRequestGeneral
         valuationRequest={valuationRequest}
         valuationData={generalInfo}
@@ -57,7 +61,6 @@ const ValuationRequestItem = ({
       />
       <RecordList />
       <ValuationRequestDetailList details={valuationRequestDetails} />
-      {/*<AssignmentConsultant />*/}
     </>
   );
 };

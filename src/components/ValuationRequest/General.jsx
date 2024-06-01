@@ -154,10 +154,12 @@ const ValuationRequestGeneral = ({
             icon={<CalendarMonthIcon />}
             title="Returned"
           >
-            {format(
-              new Date(valuationData.returnedDate),
-              "yyyy/MM/dd - HH:mm:ss",
-            )}
+            {valuationData.returnedDate === null
+              ? "N/A"
+              : format(
+                  new Date(valuationData.returnedDate),
+                  "yyyy/MM/dd - HH:mm:ss",
+                )}
           </ValuationRequestUserInfor>
         </Grid>
         <Grid item xs={4} sx={{ position: "relative" }}>

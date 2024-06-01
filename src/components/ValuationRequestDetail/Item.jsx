@@ -13,7 +13,7 @@ import DiamondValuationAssessment from "../DiamondValuation/Assessment.jsx";
 import DiamondValuationAssignTable from "../DiamondValuation/AssignTable.jsx";
 import DiamondValuationFieldGroup from "../DiamondValuation/FieldGroup.jsx";
 import DiamondValuationUserInfor from "../DiamondValuation/UserInfor.jsx";
-import UIHeader from "../UI/UIHeader.jsx";
+import UIDetailHeader from "../UI/UIDetailHeader.jsx";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -78,26 +78,46 @@ const currencies = [
     label: "¥",
   },
 ];
-const ValuationRequestDetailItem = ({ item }) => {
+const ValuationRequestDetailItem = ({
+  detail,
+  valuationRequests,
+  customer,
+}) => {
+  const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({
     giaCertDate: dayjs(new Date()),
-    giaReportNumber: "",
-    diamondOrigin: "Natural",
-    caratWeight: undefined,
-    colorGrade: "",
-    clarityGrade: "",
-    cutGrade: "",
-    shape: "",
-    symmetry: "",
-    polish: "",
-    fluorescence: "",
-    proportions: "",
-    clarityCharacteristics: "",
+    giaReportNumber: serverDiamondInfor?.certificateId,
+    diamondOrigin: serverDiamondInfor?.diamondOrigin,
+    caratWeight: serverDiamondInfor?.caratWeight,
+    colorGrade: serverDiamondInfor?.colorGrade,
+    clarityGrade: serverDiamondInfor?.clarityGrade,
+    cutGrade: serverDiamondInfor?.cutGrade,
+    shape: serverDiamondInfor?.shape,
+    symmetry: serverDiamondInfor?.symmetry,
+    polish: serverDiamondInfor?.polish,
+    fluorescence: serverDiamondInfor?.fluorescence,
+    proportions: serverDiamondInfor?.proportions,
+    clarityCharacteristics: serverDiamondInfor?.clarityCharacteristic,
   });
   const [detailState, setDetailState] = useState({
     previous: "pending",
     current: "pending",
   });
+
+  const infor = {
+    customerName: customer.firstName + " " + customer.lastName,
+    phone: customer.phone.trim(),
+    email: customer.email.trim(),
+    size: detail.size,
+    service: valuationRequests.service.name,
+    servicePrice: detail.servicePrice,
+    status: detail.status,
+    fairPriceEstimate: serverDiamondInfor?.fairPrice
+      ? "N/A"
+      : serverDiamondInfor?.fairPrice,
+    estimateRange:
+      serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
+  };
 
   function handleAssessing() {
     setDetailState((prevState) => {
@@ -239,7 +259,7 @@ const ValuationRequestDetailItem = ({ item }) => {
           justifyContent: "space-between",
         }}
       >
-        <UIHeader title={"Valuation Request Detail"} />
+        <UIDetailHeader title={"Valuation Request Detail"} detail={detail} />
 
         {detailState.current === "pending" && (
           <Button variant={"contained"} onClick={handleAssessing}>
@@ -312,7 +332,7 @@ const ValuationRequestDetailItem = ({ item }) => {
               minHeight: 328,
             }}
           >
-            <DiamondValuationUserInfor />
+            <DiamondValuationUserInfor infor={infor} />
             <Box
               sx={{ width: "50%", textAlign: "center", position: "relative" }}
             >

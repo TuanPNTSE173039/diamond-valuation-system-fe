@@ -15,7 +15,7 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import UIRichTextEditor from "../UI/RichTexEditor.jsx";
-import UIHeader from "../UI/UIHeader.jsx";
+import UIRequestHeader from "../UI/UIRequestHeader.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 import DiamondValuationInfor from "./ValuationInfor.jsx";
 
@@ -72,7 +72,7 @@ const DiamondValuationItem = () => {
         direction="row"
         sx={{ alignItems: "center", justifyContent: "space-between" }}
       >
-        <UIHeader title={"Diamond Valuation Detail"} />
+        <UIRequestHeader title={"Diamond Valuation Detail"} />
         <Button variant={"contained"}>Valuate</Button>
       </Stack>
 
