@@ -48,7 +48,6 @@ const ValuationRequestItem = ({
       };
     },
   );
-  console.log(valuationRequestDetails);
 
   return (
     <>
@@ -60,7 +59,7 @@ const ValuationRequestItem = ({
         valuationData={generalInfo}
         staffs={staffs}
       />
-      <RecordList />
+      <RecordList valuationRequest={valuationRequest} />
       <ValuationRequestDetailList details={valuationRequestDetails} />
     </>
   );

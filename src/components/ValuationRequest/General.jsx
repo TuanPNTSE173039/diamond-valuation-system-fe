@@ -22,7 +22,7 @@ import * as React from "react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { http } from "../../services/config.js";
-import { assignConsultantStaff } from "../../services/ValuationRequest/api.js";
+import { updateValuationRequest } from "../../services/ValuationRequest/api.js";
 import { formattedMoney } from "../../utilities/AppConfig.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
@@ -45,7 +45,7 @@ const ValuationRequestGeneral = ({
 
   const { mutate, isPending, isError, isSuccess } = useMutation({
     mutationFn: (body) => {
-      return assignConsultantStaff(valuationRequest.id, body);
+      return updateValuationRequest(valuationRequest.id, body);
     },
     onSuccess: (_) => {
       queryClient.invalidateQueries(["valuationRequest", valuationRequest.id]);

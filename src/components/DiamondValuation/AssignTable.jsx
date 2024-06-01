@@ -42,7 +42,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
       valuationStaffName: vStaff.firstName + " " + vStaff.lastName,
       date: item.creationDate,
       price: item.valuationPrice,
-      comments: item.comments,
+      comment: item.comment,
       status: item.status ? "PROCESSING" : "VALUATED",
     };
   });
@@ -151,7 +151,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
                 <TableCell align="left">{row.valuationStaffName}</TableCell>
                 <TableCell align="left">{row.date}</TableCell>
                 <TableCell align="right">{row.price}</TableCell>
-                <TableCell align="left">{row.comments}</TableCell>
+                <TableCell align="left">{row.comment}</TableCell>
                 <TableCell align="left">{row.status}</TableCell>
                 <TableCell align="center">
                   <Switch

@@ -30,7 +30,7 @@ const ValuationRequestList = ({ valuationRequests, customers }) => {
     console.log("Add Valuation Request");
   }
 
-  const requestRows = valuationRequests.content.map((row) => {
+  const requestRows = valuationRequests?.content.map((row) => {
     const customer = getCustomerByID(customers, row.customerID);
 
     const firstName = customer.firstName;

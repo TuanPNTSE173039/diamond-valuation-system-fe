@@ -10,5 +10,7 @@ export const getValuationRequest = async (id) => {
   return response.data;
 };
 
-export const assignConsultantStaff = (id, body) =>
+export const updateValuationRequest = (id, body) =>
   http.put(`valuation-requests/${id}`, body);
+
+export const postPayment = (body) => http.post("payments", body);
