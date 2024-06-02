@@ -19,7 +19,6 @@ import * as React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { rows } from "../../dataset/DiamondValuation.js";
 import { assignValuationStaff } from "../../services/DiamondValuation/api.js";
 import { getStaffById } from "../../services/Staff/utils.jsx";
 import { updateDetail } from "../../services/ValuationRequestDetail/api.js";
@@ -51,6 +50,15 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
       queryClient.invalidateQueries(["valuationRequests"]);
     },
   });
+  const { mutate: approve } = useMutation({
+    mutationFn: (data) => {
+      return updateDetail(detailId, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["valuationRequests"]);
+      toast.success("Approved successfully");
+    },
+  });
   const valuationAssignment = detail.diamondValuationAssigns.map((item) => {
     const vStaff = getStaffById(staffs, item.staffId);
     return {
@@ -59,7 +67,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
       date: item.creationDate,
       price: item.valuationPrice,
       comment: item.comment,
-      status: item.status ? "PROCESSING" : "VALUATED",
+      status: item.status ? "VALUATED" : "VALUATING",
     };
   });
   const valuationStaffList = staffs.content
@@ -71,7 +79,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
         years: staff.experience,
       };
     });
-  const [valuationMode, setValuationMode] = useState("One");
+  const [valuationMode, setValuationMode] = useState("Average");
   const [valuationStaff, setValuationStaff] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleClickAssign = () => {
@@ -89,12 +97,13 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
   };
 
   const [switches, setSwitches] = useState(
-    rows.map((row, index) => index === 0),
+    valuationAssignment.map((row, index) => index === 0),
   ); // Enable the first switch by default
 
   const handleValuationModeChange = (event) => {
-    setValuationMode(event.target.checked ? "Average" : "One");
-    setSwitches(switches.map((val, i) => i === 0)); // Enable the first switch when valuation mode changes
+    const isAverageMode = event.target.checked;
+    setValuationMode(isAverageMode ? "Average" : "One");
+    setSwitches(switches.map(() => isAverageMode)); // Enable the first switch when valuation mode changes
   };
 
   const handleSwitchChange = (index) => {
@@ -173,6 +182,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
                     checked={switches[index]}
                     onChange={() => handleSwitchChange(index)}
                     inputProps={{ "aria-label": "controlled" }}
+                    disabled={valuationMode === "Average"}
                   />
                 </TableCell>
               </TableRow>
@@ -226,7 +236,19 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
               />
               <Typography>Average</Typography>
             </Stack>
-            <Button variant={"contained"}>Approve</Button>
+            <Button
+              variant={"contained"}
+              onClick={() => {
+                const body = {
+                  ...detail,
+                  mode: valuationMode === "Average",
+                  status: "APPROVED",
+                };
+                approve(body);
+              }}
+            >
+              Approve
+            </Button>
           </Stack>
         )}
       </Box>

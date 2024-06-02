@@ -7,9 +7,9 @@ import Box from "@mui/material/Box";
 import * as React from "react";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
-const DiamondValuationUserInfor = ({ infor }) => {
+const DiamondValuationUserInfor = ({ infor, ...props }) => {
   return (
-    <Box sx={{ width: "50%" }}>
+    <Box {...props}>
       <DiamondValuationInforItem icon={<PersonIcon />} title="Customer">
         {infor.customerName}
       </DiamondValuationInforItem>

@@ -77,7 +77,7 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
       return updateDiamondValuation(valuation.id, body);
     },
     onSuccess: (body) => {
-      queryClient.invalidateQueries(["diamondValuation", body.id]);
+      queryClient.invalidateQueries(["valuationRequests"]);
       if (!body.status) toast.success("Save diamond valuation successfully");
       else {
         toast.success("Confirm diamond valuation successfully");

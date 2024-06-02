@@ -1,7 +1,7 @@
 import { http } from "../config.js";
 
 export const getValuationRequests = async () => {
-  const response = await http.get("valuation-requests");
+  const response = await http.get("valuation-requests?sortBy=id&sortDir=desc");
   return response.data;
 };
 

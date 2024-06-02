@@ -10,8 +10,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import * as React from "react";
 import { useState } from "react";
+import Carousel from "react-material-ui-carousel";
 import { updateDiamondNote } from "../../services/DiamondValuation/api.js";
+import { getStaffById } from "../../services/Staff/utils.jsx";
 import { updateDetail } from "../../services/ValuationRequestDetail/api.js";
+import { formattedMoney } from "../../utilities/AppConfig.js";
 import DiamondValuationAssessment from "../DiamondValuation/Assessment.jsx";
 import DiamondValuationAssignTable from "../DiamondValuation/AssignTable.jsx";
 import DiamondValuationFieldGroup from "../DiamondValuation/FieldGroup.jsx";
@@ -227,6 +230,20 @@ const ValuationRequestDetailItem = ({
     // ...
     setOpen(false);
   };
+
+  const resultStaff =
+    detail.valuationPrice === 0
+      ? null
+      : !detail.mode
+        ? {
+            staff: getStaffById(staffs, detail.diamondValuationAssign.staffId),
+            comment: detail.diamondValuationAssign.comment,
+          }
+        : detail.diamondValuationAssigns.map((item) => ({
+            staff: getStaffById(staffs, item.staffId),
+            comment: item.comment,
+          }));
+  console.log(resultStaff);
   return (
     <>
       {/*HEADING*/}
@@ -286,31 +303,74 @@ const ValuationRequestDetailItem = ({
               minHeight: 328,
             }}
           >
-            <DiamondValuationUserInfor infor={infor} />
-            <Box
-              sx={{ width: "50%", textAlign: "center", position: "relative" }}
-            >
-              <Typography sx={{ fontSize: "1rem" }}>Final price</Typography>
-              <Typography sx={{ fontSize: "3rem" }}>27$</Typography>
-              <AvatarGroup
-                max={3}
+            <DiamondValuationUserInfor
+              infor={infor}
+              sx={{ width: detail.valuationPrice === 0.0 ? "100%" : "50%" }}
+            />
+            {detail.valuationPrice !== 0.0 && (
+              <Box
                 sx={{
-                  position: "absolute",
-                  left: "50%",
-                  transform: "translateX(-50%)",
+                  width: detail.valuationPrice === 0.0 ? undefined : "50%",
+                  textAlign: "center",
+                  position: "relative",
                 }}
               >
-                <Avatar alt="Remy Sharp" src="" />
-                <Avatar alt="Travis Howard" src="" />
-                <Avatar alt="Cindy Baker" src="" />
-              </AvatarGroup>
-              <Typography sx={{ fontSize: "1.5rem", mt: 5.5 }}>Tuan</Typography>
-              <Typography sx={{ fontSize: "0.8rem", px: 3 }}>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Asperiores dignissimos dolor, doloremque et explicabo harum
-                itaque molestias natus neque perspiciatis quam qui quod
-              </Typography>
-            </Box>
+                <Typography sx={{ fontSize: "1rem" }}>Final price</Typography>
+                <Typography sx={{ fontSize: "3rem" }}>
+                  {formattedMoney(detail.valuationPrice)}
+                </Typography>
+                <AvatarGroup
+                  max={3}
+                  sx={{
+                    position: "absolute",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  {!detail.mode ? (
+                    <Avatar alt={resultStaff.staff.id} src="" />
+                  ) : (
+                    resultStaff.map((item) => {
+                      return (
+                        <Avatar
+                          key={item.staff.id}
+                          alt={item.staff.id}
+                          src=""
+                        />
+                      );
+                    })
+                  )}
+                </AvatarGroup>
+                <Box>
+                  {!detail.mode ? (
+                    <Typography>
+                      `${resultStaff.comment.replace(/<[^>]*>/g, "")}`
+                    </Typography>
+                  ) : (
+                    <Carousel sx={{ mt: 5, height: "100%" }}>
+                      {resultStaff.map((item) => (
+                        // <Box>
+                        //   <Typography sx={{ fontSize: "1.5rem", mt: 5.5 }}>
+                        //     {item.staff.firstName}
+                        //   </Typography>
+                        //   <Typography sx={{ fontSize: "0.8rem", px: 3 }}>
+                        //     {item.comment}
+                        //   </Typography>
+                        // </Box>
+                        <Box sx={{ mt: 2 }}>
+                          <h2 className="text-xl mb-1/2 font-bold">
+                            {item.staff.firstName + " " + item.staff.lastName}
+                          </h2>
+                          <p>{item.comment.replace(/<[^>]*>/g, "")}</p>
+
+                          {/*<Button className="CheckButton">Check it out!</Button>*/}
+                        </Box>
+                      ))}
+                    </Carousel>
+                  )}
+                </Box>
+              </Box>
+            )}
           </Box>
         </DiamondValuationFieldGroup>
         {/*Diamond Image*/}

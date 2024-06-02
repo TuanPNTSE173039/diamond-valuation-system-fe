@@ -7,7 +7,9 @@ export const assignValuationStaff = (body) =>
   http.post("diamond-valuation-assigns", body);
 
 export const getAllDiamondValuation = async () => {
-  const { data } = await http.get("diamond-valuation-assigns");
+  const { data } = await http.get(
+    "diamond-valuation-assigns?sortBy=id&sortDir=desc",
+  );
   return data;
 };
 
