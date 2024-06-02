@@ -15,7 +15,7 @@ export default function RecordList({ valuationRequest }) {
         <RecordReceipt valuationRequest={valuationRequest} />
         <RecordResult />
         <RecordSealed />
-        <RecordReturned />
+        <RecordReturned valuationRequest={valuationRequest} />
       </Box>
     </Box>
   );
