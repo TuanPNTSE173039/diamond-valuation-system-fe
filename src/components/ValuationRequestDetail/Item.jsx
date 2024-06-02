@@ -362,7 +362,6 @@ const ValuationRequestDetailItem = ({
                             {item.staff.firstName + " " + item.staff.lastName}
                           </h2>
                           <p>{item.comment.replace(/<[^>]*>/g, "")}</p>
-
                           {/*<Button className="CheckButton">Check it out!</Button>*/}
                         </Box>
                       ))}

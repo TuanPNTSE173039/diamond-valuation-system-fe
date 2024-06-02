@@ -11,7 +11,7 @@ import {
 } from "../../../services/ValuationRequest/api.js";
 import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
-const ReceiptRecord = () => {
+const RecordReceipt = () => {
   const { requestId } = useParams();
   const queryClient = useQueryClient();
   const {
@@ -85,4 +85,4 @@ const ReceiptRecord = () => {
     </Paper>
   );
 };
-export default ReceiptRecord;
+export default RecordReceipt;

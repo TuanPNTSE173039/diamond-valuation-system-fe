@@ -2,8 +2,9 @@ import { Card, CardActions, CardContent } from "@mui/material";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
 
-const ResultRecord = () => {
+const RecordResult = () => {
   return (
     <Paper elevation={3} sx={{ mb: 0.5, minWidth: "275px" }}>
       <Card variant="outlined">
@@ -22,10 +23,12 @@ const ResultRecord = () => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small">Create</Button>
+          <Button size="small">
+            <Link to={"result"}>Create</Link>
+          </Button>
         </CardActions>
       </Card>
     </Paper>
   );
 };
-export default ResultRecord;
+export default RecordResult;

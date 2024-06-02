@@ -79,7 +79,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
         years: staff.experience,
       };
     });
-  const [valuationMode, setValuationMode] = useState("Average");
+  const [valuationMode, setValuationMode] = useState("One");
   const [valuationStaff, setValuationStaff] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleClickAssign = () => {

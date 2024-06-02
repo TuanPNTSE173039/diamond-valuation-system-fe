@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ScreenAppLayout from "./screens/AppLayout.jsx";
 import ScreenDiamondValuationItem from "./screens/DiamondValuation/Item.jsx";
 import ScreenDiamondValuationList from "./screens/DiamondValuation/List.jsx";
+import ScreenResult from "./screens/Record/Result.jsx";
 import ScreenValuationRequestItem from "./screens/ValuationRequest/Item.jsx";
 import ScreenValuationRequestList from "./screens/ValuationRequest/List.jsx";
 import ScreenValuationRequestDetailItem from "./screens/ValuationRequestDetail/Item.jsx";
@@ -25,11 +26,20 @@ const router = createBrowserRouter([
           },
           {
             path: ":requestId",
-            element: <ScreenValuationRequestItem />,
-          },
-          {
-            path: ":requestId/:detailId",
-            element: <ScreenValuationRequestDetailItem />,
+            children: [
+              {
+                index: true,
+                element: <ScreenValuationRequestItem />,
+              },
+              {
+                path: ":detailId",
+                element: <ScreenValuationRequestDetailItem />,
+              },
+              {
+                path: "result",
+                element: <ScreenResult />,
+              },
+            ],
           },
         ],
       },
