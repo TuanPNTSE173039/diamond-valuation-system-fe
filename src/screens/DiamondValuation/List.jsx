@@ -50,7 +50,7 @@ const ScreenDiamondValuationList = () => {
     const returnedDate = valuationRequest?.returnDate;
 
     return {
-      id: valuation.id,
+      number: valuation.id,
       valuationStaffName: staff.firstName + " " + staff.lastName,
       returnDate: returnedDate ? formatDateTime(returnedDate) : "",
       service: valuationRequest?.service.name,
@@ -63,8 +63,6 @@ const ScreenDiamondValuationList = () => {
       status: valuation.status ? "Valuated" : "Valuating",
     };
   });
-
-  console.log(diamondValuations);
 
   return <DiamondValuationList diamondValuations={diamondValuations} />;
 };

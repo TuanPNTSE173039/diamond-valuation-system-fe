@@ -211,62 +211,6 @@ const ValuationRequestDetailItem = ({
     mutateDetail(detailBody);
   }
 
-  function handleValuating() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "assessed",
-        current: "valuating",
-      };
-    });
-  }
-
-  function handleCancelValuating() {
-    setDetailState((prevState) => {
-      if (prevState.previous === "assessed") {
-        return {
-          ...prevState,
-          current: "assessed",
-        };
-      }
-      return {
-        ...prevState,
-        previous: "valuating",
-        current: "draft-valuating",
-      };
-    });
-  }
-
-  function handleSaveValuation() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "valuating",
-        current: "draft-valuating",
-      };
-    });
-  }
-
-  function handleEditValuation() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: prevState.previous,
-        current: "valuating",
-      };
-    });
-  }
-
-  function handleConfirmValuation() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "",
-        current: "valuated",
-      };
-    });
-  }
-
   const [open, setOpen] = React.useState(false);
   const [selectedStaff, setSelectedStaff] = React.useState(null);
 
@@ -317,31 +261,6 @@ const ValuationRequestDetailItem = ({
               Edit
             </Button>
             <Button variant={"contained"} onClick={handleConfirmAssessment}>
-              Confirm
-            </Button>
-          </Box>
-        )}
-        {detailState.current === "ASSESSED" && (
-          <Button variant={"contained"} onClick={handleValuating}>
-            Valuate
-          </Button>
-        )}
-        {detailState.current === "valuating" && (
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant={"outlined"} onClick={handleCancelValuating}>
-              Cancel
-            </Button>
-            <Button variant={"contained"} onClick={handleSaveValuation}>
-              Save
-            </Button>
-          </Box>
-        )}
-        {detailState.current === "draft-valuating" && (
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant={"outlined"} onClick={handleEditValuation}>
-              Edit
-            </Button>
-            <Button variant={"contained"} onClick={handleConfirmValuation}>
               Confirm
             </Button>
           </Box>

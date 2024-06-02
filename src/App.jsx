@@ -41,7 +41,7 @@ const router = createBrowserRouter([
             element: <ScreenDiamondValuationList />,
           },
           {
-            path: ":detailId",
+            path: ":valuationId",
             element: <ScreenDiamondValuationItem />,
           },
         ],

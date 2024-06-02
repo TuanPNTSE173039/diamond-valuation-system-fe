@@ -10,15 +10,17 @@ import {
 } from "mui-tiptap";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
-const UIRichTextEditor = forwardRef(({ value }, ref) => {
+const UIRichTextEditor = forwardRef(({ value, isDisabled }, ref) => {
   const rteRef = useRef(null);
   useImperativeHandle(ref, () => ({
     getContent: () => rteRef.current?.editor?.getHTML(),
+    setContent: (content) => rteRef.current?.editor?.setContent(content),
   }));
   return (
     <Box sx={{ height: 500 }}>
       <RichTextEditor
         ref={rteRef}
+        editable={!isDisabled}
         extensions={[StarterKit]} // Or any Tiptap extensions you wish!
         content={`${value}`} // Initial content for the editor
         //expand height of the content full of the box container

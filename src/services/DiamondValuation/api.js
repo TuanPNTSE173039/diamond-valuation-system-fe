@@ -15,3 +15,6 @@ export const getDiamondValuationById = async (id) => {
   const { data } = await http.get(`diamond-valuation-assigns/${id}`);
   return data;
 };
+
+export const updateDiamondValuation = (id, body) =>
+  http.put(`diamond-valuation-assigns/${id}`, body);

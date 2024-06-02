@@ -3,19 +3,20 @@ import LabelIcon from "@mui/icons-material/Label";
 import PersonIcon from "@mui/icons-material/Person";
 import Box from "@mui/material/Box";
 import * as React from "react";
+import { formatDateTime } from "../../utilities/AppConfig.js";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
-const DiamondValuationInfor = ({ ...props }) => {
+const DiamondValuationInfor = ({ valuationInfor, ...props }) => {
   return (
     <Box {...props}>
       <DiamondValuationInforItem icon={<PersonIcon />} title="Service">
-        Fast - 3h
+        {valuationInfor.service}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<CalendarMonthIcon />} title="Deadline">
-        10/10/2022
+        {formatDateTime(valuationInfor.deadline)}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LabelIcon />} title="Status">
-        Processing
+        {valuationInfor.status}
       </DiamondValuationInforItem>
     </Box>
   );

@@ -13,9 +13,14 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import { updateDiamondValuation } from "../../services/DiamondValuation/api.js";
 import UIRichTextEditor from "../UI/RichTexEditor.jsx";
+import DiamondValuationAssessment from "./Assessment.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 import DiamondValuationInfor from "./ValuationInfor.jsx";
 
@@ -65,20 +70,146 @@ const VisuallyHiddenInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
-const DiamondValuationItem = () => {
-  const [diamondInfor, setDiamondInfor] = useState(null);
-  const [detailState, setDetailState] = useState(null);
-  const [valuationPrice, setValuationPrice] = useState(null);
-  const editorRef = useRef();
-  const handleValuate = () => {
-    const editorContent = editorRef.current.getContent();
-    const body = {
-      valuationPrice,
-      comments: editorContent,
-    };
-    console.log(body);
+const DiamondValuationItem = ({ detail, valuation, request }) => {
+  const queryClient = useQueryClient();
+  const { mutate: saveMutate } = useMutation({
+    mutationFn: (body) => {
+      return updateDiamondValuation(valuation.id, body);
+    },
+    onSuccess: (body) => {
+      queryClient.invalidateQueries(["diamondValuation", body.id]);
+      if (!body.status) toast.success("Save diamond valuation successfully");
+      else {
+        toast.success("Confirm diamond valuation successfully");
+      }
+    },
+  });
+
+  const valuationInfor = {
+    service: request.service.name,
+    deadline: request.returnDate,
+    status: !valuation.status ? "Valuating" : "Valuated",
   };
-  const comment = "Ahihi Tuan Ne";
+  const serverDiamondInfor = detail?.diamondValuationNote;
+  const [diamondInfor, setDiamondInfor] = useState({
+    giaCertDate: dayjs(new Date()),
+    certificateId: serverDiamondInfor?.certificateId,
+    diamondOrigin: serverDiamondInfor?.diamondOrigin,
+    caratWeight: serverDiamondInfor?.caratWeight,
+    color: serverDiamondInfor?.color,
+    clarity: serverDiamondInfor?.clarity,
+    cut: serverDiamondInfor?.cut,
+    shape: serverDiamondInfor?.shape,
+    symmetry: serverDiamondInfor?.symmetry,
+    polish: serverDiamondInfor?.polish,
+    fluorescence: serverDiamondInfor?.fluorescence,
+    proportions: serverDiamondInfor?.proportions,
+    clarityCharacteristics: serverDiamondInfor?.clarityCharacteristic,
+  });
+  const getPreviousStatus = (currentStatus) => {
+    switch (currentStatus) {
+      case "PENDING":
+        return "PENDING";
+      case "ASSESSING":
+        return "PENDING";
+      case "ASSESSED":
+        return "ASSESSING";
+      case "VALUATING":
+        return "ASSESSED";
+      case "VALUATED":
+        return "VALUATING";
+      case "APPROVED":
+        return "APPROVED";
+    }
+  };
+  const [detailState, setDetailState] = useState({
+    previous: getPreviousStatus(detail.status),
+    current: detail.status,
+  });
+  const [valuationPrice, setValuationPrice] = useState(
+    valuation.valuationPrice === 0 ? "" : valuation.valuationPrice,
+  );
+  const editorRef = useRef();
+  const comment = valuation.comment === null ? "" : valuation.comment;
+
+  function handleCancelValuating() {
+    setDetailState((prevState) => {
+      if (prevState.previous === "ASSESSED") {
+        return {
+          ...prevState,
+          current: "ASSESSED",
+        };
+      }
+      return {
+        ...prevState,
+        previous: "VALUATING",
+        current: "DRAFT_VALUATING",
+      };
+    });
+    setValuationPrice(null);
+    // editorRef.current.setContent("");
+  }
+
+  useEffect(() => {
+    if (detailState.previous === "ASSESSED") {
+      setDetailState((prevState) => {
+        return {
+          ...prevState,
+          current: "ASSESSED",
+        };
+      });
+    }
+  }, []);
+
+  function handleSaveValuation() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "VALUATING",
+        current: "DRAFT_VALUATING",
+      };
+    });
+    const body = {
+      ...valuation,
+      comment: editorRef.current.getContent(),
+      valuationPrice,
+    };
+    saveMutate(body);
+  }
+
+  function handleEditValuation() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: prevState.previous,
+        current: "VALUATING",
+      };
+    });
+  }
+
+  function handleConfirmValuation() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "",
+        current: "VALUATED",
+      };
+    });
+    const body = {
+      ...valuation,
+      status: true,
+    };
+    saveMutate(body);
+  }
+
+  function handleValuating() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        current: "VALUATING",
+      };
+    });
+  }
   return (
     <>
       <Stack
@@ -101,9 +232,31 @@ const DiamondValuationItem = () => {
             Diamond Valuation Detail
           </Typography>
         </Box>
-        <Button variant={"contained"} onClick={handleValuate}>
-          Valuate
-        </Button>
+        {detailState.current === "ASSESSED" && (
+          <Button variant={"contained"} onClick={handleValuating}>
+            Valuating
+          </Button>
+        )}
+        {detailState.current === "VALUATING" && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button variant={"outlined"} onClick={handleCancelValuating}>
+              Cancel
+            </Button>
+            <Button variant={"contained"} onClick={handleSaveValuation}>
+              Save
+            </Button>
+          </Box>
+        )}
+        {detailState.current === "DRAFT_VALUATING" && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button variant={"outlined"} onClick={handleEditValuation}>
+              Edit
+            </Button>
+            <Button variant={"contained"} onClick={handleConfirmValuation}>
+              Confirm
+            </Button>
+          </Box>
+        )}
       </Stack>
 
       <Box
@@ -121,7 +274,11 @@ const DiamondValuationItem = () => {
               spacing={4}
               sx={{ justifyContent: "space-between", alignItems: "flex-start" }}
             >
-              <DiamondValuationInfor sx={{ width: "50%" }} />
+              <DiamondValuationInfor
+                sx={{ width: "50%" }}
+                valuationInfor={valuationInfor}
+              />
+
               <Box sx={{ width: "50%" }}>
                 <FormControl sx={{ width: "100%" }} variant="outlined">
                   <label
@@ -155,11 +312,16 @@ const DiamondValuationItem = () => {
                     onChange={(e) => {
                       setValuationPrice(e.target.value);
                     }}
+                    disabled={detailState.current !== "VALUATING"}
                   />
                 </FormControl>
               </Box>
             </Stack>
-            <UIRichTextEditor ref={editorRef} value={comment} />
+            <UIRichTextEditor
+              ref={editorRef}
+              value={comment}
+              isDisabled={detailState.current !== "VALUATING"}
+            />
           </Box>
         </DiamondValuationFieldGroup>
 
@@ -217,11 +379,11 @@ const DiamondValuationItem = () => {
         </Box>
       </Box>
 
-      {/*<DiamondValuationAssessment*/}
-      {/*  diamondInfor={diamondInfor}*/}
-      {/*  setDiamondInfor={setDiamondInfor}*/}
-      {/*  detailState={detailState}*/}
-      {/*/>*/}
+      <DiamondValuationAssessment
+        diamondInfor={diamondInfor}
+        setDiamondInfor={setDiamondInfor}
+        detailState={detailState}
+      />
     </>
   );
 };

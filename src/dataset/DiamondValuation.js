@@ -45,7 +45,7 @@ export const rows = [
 
 export const headCells = [
   {
-    id: "id",
+    id: "number",
     numeric: false,
     disablePadding: false,
     label: "Id",
