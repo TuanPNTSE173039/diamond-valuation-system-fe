@@ -15,49 +15,17 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
+import { getDownloadURL, listAll, ref } from "firebase/storage";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { updateDiamondValuation } from "../../services/DiamondValuation/api.js";
+import { storage } from "../../utilities/firebaseConfig.js";
+import { loadImageByPath } from "../../utilities/ImageLoader.js";
 import UIRichTextEditor from "../UI/RichTexEditor.jsx";
 import DiamondValuationAssessment from "./Assessment.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 import DiamondValuationInfor from "./ValuationInfor.jsx";
-
-const imagesData = [
-  {
-    img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-    title: "Breakfast",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-    title: "Burger",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c",
-    title: "Coffee",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
-    title: "Hats",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-];
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -84,7 +52,10 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
       }
     },
   });
-
+  const [proportionImage, setProportionImage] = useState(null);
+  const [clarityCharacteristicImage, setClarityCharacteristicImage] =
+    useState(null);
+  const [uploadedImages, setUploadedImages] = useState([]); // state hiển thị danh sách ảnh đã tải lên store
   const valuationInfor = {
     service: request.service.name,
     deadline: request.returnDate,
@@ -131,6 +102,44 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
   );
   const editorRef = useRef();
   const comment = valuation.comment === null ? "" : valuation.comment;
+
+  const imageLinks = `diamonds/${detail.id}/images`;
+  const getListAllImages = () => {
+    const listRef = ref(storage, imageLinks);
+
+    listAll(listRef)
+      .then(async (res) => {
+        res.prefixes.forEach((folderRef) => {
+          console.log("folderRef", folderRef);
+        });
+        const images = await Promise.all(
+          res.items.map(async (itemRef) => {
+            const url = await getDownloadURL(itemRef);
+            return url;
+          }),
+        );
+        setUploadedImages(images);
+      })
+      .catch((error) => {
+        console.error("Error getting download URL:", error);
+      });
+  };
+
+  useEffect(() => {
+    getListAllImages();
+    if (detail.diamondValuationNote?.proportions !== null) {
+      loadImageByPath(
+        detail.diamondValuationNote?.proportions,
+        setProportionImage,
+      );
+    }
+    if (detail.diamondValuationNote?.clarityCharacteristic !== null) {
+      loadImageByPath(
+        detail.diamondValuationNote?.clarityCharacteristic,
+        setClarityCharacteristicImage,
+      );
+    }
+  }, []);
 
   function handleCancelValuating() {
     setDetailState((prevState) => {
@@ -345,35 +354,37 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
                   <VisuallyHiddenInput type="file" />
                 </Button>
               </ImageListItem>
-              {imagesData.map((item, index) => (
-                <ImageListItem key={index} sx={{ position: "relative" }}>
-                  <IconButton
-                    aria-label="delete"
-                    size="large"
-                    sx={{
-                      position: "absolute",
-                      bottom: 7,
-                      right: 7,
-                      bgcolor: "white",
-                      "&:hover": {
-                        bgcolor: "red",
-                      },
-                      p: 0.5,
-                    }}
-                  >
-                    <DeleteIcon
-                      sx={{ color: "red", "&:hover": { color: "white" } }}
+              {uploadedImages
+                .map((item) => ({ img: item, title: "Diamond Image" }))
+                .map((item, index) => (
+                  <ImageListItem key={index} sx={{ position: "relative" }}>
+                    <IconButton
+                      aria-label="delete"
+                      size="large"
+                      sx={{
+                        position: "absolute",
+                        bottom: 7,
+                        right: 7,
+                        bgcolor: "white",
+                        "&:hover": {
+                          bgcolor: "red",
+                        },
+                        p: 0.5,
+                      }}
+                    >
+                      <DeleteIcon
+                        sx={{ color: "red", "&:hover": { color: "white" } }}
+                      />
+                    </IconButton>
+                    <img
+                      srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                      src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                      alt={item.title}
+                      loading="lazy"
+                      style={{ height: "164px", objectFit: "cover" }}
                     />
-                  </IconButton>
-                  <img
-                    srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                    src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                    alt={item.title}
-                    loading="lazy"
-                    style={{ height: "164px", objectFit: "cover" }}
-                  />
-                </ImageListItem>
-              ))}
+                  </ImageListItem>
+                ))}
             </ImageList>
           </DiamondValuationFieldGroup>
         </Box>
@@ -383,6 +394,8 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
         diamondInfor={diamondInfor}
         setDiamondInfor={setDiamondInfor}
         detailState={detailState}
+        proportionImage={proportionImage}
+        clarityCharacteristic={clarityCharacteristicImage}
       />
     </>
   );

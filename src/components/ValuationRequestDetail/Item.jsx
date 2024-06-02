@@ -8,13 +8,22 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
+import {
+  getDownloadURL,
+  listAll,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
+import { useParams } from "react-router-dom";
 import { updateDiamondNote } from "../../services/DiamondValuation/api.js";
 import { getStaffById } from "../../services/Staff/utils.jsx";
 import { updateDetail } from "../../services/ValuationRequestDetail/api.js";
 import { formattedMoney } from "../../utilities/AppConfig.js";
+import { storage } from "../../utilities/firebaseConfig.js";
+import { loadImageByPath } from "../../utilities/ImageLoader.js";
 import DiamondValuationAssessment from "../DiamondValuation/Assessment.jsx";
 import DiamondValuationAssignTable from "../DiamondValuation/AssignTable.jsx";
 import DiamondValuationFieldGroup from "../DiamondValuation/FieldGroup.jsx";
@@ -32,41 +41,10 @@ const VisuallyHiddenInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
-const imagesData = [
-  {
-    img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-    title: "Breakfast",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-    title: "Burger",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c",
-    title: "Coffee",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
-    title: "Hats",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-];
 
+export const metadata = {
+  contentType: "image/jpeg",
+};
 const ValuationRequestDetailItem = ({
   detail,
   valuationRequests,
@@ -82,7 +60,7 @@ const ValuationRequestDetailItem = ({
       queryClient.invalidateQueries(["valuationRequests"]);
     },
   });
-
+  const { detailId } = useParams();
   const { mutate: mutateAssessment } = useMutation({
     mutationFn: (body) => {
       return updateDiamondNote(detail.diamondValuationNote.id, body);
@@ -230,7 +208,12 @@ const ValuationRequestDetailItem = ({
     // ...
     setOpen(false);
   };
-
+  const [image, setImage] = useState(null); // state lưu ảnh sau khi chọn
+  const [proportionImage, setProportionImage] = useState(null);
+  const [clarityCharacteristicImage, setClarityCharacteristicImage] =
+    useState(null);
+  const [progress, setProgress] = useState(0); // state hiển thị phần trăm tải ảnh lên store
+  const [uploadedImages, setUploadedImages] = useState([]); // state hiển thị danh sách ảnh đã tải lên store
   const resultStaff =
     detail.valuationPrice === 0
       ? null
@@ -243,7 +226,92 @@ const ValuationRequestDetailItem = ({
             staff: getStaffById(staffs, item.staffId),
             comment: item.comment,
           }));
-  console.log(resultStaff);
+
+  function handleSelectImage(e) {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  }
+
+  const imageLinks = `diamonds/${detailId}/images`;
+  const getListAllImages = () => {
+    const listRef = ref(storage, imageLinks);
+
+    listAll(listRef)
+      .then(async (res) => {
+        res.prefixes.forEach((folderRef) => {
+          console.log("folderRef", folderRef);
+        });
+        const images = await Promise.all(
+          res.items.map(async (itemRef) => {
+            const url = await getDownloadURL(itemRef);
+            return url;
+          }),
+        );
+        setUploadedImages(images);
+      })
+      .catch((error) => {
+        console.error("Error getting download URL:", error);
+      });
+  };
+
+  useEffect(() => {
+    getListAllImages();
+    if (detail.diamondValuationNote?.proportions !== null) {
+      loadImageByPath(
+        detail.diamondValuationNote?.proportions,
+        setProportionImage,
+      );
+    }
+    if (detail.diamondValuationNote?.clarityCharacteristic !== null) {
+      loadImageByPath(
+        detail.diamondValuationNote?.clarityCharacteristic,
+        setClarityCharacteristicImage,
+      );
+    }
+  }, []);
+
+  const handleUploadDiamondImage = () => {
+    const storageRef = ref(storage, `${imageLinks}/${image.name}`);
+
+    const uploadTask = uploadBytesResumable(storageRef, image, metadata);
+
+    // Register three observers:
+    // 1. 'state_changed' observer, called any time the state changes
+    // 2. Error observer, called on failure
+    // 3. Completion observer, called on successful completion
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(progress);
+        console.log("Upload is " + progress + "% done");
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setUploadedImages([downloadURL, ...uploadedImages]);
+          const imageLink = `${imageLinks}` / `${image.name}`;
+          setImage(null);
+          setProgress(0);
+        });
+      },
+    );
+  };
+
   return (
     <>
       {/*HEADING*/}
@@ -380,21 +448,26 @@ const ValuationRequestDetailItem = ({
               cols={3}
               rowHeight={164}
             >
-              <ImageListItem>
-                <Button
-                  component="label"
-                  role={undefined}
-                  variant="outlined"
-                  tabIndex={-1}
-                  startIcon={<CloudUploadIcon />}
-                  sx={{ height: 164 }}
-                >
-                  Upload file
-                  <VisuallyHiddenInput type="file" />
-                </Button>
-              </ImageListItem>
-              {imagesData.map((item, index) => (
-                <ImageListItem key={index} sx={{ position: "relative" }}>
+              {!image && (
+                <ImageListItem>
+                  <Button
+                    component="label"
+                    role={undefined}
+                    variant="outlined"
+                    tabIndex={-1}
+                    startIcon={<CloudUploadIcon />}
+                    sx={{ height: 164 }}
+                  >
+                    Upload file
+                    <VisuallyHiddenInput
+                      type="file"
+                      onChange={handleSelectImage}
+                    />
+                  </Button>
+                </ImageListItem>
+              )}
+              {image && (
+                <ImageListItem sx={{ position: "relative" }}>
                   <IconButton
                     aria-label="delete"
                     size="large"
@@ -413,16 +486,58 @@ const ValuationRequestDetailItem = ({
                       sx={{ color: "red", "&:hover": { color: "white" } }}
                     />
                   </IconButton>
-                  <img
-                    srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                    src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                    alt={item.title}
-                    loading="lazy"
-                    style={{ height: "164px", objectFit: "cover" }}
-                  />
+                  <Box sx={{ w: 164, h: 164 }}>
+                    <img
+                      src={`${URL.createObjectURL(image)}`}
+                      alt="New upload image"
+                      loading="lazy"
+                      style={{ height: "164px", objectFit: "cover" }}
+                    />
+                  </Box>
                 </ImageListItem>
-              ))}
+              )}
+              {uploadedImages
+                .map((item) => ({ img: item, title: "Diamond Image" }))
+                .map((item, index) => (
+                  <ImageListItem key={index} sx={{ position: "relative" }}>
+                    <IconButton
+                      aria-label="delete"
+                      size="large"
+                      sx={{
+                        position: "absolute",
+                        bottom: 7,
+                        right: 7,
+                        bgcolor: "white",
+                        "&:hover": {
+                          bgcolor: "red",
+                        },
+                        p: 0.5,
+                      }}
+                    >
+                      <DeleteIcon
+                        sx={{ color: "red", "&:hover": { color: "white" } }}
+                      />
+                    </IconButton>
+                    <img
+                      srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                      src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                      alt={item.title}
+                      loading="lazy"
+                      style={{ height: "164px", objectFit: "cover" }}
+                    />
+                  </ImageListItem>
+                ))}
             </ImageList>
+            {image && (
+              <Button
+                onClick={handleUploadDiamondImage}
+                variant={"outlined"}
+                sx={{ position: "absolute", top: 0, right: 0 }}
+                size={"small"}
+              >
+                Upload
+              </Button>
+            )}
           </DiamondValuationFieldGroup>
         </Box>
       </Box>
@@ -432,6 +547,8 @@ const ValuationRequestDetailItem = ({
           diamondInfor={diamondInfor}
           setDiamondInfor={setDiamondInfor}
           detailState={detailState}
+          proportionImage={proportionImage}
+          clarityCharacteristic={clarityCharacteristicImage}
         />
       )}
       {(detailState.current === "ASSESSED" ||

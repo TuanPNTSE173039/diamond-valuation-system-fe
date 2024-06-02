@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ScreenAppLayout from "./screens/AppLayout.jsx";
+import ScreenDashboard from "./screens/Dashboard.jsx";
 import ScreenDiamondValuationItem from "./screens/DiamondValuation/Item.jsx";
 import ScreenDiamondValuationList from "./screens/DiamondValuation/List.jsx";
 import ScreenResult from "./screens/Record/Result.jsx";
@@ -15,7 +16,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <div>Dashboard</div>,
+        element: <ScreenDashboard />,
       },
       {
         path: "requests",

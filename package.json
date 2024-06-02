@@ -25,6 +25,7 @@
     "axios": "^1.7.2",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
+    "firebase": "^10.12.2",
     "json-server": "^1.0.0-beta.0",
     "localforage": "^1.10.0",
     "luxon": "^3.4.4",

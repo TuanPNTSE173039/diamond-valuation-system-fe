@@ -20,13 +20,18 @@ import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { ref, uploadBytesResumable } from "firebase/storage";
 import * as React from "react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import CrystalImage from "../../assets/images/crystal.png";
 import FeatherImage from "../../assets/images/feather.png";
 import NeedleImage from "../../assets/images/needle.png";
 import PinpointImage from "../../assets/images/pinpoint.png";
 import { DiamondStatus } from "../../utilities/DiamondStatus.js";
+import { storage } from "../../utilities/firebaseConfig.js";
 import UIDatePicker from "../UI/DatePicker.jsx";
+import { metadata } from "../ValuationRequestDetail/Item.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
 const VisuallyHiddenInput = styled("input")({
@@ -48,9 +53,15 @@ const DiamondValuationAssessment = ({
   diamondInfor,
   setDiamondInfor,
   detailState,
+  proportionImage,
+  clarityCharacteristic,
 }) => {
+  const { detailId } = useParams();
   const [open, setOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
+  const [proportionFile, setProportionFile] = useState(null);
+  const [clarityCharacteristicFile, setClarityCharacteristicFile] =
+    useState(null);
 
   const handleClickOpen = (image) => {
     setSelectedImage(image);
@@ -60,6 +71,119 @@ const DiamondValuationAssessment = ({
   const handleClose = () => {
     setOpen(false);
   };
+
+  function handleProportionChange(e) {
+    if (e.target.files[0]) {
+      setProportionFile(e.target.files[0]);
+      // setDiamondInfor((prevState) => ({
+      //   ...prevState,
+      //   proportions: `diamond/${detailId}/proportion/${e.target.files[0].name}`,
+      // }));
+    }
+  }
+
+  function handleClarityCharacteristicChange(e) {
+    if (e.target.files[0]) {
+      setClarityCharacteristicFile(e.target.files[0]);
+      // setDiamondInfor((prevState) => ({
+      //   ...prevState,
+      //   clarityCharacteristics: `diamond/${detailId}/clarity/${e.target.files[0].name}`,
+      // }));
+    }
+  }
+
+  const handleUploadProportion = () => {
+    const storageRef = ref(
+      storage,
+      `diamonds/${detailId}/proportion/${proportionFile.name}`,
+    );
+
+    const uploadTask = uploadBytesResumable(
+      storageRef,
+      proportionFile,
+      metadata,
+    );
+
+    // Register three observers:
+    // 1. 'state_changed' observer, called any time the state changes
+    // 2. Error observer, called on failure
+    // 3. Completion observer, called on successful completion
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+      },
+      () => {
+        const imageLink = `diamonds/${detailId}/proportion/${proportionFile.name}`;
+        setDiamondInfor((prevState) => ({
+          ...prevState,
+          proportions: imageLink,
+        }));
+      },
+    );
+  };
+
+  function handleUploadClarityCharacteristic() {
+    const storageRef = ref(
+      storage,
+      `diamonds/${detailId}/clarity/${clarityCharacteristicFile.name}`,
+    );
+
+    const uploadTask = uploadBytesResumable(
+      storageRef,
+      clarityCharacteristicFile,
+      metadata,
+    );
+
+    // Register three observers:
+    // 1. 'state_changed' observer, called any time the state changes
+    // 2. Error observer, called on failure
+    // 3. Completion observer, called on successful completion
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+      },
+      () => {
+        const imageLink = `diamonds/${detailId}/clarity/${clarityCharacteristicFile.name}`;
+        setDiamondInfor((prevState) => ({
+          ...prevState,
+          clarityCharacteristic: imageLink,
+        }));
+      },
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -308,8 +432,21 @@ const DiamondValuationAssessment = ({
         </DiamondValuationFieldGroup>
       </Box>
       <Box sx={{ width: "50%" }}>
-        <DiamondValuationFieldGroup title="Proportions" sx={{ mt: 0.5 }}>
-          {diamondInfor.proportions && (
+        <DiamondValuationFieldGroup
+          title="Proportions"
+          sx={{ mt: 0.5, position: "relative" }}
+        >
+          {!proportionImage && proportionFile && (
+            <Button
+              variant={"outlined"}
+              sx={{ position: "absolute", top: 0, right: 0 }}
+              size={"small"}
+              onClick={handleUploadProportion}
+            >
+              Upload
+            </Button>
+          )}
+          {!proportionImage && !proportionFile && (
             <Button
               component="label"
               role={undefined}
@@ -319,14 +456,49 @@ const DiamondValuationAssessment = ({
               sx={{ height: 240, width: "100%" }}
             >
               Upload file
-              <VisuallyHiddenInput type="file" />
+              <VisuallyHiddenInput
+                type="file"
+                onChange={handleProportionChange}
+              />
             </Button>
           )}
-          {!diamondInfor.proportions && (
+          {!proportionImage && proportionFile && (
             <Box sx={{ position: "relative" }}>
               <img
-                srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                src={URL.createObjectURL(proportionFile)}
+                alt={"Proportion"}
+                loading="lazy"
+                style={{
+                  height: 240,
+                  width: "100%",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+              />
+              <IconButton
+                aria-label="delete"
+                size="large"
+                sx={{
+                  position: "absolute",
+                  bottom: 7,
+                  right: 7,
+                  bgcolor: "white",
+                  "&:hover": {
+                    bgcolor: "red",
+                  },
+                  p: 0.5,
+                }}
+              >
+                <DeleteIcon
+                  sx={{ color: "red", "&:hover": { color: "white" } }}
+                />
+              </IconButton>
+            </Box>
+          )}
+          {proportionImage && (
+            <Box sx={{ position: "relative" }}>
+              <img
+                src={proportionImage}
                 alt={"a"}
                 loading="lazy"
                 style={{
@@ -335,11 +507,7 @@ const DiamondValuationAssessment = ({
                   objectFit: "cover",
                   cursor: "pointer",
                 }}
-                onClick={() =>
-                  handleClickOpen(
-                    "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2",
-                  )
-                }
+                onClick={() => handleClickOpen(proportionImage)}
               />
               <IconButton
                 aria-label="delete"
@@ -364,39 +532,80 @@ const DiamondValuationAssessment = ({
         </DiamondValuationFieldGroup>
         <DiamondValuationFieldGroup
           title="Clarity Characteristics"
-          sx={{ mt: 2.5 }}
+          sx={{ mt: 2.5, position: "relative" }}
         >
-          {diamondInfor.clarityCharacteristics && (
+          {!clarityCharacteristic && clarityCharacteristicFile && (
+            <Button
+              variant={"outlined"}
+              sx={{ position: "absolute", top: 0, right: 0 }}
+              size={"small"}
+              onClick={handleUploadClarityCharacteristic}
+            >
+              Upload
+            </Button>
+          )}
+          {!clarityCharacteristic && !clarityCharacteristicFile && (
             <Button
               component="label"
               role={undefined}
               variant="outlined"
               tabIndex={-1}
               startIcon={<CloudUploadIcon />}
-              sx={{ height: 220, width: "100%" }}
+              sx={{ height: 240, width: "100%" }}
             >
               Upload file
-              <VisuallyHiddenInput type="file" />
+              <VisuallyHiddenInput
+                type="file"
+                onChange={handleClarityCharacteristicChange}
+              />
             </Button>
           )}
-          {!diamondInfor.clarityCharacteristics && (
+          {!clarityCharacteristic && clarityCharacteristicFile && (
             <Box sx={{ position: "relative" }}>
               <img
-                srcSet={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                src={`https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                // alt={item.title}
+                src={URL.createObjectURL(clarityCharacteristicFile)}
+                alt={"Clarity Characteristic"}
                 loading="lazy"
                 style={{
-                  height: 250,
+                  height: 240,
                   width: "100%",
                   objectFit: "cover",
                   cursor: "pointer",
                 }}
-                onClick={() =>
-                  handleClickOpen(
-                    "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?w=164&h=164&fit=crop&auto=format&dpr=2",
-                  )
-                }
+              />
+              <IconButton
+                aria-label="delete"
+                size="large"
+                sx={{
+                  position: "absolute",
+                  bottom: 7,
+                  right: 7,
+                  bgcolor: "white",
+                  "&:hover": {
+                    bgcolor: "red",
+                  },
+                  p: 0.5,
+                }}
+              >
+                <DeleteIcon
+                  sx={{ color: "red", "&:hover": { color: "white" } }}
+                />
+              </IconButton>
+            </Box>
+          )}
+          {clarityCharacteristic && (
+            <Box sx={{ position: "relative" }}>
+              <img
+                src={clarityCharacteristic}
+                alt={"Clarity Characteristic"}
+                loading="lazy"
+                style={{
+                  height: 240,
+                  width: "100%",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleClickOpen(clarityCharacteristic)}
               />
               <IconButton
                 aria-label="delete"
