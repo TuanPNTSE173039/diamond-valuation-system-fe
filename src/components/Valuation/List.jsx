@@ -1,15 +1,11 @@
-import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { format } from "date-fns";
 import * as React from "react";
 import { useState } from "react";
-import { getCustomerByID } from "../../utilities/Filtering.js";
-import { valuationRequestStatus } from "../../utilities/Status.js";
-import { RequestHeadCells } from "../../utilities/Table.js";
-import UIDateRangePicker from "../UI/DateRangePicker.jsx";
+
+import { diamondValuationStatus } from "../../utilities/Status.js";
+import { ValuationHeadCells } from "../../utilities/Table.js";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
@@ -19,7 +15,7 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const ValuationRequestList = ({ valuationRequests, customers }) => {
+const DiamondValuationList = ({ diamondValuations: rows }) => {
   const [statusIndex, setStatusIndex] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -29,22 +25,6 @@ const ValuationRequestList = ({ valuationRequests, customers }) => {
   function handleAddValuationRequest() {
     console.log("Add Valuation Request");
   }
-
-  const requestRows = valuationRequests?.content.map((row) => {
-    const customer = getCustomerByID(customers, row.customerID);
-
-    const firstName = customer.firstName;
-    const lastName = customer.lastName;
-    return {
-      number: row.id,
-      status: row.status,
-      customerFirstName: firstName,
-      customerLastName: lastName,
-      creationDate: format(new Date(row.creationDate), "yyyy/MM/dd - HH:mm:ss"),
-      diamondAmount: row.diamondAmount,
-      service: row.service.name,
-    };
-  });
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -64,51 +44,43 @@ const ValuationRequestList = ({ valuationRequests, customers }) => {
             aria-label="valuation requests status"
           >
             <Tab label="All" {...a11yProps(0)} />
-            {valuationRequestStatus
+            {diamondValuationStatus
               .filter((status, index) => index !== 0)
               .map((status, index) => (
                 <Tab
-                  key={status.id}
+                  key={index}
                   label={status.name}
                   {...a11yProps(index + 1)}
                 />
               ))}
           </Tabs>
         </Box>
-        <UIDateRangePicker />
       </Box>
 
       <UITabPanel index={0} value={statusIndex}>
         <UITable
-          heading="All Requests"
-          headCells={RequestHeadCells}
-          rows={requestRows}
-        >
-          <Button
-            onClick={handleAddValuationRequest}
-            variant="contained"
-            size="large"
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
-        </UITable>
+          heading="All Valuations"
+          headCells={ValuationHeadCells}
+          rows={rows}
+          readOnly
+        />
       </UITabPanel>
 
-      {valuationRequestStatus
+      {diamondValuationStatus
         .filter((status, index) => index !== 0)
         .map((status, index) => (
           <UITabPanel key={index} index={index + 1} value={statusIndex}>
             <UITable
               heading={
-                statusIndex === index + 1 ? `${status.name} Requests` : ""
+                statusIndex === index + 1 ? `${status.name} Valuations` : ""
               }
-              headCells={RequestHeadCells}
+              headCells={ValuationHeadCells}
               rows={
                 statusIndex === index + 1
-                  ? requestRows.filter((row) => row.status === status.name)
+                  ? rows.filter((row) => row.status === status.name)
                   : []
               }
+              readOnly
             />
           </UITabPanel>
         ))}
@@ -116,4 +88,4 @@ const ValuationRequestList = ({ valuationRequests, customers }) => {
   );
 };
 
-export default ValuationRequestList;
+export default DiamondValuationList;

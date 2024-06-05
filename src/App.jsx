@@ -1,12 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ScreenAppLayout from "./screens/AppLayout.jsx";
 import ScreenDashboard from "./screens/Dashboard.jsx";
-import ScreenDiamondValuationItem from "./screens/DiamondValuation/Item.jsx";
-import ScreenDiamondValuationList from "./screens/DiamondValuation/List.jsx";
+import ScreenValuationRequestDetailItem from "./screens/Detail/Item.jsx";
 import ScreenResult from "./screens/Record/Result.jsx";
-import ScreenValuationRequestItem from "./screens/ValuationRequest/Item.jsx";
-import ScreenValuationRequestList from "./screens/ValuationRequest/List.jsx";
-import ScreenValuationRequestDetailItem from "./screens/ValuationRequestDetail/Item.jsx";
+import ScreenValuationRequestItem from "./screens/Request/Item.jsx";
+import ScreenRequestList from "./screens/Request/List.jsx";
+import ScreenDiamondValuationItem from "./screens/Valuation/Item.jsx";
+import ScreenDiamondValuationList from "./screens/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
@@ -23,7 +23,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <ScreenValuationRequestList />,
+            element: <ScreenRequestList />,
           },
           {
             path: ":requestId",

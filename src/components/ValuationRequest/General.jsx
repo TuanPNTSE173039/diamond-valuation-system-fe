@@ -21,9 +21,10 @@ import { format } from "date-fns";
 import * as React from "react";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { updateValuationRequest } from "../../services/api.js";
 import { axiosInstance } from "../../services/config.js";
-import { updateValuationRequest } from "../../services/ValuationRequest/api.js";
-import { formattedMoney } from "../../utilities/AppConfig.js";
+
+import { formattedMoney } from "../../utilities/Formatter.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
 

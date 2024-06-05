@@ -1,10 +1,11 @@
 import React from "react";
-import { formatDateTime, formattedMoney } from "../../utilities/AppConfig.js";
+
+import { formatDateTime, formattedMoney } from "../../utilities/Formatter.js";
+import ValuationRequestDetailList from "../Detail/List.jsx";
+import RecordList from "../Record/RecordList.jsx";
 import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
 import UIRequestHeader from "../UI/UIRequestHeader.jsx";
-import ValuationRequestDetailList from "../ValuationRequestDetail/List.jsx";
 import ValuationRequestGeneral from "./General.jsx";
-import RecordList from "./Record/RecordList.jsx";
 
 const ValuationRequestItem = ({
   valuationRequest,

@@ -15,9 +15,10 @@ import logo from "../../assets/images/logo.png";
 import NeedleImage from "../../assets/images/needle.png";
 import PinpointImage from "../../assets/images/pinpoint.png";
 import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.jsx";
-import { getValuationRequest } from "../../services/ValuationRequest/api.js";
-import { formattedMoney } from "../../utilities/AppConfig.js";
-import { storage } from "../../utilities/firebaseConfig.js";
+import { getValuationRequest } from "../../services/api.js";
+import { storage } from "../../services/firebase.js";
+
+import { formattedMoney } from "../../utilities/Formatter.js";
 
 const ScreenResult = () => {
   const { requestId } = useParams();

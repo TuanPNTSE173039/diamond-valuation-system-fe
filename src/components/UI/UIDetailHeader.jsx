@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { checkDiamond } from "../../services/ValuationRequestDetail/api.js";
+import { checkDiamond } from "../../services/api.js";
 
 export default function UIDetailHeader({ title, detail }) {
   const queryClient = useQueryClient();

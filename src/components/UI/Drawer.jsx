@@ -11,7 +11,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
 import { NavLink } from "react-router-dom";
-import { checkRole } from "../../utilities/DrawerItemByRole.jsx";
+import { checkRole } from "../../utilities/DrawerItem.jsx";
 
 const drawerWidth = 240;
 
