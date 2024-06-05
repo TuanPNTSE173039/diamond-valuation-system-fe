@@ -24,6 +24,7 @@ import { ref, uploadBytesResumable } from "firebase/storage";
 import * as React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import CrystalImage from "../../assets/images/crystal.png";
 import FeatherImage from "../../assets/images/feather.png";
 import NeedleImage from "../../assets/images/needle.png";
@@ -134,6 +135,8 @@ const DiamondValuationAssessment = ({
           ...prevState,
           proportions: imageLink,
         }));
+
+        toast.success("Upload image successfully");
       },
     );
   };
@@ -180,6 +183,8 @@ const DiamondValuationAssessment = ({
           ...prevState,
           clarityCharacteristic: imageLink,
         }));
+
+        toast.success("Upload image successfully");
       },
     );
   }

@@ -4,6 +4,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   getValuationRequest,
   postPayment,
@@ -38,6 +39,7 @@ const RecordReceipt = () => {
       };
       newPayment(paymentBody);
       queryClient.invalidateQueries(["valuationRequest", requestId]);
+      toast.success("Update successfully");
     },
   });
   const { mutate: newPayment } = useMutation({

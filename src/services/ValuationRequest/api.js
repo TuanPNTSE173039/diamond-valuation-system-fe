@@ -1,16 +1,18 @@
-import { http } from "../config.js";
+import { axiosInstance } from "../config.js";
 
 export const getValuationRequests = async () => {
-  const response = await http.get("valuation-requests?sortBy=id&sortDir=desc");
+  const response = await axiosInstance.get(
+    "valuation-requests?sortBy=id&sortDir=desc",
+  );
   return response.data;
 };
 
 export const getValuationRequest = async (id) => {
-  const response = await http.get(`valuation-requests/${id}`);
+  const response = await axiosInstance.get(`valuation-requests/${id}`);
   return response.data;
 };
 
 export const updateValuationRequest = (id, body) =>
-  http.put(`valuation-requests/${id}`, body);
+  axiosInstance.put(`valuation-requests/${id}`, body);
 
-export const postPayment = (body) => http.post("payments", body);
+export const postPayment = (body) => axiosInstance.post("payments", body);

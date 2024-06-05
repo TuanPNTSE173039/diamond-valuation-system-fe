@@ -21,7 +21,7 @@ import { format } from "date-fns";
 import * as React from "react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { http } from "../../services/config.js";
+import { axiosInstance } from "../../services/config.js";
 import { updateValuationRequest } from "../../services/ValuationRequest/api.js";
 import { formattedMoney } from "../../utilities/AppConfig.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
@@ -57,7 +57,8 @@ const ValuationRequestGeneral = ({
   const [consultant, setConsultant] = useState(consultantList[0]);
   const { data, error, status } = useQuery({
     queryKey: ["valuationRequest", valuationRequest.id],
-    queryFn: () => http.get("/valuation-requests/" + valuationRequest.id),
+    queryFn: () =>
+      axiosInstance.get("/valuation-requests/" + valuationRequest.id),
   });
   console.log(data);
   const handleClickOpen = () => {

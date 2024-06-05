@@ -18,6 +18,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { updateDiamondNote } from "../../services/DiamondValuation/api.js";
 import { getStaffById } from "../../services/Staff/utils.jsx";
 import { updateDetail } from "../../services/ValuationRequestDetail/api.js";
@@ -307,6 +308,7 @@ const ValuationRequestDetailItem = ({
           const imageLink = `${imageLinks}` / `${image.name}`;
           setImage(null);
           setProgress(0);
+          toast.success("Upload image successfully");
         });
       },
     );

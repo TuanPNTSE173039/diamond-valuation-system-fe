@@ -1,6 +1,6 @@
-import { http } from "../config.js";
+import { axiosInstance } from "../config.js";
 
 export const getStaffs = async () => {
-  const response = await http.get("staffs");
+  const response = await axiosInstance.get("staffs");
   return response.data;
 };

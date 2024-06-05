@@ -3,11 +3,27 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import React, { useRef } from "react";
+import Typography from "@mui/material/Typography";
+import { useQuery } from "@tanstack/react-query";
+import { getDownloadURL, ref as loadImageRef } from "firebase/storage";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Margin, Resolution, usePDF } from "react-to-pdf";
+import CrystalImage from "../../assets/images/crystal.png";
+import FeatherImage from "../../assets/images/feather.png";
 import logo from "../../assets/images/logo.png";
+import NeedleImage from "../../assets/images/needle.png";
+import PinpointImage from "../../assets/images/pinpoint.png";
+import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.jsx";
+import { getValuationRequest } from "../../services/ValuationRequest/api.js";
+import { formattedMoney } from "../../utilities/AppConfig.js";
+import { storage } from "../../utilities/firebaseConfig.js";
 
 const ScreenResult = () => {
+  const { requestId } = useParams();
+  const [proportionImages, setProportionImages] = useState([]);
+  const [clarityCharacteristicImages, setClarityCharacteristicImages] =
+    useState([]);
   const ref = useRef(); // Create a reference
   const options = {
     // default is `save`
@@ -24,7 +40,7 @@ const ScreenResult = () => {
       // default is 'A4'
       format: "letter",
       // default is 'portrait'
-      orientation: "landscape",
+      orientation: "portrait",
     },
     canvas: {
       // default is 'image/jpeg' for better size performance
@@ -46,16 +62,69 @@ const ScreenResult = () => {
     },
   };
   const { toPDF, targetRef } = usePDF(options);
+  const {
+    data: { valuationRequestDetails },
+    isLoading: isValuationRequestLoading,
+    error,
+  } = useQuery({
+    queryKey: ["valuationRequest", requestId],
+    queryFn: () => getValuationRequest(requestId),
+    select: (data) => {
+      return {
+        ...data,
+        valuationRequestDetails: data.valuationRequestDetails.filter(
+          (item) => item.status === "APPROVED",
+        ),
+      };
+    },
+  });
+  if (isValuationRequestLoading) {
+    return <UICircularIndeterminate />;
+  }
+  const loadImage = async (imagePath, setLink) => {
+    const imageRef = loadImageRef(storage, imagePath);
+    try {
+      const url = await getDownloadURL(imageRef);
+      setLink((prev) => [...prev, url]);
+    } catch (error) {
+      console.error("Error loading image by path:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (proportionImages.length === 0) {
+      for (let i = 0; i < valuationRequestDetails.length; i++) {
+        loadImage(
+          valuationRequestDetails[i].diamondValuationNote.proportions,
+          setProportionImages,
+        );
+      }
+    }
+    if (clarityCharacteristicImages.length === 0) {
+      for (let i = 0; i < valuationRequestDetails.length; i++) {
+        loadImage(
+          valuationRequestDetails[i].diamondValuationNote.clarityCharacteristic,
+          setClarityCharacteristicImages,
+        );
+      }
+    }
+  }, []);
 
   return (
     <div>
       <div>
         <Stack direction="row" spacing={1}>
-          <button onClick={() => toPDF()}>
+          <div
+            onClick={() => {
+              console.log(proportionImages);
+              toPDF();
+              console.log(proportionImages);
+            }}
+          >
             <IconButton color="primary" aria-label="download">
               <DownloadIcon />
             </IconButton>
-          </button>
+          </div>
           <IconButton color="secondary" aria-label="upload">
             <FileUploadIcon />
           </IconButton>
@@ -65,154 +134,203 @@ const ScreenResult = () => {
         </Stack>
       </div>
       <div ref={targetRef}>
-        <main className="text-slate-800 mt-24 h-[100vh] flex flex-col w-full">
-          <div className="flex flex-row justify-center items-center mb-2">
-            <img src={logo} alt={"H&T Diamond"} className="h-20 w-auto" />
-          </div>
-          <h1 className="text-center text-2xl text-slate-800">H&T Diamond</h1>
-          <p className="pt-1 text-slate-400 text-center h-full">
-            Valuation #10192
-          </p>
-          <div className="p-12 flex-grow bg-white rounded-2xl rounded-t-none shadow-xl shadow-black/10">
-            <div className="">
-              <div className="h-px bg-gray-300 my-4" />
-              <div>
-                <p className="p-0 mb-1">
-                  <b>Diamond Attribute</b>
-                </p>
-                <div className="flex gap-10">
-                  <div className="flex w-1/2">
+        {valuationRequestDetails.map((item, index) => (
+          <main
+            key={item.id}
+            className="text-slate-800 mt-24 h-[161vh] flex flex-col w-full"
+          >
+            <div className="flex flex-row justify-center items-center mb-2">
+              <img src={logo} alt={"H&T Diamond"} className="h-20 w-auto" />
+            </div>
+            <h1 className="text-center text-2xl text-slate-800">H&T Diamond</h1>
+            <p className="pt-1 text-slate-400 text-center h-[35px]">
+              Valuation #{item.id}
+            </p>
+            <div className="p-12 flex-grow bg-white rounded-2xl rounded-t-none shadow-xl shadow-black/10">
+              <div className="">
+                {/*<div className="h-px bg-gray-300 my-4" />*/}
+                <div>
+                  <p className="p-0 mb-1">
+                    <b>Diamond Attribute</b>
+                  </p>
+                  <div className="flex gap-10">
+                    <div className="flex w-1/2">
+                      <div className="w-1/2">
+                        <p className="p-0 mb-1">Diamond Origin</p>
+                        <p className="p-0 mb-1">Carat</p>
+                        <p className="p-0 mb-1">Color</p>
+                        <p className="p-0 mb-1">Clarity</p>
+                        <p className="p-0 mb-1">Cut</p>
+                        <p className="p-0 mb-1">Shape</p>
+                        <p className="p-0 mb-1">Polish</p>
+                        <p className="p-0 mb-1">Symmetry</p>
+                        <p className="p-0 mb-1">Fluorescence</p>
+                      </div>
+                      <div className="w-1/2 text-right">
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.diamondOrigin}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.caratWeight}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.color}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.clarity}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.cut}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.shape}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.polish}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.symmetry}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {item.diamondValuationNote.fluorescence}
+                        </p>
+                      </div>
+                    </div>
                     <div className="w-1/2">
-                      <p className="p-0 mb-1">Diamond Origin</p>
-                      <p className="p-0 mb-1">Carat</p>
-                      <p className="p-0 mb-1">Color</p>
-                      <p className="p-0 mb-1">Clarity</p>
-                      <p className="p-0 mb-1">Cut</p>
-                      <p className="p-0 mb-1">Shape</p>
-                      <p className="p-0 mb-1">Polish</p>
-                      <p className="p-0 mb-1">Symmetry</p>
-                      <p className="p-0 mb-1">Fluorescence</p>
+                      <div className="">
+                        <img
+                          src={proportionImages[index]}
+                          alt={"Proportion"}
+                          loading="lazy"
+                          style={{
+                            height: "auto",
+                            width: "100%",
+                            objectFit: "cover",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </div>
+                      {/*<div className="">*/}
+                      {/*  <img*/}
+                      {/*    src="https://stonealgo-cert.b-cdn.net/img/img_prop-53d827c57a7a0d79f823a43c226fca6b.jpg"*/}
+                      {/*    alt="proportion"*/}
+                      {/*    className="w-auto h-[150px]"*/}
+                      {/*  />*/}
+                      {/*</div>*/}
                     </div>
-                    <div className="w-1/2 text-right">
-                      <p className="p-0 mb-1">Diamond Origin</p>
-                      <p className="p-0 mb-1">Carat</p>
-                      <p className="p-0 mb-1">Color</p>
-                      <p className="p-0 mb-1">Clarity</p>
-                      <p className="p-0 mb-1">Cut</p>
-                      <p className="p-0 mb-1">Shape</p>
-                      <p className="p-0 mb-1">Polish</p>
-                      <p className="p-0 mb-1">Symmetry</p>
-                      <p className="p-0 mb-1">Fluorescence</p>
-                    </div>
-                  </div>
-                  <div className="w-1/2">
-                    {/*<div className="">*/}
-                    {/*  <img*/}
-                    {/*    src="https://stonealgo-cert.b-cdn.net/img/img_prop-53d827c57a7a0d79f823a43c226fca6b.jpg"*/}
-                    {/*    alt="proportion"*/}
-                    {/*    className="w-auto h-[150px]"*/}
-                    {/*  />*/}
-                    {/*</div>*/}
-                    {/*<div className="">*/}
-                    {/*  <img*/}
-                    {/*    src="https://stonealgo-cert.b-cdn.net/img/img_prop-53d827c57a7a0d79f823a43c226fca6b.jpg"*/}
-                    {/*    alt="proportion"*/}
-                    {/*    className="w-auto h-[150px]"*/}
-                    {/*  />*/}
-                    {/*</div>*/}
                   </div>
                 </div>
-              </div>
-              <div className="h-px bg-gray-300 my-4" />
-            </div>
-            <div className="bg-slate-100 px-6 py-2 rounded-md">
-              <table className="w-full">
-                <tr className="font-bold text-slate-700">
-                  <td className="py-4">Estimated Retail Replacement Value</td>
-                  <td className="py-4">$2000</td>
-                </tr>
-              </table>
-            </div>
-            <hr className="my-6" />
-            This is some additional content to to inform you that Acme Inc. is a
-            fake company and this is a fake receipt. This is just a demo to show
-            you how you can create a beautiful receipt with Onedoc.{" "}
-          </div>
-        </main>
-        <main className="text-slate-800 mt-24 h-[100vh] flex flex-col w-full">
-          <div className="flex flex-row justify-center items-center mb-2">
-            <img src={logo} alt={"H&T Diamond"} className="h-20 w-auto" />
-          </div>
-          <h1 className="text-center text-2xl text-slate-800">H&T Diamond</h1>
-          <p className="pt-1 text-slate-400 text-center h-full">
-            Valuation #10193
-          </p>
-          <div className="p-12 flex-grow bg-white rounded-2xl rounded-t-none shadow-xl shadow-black/10">
-            <div className="">
-              <div className="h-px bg-gray-300 my-4" />
-              <div>
-                <p className="p-0 mb-1">
-                  <b>Diamond Attribute</b>
-                </p>
-                <div className="flex gap-10">
-                  <div className="flex w-1/2">
-                    <div className="w-1/2">
-                      <p className="p-0 mb-1">Diamond Origin</p>
-                      <p className="p-0 mb-1">Carat</p>
-                      <p className="p-0 mb-1">Color</p>
-                      <p className="p-0 mb-1">Clarity</p>
-                      <p className="p-0 mb-1">Cut</p>
-                      <p className="p-0 mb-1">Shape</p>
-                      <p className="p-0 mb-1">Polish</p>
-                      <p className="p-0 mb-1">Symmetry</p>
-                      <p className="p-0 mb-1">Fluorescence</p>
-                    </div>
-                    <div className="w-1/2 text-right">
-                      <p className="p-0 mb-1">Diamond Origin</p>
-                      <p className="p-0 mb-1">Carat</p>
-                      <p className="p-0 mb-1">Color</p>
-                      <p className="p-0 mb-1">Clarity</p>
-                      <p className="p-0 mb-1">Cut</p>
-                      <p className="p-0 mb-1">Shape</p>
-                      <p className="p-0 mb-1">Polish</p>
-                      <p className="p-0 mb-1">Symmetry</p>
-                      <p className="p-0 mb-1">Fluorescence</p>
-                    </div>
+                <div className="h-px bg-gray-300 my-4" />
+                <div>
+                  <div>
+                    <img
+                      src={clarityCharacteristicImages[index]}
+                      alt={"Clarity Characteristic"}
+                      loading="lazy"
+                      style={{
+                        height: "auto",
+                        width: "100%",
+                        objectFit: "cover",
+                        cursor: "pointer",
+                      }}
+                    />
                   </div>
-                  <div className="w-1/2">
-                    {/*<div className="">*/}
-                    {/*  <img*/}
-                    {/*    src="https://stonealgo-cert.b-cdn.net/img/img_prop-53d827c57a7a0d79f823a43c226fca6b.jpg"*/}
-                    {/*    alt="proportion"*/}
-                    {/*    className="w-auto h-[150px]"*/}
-                    {/*  />*/}
-                    {/*</div>*/}
-                    {/*<div className="">*/}
-                    {/*  <img*/}
-                    {/*    src="https://stonealgo-cert.b-cdn.net/img/img_prop-53d827c57a7a0d79f823a43c226fca6b.jpg"*/}
-                    {/*    alt="proportion"*/}
-                    {/*    className="w-auto h-[150px]"*/}
-                    {/*  />*/}
-                    {/*</div>*/}
-                  </div>
+
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ justifyContent: "space-evenly", mt: 1 }}
+                  >
+                    <Stack
+                      direction="row"
+                      sx={{
+                        alignItems: "center",
+                        height: 30,
+                        p: "2px",
+                      }}
+                    >
+                      <img
+                        src={CrystalImage}
+                        alt="Crystal"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                      <Typography sx={{ color: "gray" }}>Crystal</Typography>
+                    </Stack>
+                    <Stack
+                      direction="row"
+                      sx={{ alignItems: "center", height: 30, p: "2px" }}
+                    >
+                      <img
+                        src={FeatherImage}
+                        alt="Feather"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                      <Typography sx={{ color: "gray", pl: 2 }}>
+                        Feather
+                      </Typography>
+                    </Stack>
+                    <Stack
+                      direction="row"
+                      sx={{ alignItems: "center", height: 30, p: "2px" }}
+                    >
+                      <img
+                        src={NeedleImage}
+                        alt="Needle"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                      <Typography sx={{ color: "gray", pl: 1 }}>
+                        Needle
+                      </Typography>
+                    </Stack>
+                    <Stack
+                      direction="row"
+                      sx={{ alignItems: "center", height: 30, p: "2px" }}
+                    >
+                      <img
+                        src={PinpointImage}
+                        alt="Pinpoint"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                      <Typography sx={{ color: "gray" }}>Pinpoint</Typography>
+                    </Stack>
+                  </Stack>
                 </div>
+
+                <div className="h-px bg-gray-300 my-4" />
               </div>
-              <div className="h-px bg-gray-300 my-4" />
+              <div className="bg-slate-100 px-6 py-2 rounded-md">
+                <table className="w-full">
+                  <tr className="font-bold text-slate-700">
+                    <td className="py-4">Estimated Retail Replacement Value</td>
+                    <td className="py-4">
+                      {formattedMoney(item.valuationPrice)}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <hr className="my-6" />
+              This is some additional content to to inform you that Acme Inc. is
+              a fake company and this is a fake receipt. This is just a demo to
+              show you how you can create a beautiful receipt with Onedoc.{" "}
             </div>
-            <div className="bg-slate-100 px-6 py-2 rounded-md">
-              <table className="w-full">
-                <tr className="font-bold text-slate-700">
-                  <td className="py-4">Estimated Retail Replacement Value</td>
-                  <td className="py-4">$2000</td>
-                </tr>
-              </table>
-            </div>
-            <hr className="my-6" />
-            This is some additional content to to inform you that Acme Inc. is a
-            fake company and this is a fake receipt. This is just a demo to show
-            you how you can create a beautiful receipt with Onedoc.{" "}
-          </div>
-        </main>
+          </main>
+        ))}
       </div>
     </div>
   );
