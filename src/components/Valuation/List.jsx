@@ -4,8 +4,8 @@ import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
 
-import { diamondValuationStatus } from "../../utilities/Status.js";
-import { ValuationHeadCells } from "../../utilities/Table.js";
+import { diamondValuationStatus } from "../../utilities/Status.jsx";
+import { ValuationHeadCells } from "../../utilities/table.js";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 

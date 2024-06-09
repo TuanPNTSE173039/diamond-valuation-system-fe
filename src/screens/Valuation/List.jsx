@@ -8,8 +8,8 @@ import {
   getValuationRequests,
 } from "../../services/api.js";
 
-import { getValuationRequestById } from "../../utilities/Filtering.js";
-import { formatDateTime, formattedMoney } from "../../utilities/Formatter.js";
+import { getValuationRequestById } from "../../utilities/filtering.js";
+import { formatDateTime, formattedMoney } from "../../utilities/formatter.js";
 
 const ScreenDiamondValuationList = () => {
   const { data: valuations, isLoading: isValuationLoading } = useQuery({

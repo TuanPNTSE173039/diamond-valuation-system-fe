@@ -20,11 +20,13 @@ import Carousel from "react-material-ui-carousel";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateDetail, updateDiamondNote } from "../../services/api.js";
-import { storage } from "../../services/firebase.js";
+import { storage } from "../../services/config/firebase.js";
+import { useDetail } from "../../services/details.js";
 
-import { getStaffById } from "../../utilities/Filtering.js";
-import { formattedMoney } from "../../utilities/Formatter.js";
-import { loadImageByPath } from "../../utilities/ImageLoader.js";
+import { getStaffById } from "../../utilities/filtering.js";
+import { formattedMoney } from "../../utilities/formatter.js";
+import { loadImageByPath } from "../../utilities/imageLoader.js";
+import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIDetailHeader from "../UI/UIDetailHeader.jsx";
 import DiamondValuationAssessment from "../Valuation/Assessment.jsx";
 import DiamondValuationAssignTable from "../Valuation/AssignTable.jsx";
@@ -46,13 +48,12 @@ const VisuallyHiddenInput = styled("input")({
 export const metadata = {
   contentType: "image/jpeg",
 };
-const ValuationRequestDetailItem = ({
-  detail,
-  valuationRequests,
-  customer,
-  staffs,
-}) => {
+const DetailItem = ({ staffs }) => {
   const queryClient = useQueryClient();
+  const { requestId, detailId } = useParams();
+  const { data: detail } = useDetail(detailId);
+
+  //Mutate
   const { mutate: mutateDetail } = useMutation({
     mutationFn: (body) => {
       return updateDetail(detail.id, body);
@@ -61,18 +62,25 @@ const ValuationRequestDetailItem = ({
       queryClient.invalidateQueries(["valuationRequests"]);
     },
   });
-  const { detailId } = useParams();
   const { mutate: mutateAssessment } = useMutation({
     mutationFn: (body) => {
       return updateDiamondNote(detail.diamondValuationNote.id, body);
     },
     onSuccess: (body) => {
-      queryClient.invalidateQueries(["valuationRequests"]);
+      queryClient.invalidateQueries({
+        queryKey: ["detail", { detailId: detailId }],
+      });
+      if (body.status === "ASSESSING")
+        toast.success("Save assessment successfully");
+      else if (body.status === "ASSESSED")
+        toast.success("Confirm assessment successfully");
     },
   });
-  const serverDiamondInfor = detail?.diamondValuationNote;
+
+  //DiamondInfor
+  const serverDiamondInfor = detail.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({
-    giaCertDate: dayjs(new Date()),
+    giaCertDate: dayjs(new Date()), //xu ly sau
     certificateId: serverDiamondInfor?.certificateId,
     diamondOrigin: serverDiamondInfor?.diamondOrigin,
     caratWeight: serverDiamondInfor?.caratWeight,
@@ -84,45 +92,25 @@ const ValuationRequestDetailItem = ({
     polish: serverDiamondInfor?.polish,
     fluorescence: serverDiamondInfor?.fluorescence,
     proportions: serverDiamondInfor?.proportions,
-    clarityCharacteristics: serverDiamondInfor?.clarityCharacteristic,
+    clarityCharacteristicLink: serverDiamondInfor?.clarityCharacteristicLink,
+    clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
   });
-  const getPreviousStatus = (currentStatus) => {
-    switch (currentStatus) {
-      case "PENDING":
-        return "PENDING";
-      case "ASSESSING":
-        return "PENDING";
-      case "ASSESSED":
-        return "ASSESSING";
-      case "VALUATING":
-        return "ASSESSED";
-      case "VALUATED":
-        return "VALUATING";
-      case "APPROVED":
-        return "APPROVED";
-    }
+
+  //Clarity Characteristic List
+  const [clarities, setClarities] = useState(
+    diamondInfor.clarityCharacteristic === null
+      ? []
+      : () => diamondInfor.clarityCharacteristic,
+  );
+  const handleClarities = (event, newClarity) => {
+    setClarities(newClarity);
   };
+
+  //Assessing State
   const [detailState, setDetailState] = useState({
     previous: getPreviousStatus(detail.status),
     current: detail.status,
   });
-
-  const infor = {
-    customerName: customer.firstName + " " + customer.lastName,
-    phone: customer.phone.trim(),
-    email: customer.email.trim(),
-    size: detail.size,
-    service: valuationRequests.service.name,
-    servicePrice: detail.servicePrice,
-    status: detail.status,
-    fairPriceEstimate:
-      serverDiamondInfor?.fairPrice === null
-        ? "N/A"
-        : serverDiamondInfor?.fairPrice,
-    estimateRange:
-      serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
-  };
-
   function handleAssessing() {
     setDetailState((prevState) => {
       return {
@@ -132,7 +120,6 @@ const ValuationRequestDetailItem = ({
       };
     });
   }
-
   function handleCancelAssessing() {
     setDetailState((prevState) => {
       if (prevState.previous === "PENDING") {
@@ -148,7 +135,6 @@ const ValuationRequestDetailItem = ({
       };
     });
   }
-
   function handleSaveAssessing() {
     setDetailState((prevState) => {
       return {
@@ -164,10 +150,10 @@ const ValuationRequestDetailItem = ({
     mutateDetail(detailBody);
     const assessmentBody = {
       ...diamondInfor,
+      clarityCharacteristic: clarities,
     };
     mutateAssessment(assessmentBody);
   }
-
   function handleEditAssessment() {
     setDetailState((prevState) => {
       return {
@@ -177,7 +163,6 @@ const ValuationRequestDetailItem = ({
       };
     });
   }
-
   function handleConfirmAssessment() {
     setDetailState((prevState) => {
       return {
@@ -193,47 +178,17 @@ const ValuationRequestDetailItem = ({
     mutateDetail(detailBody);
   }
 
-  const [open, setOpen] = React.useState(false);
-  const [selectedStaff, setSelectedStaff] = React.useState(null);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSave = () => {
-    // Save your changes here
-    // ...
-    setOpen(false);
-  };
-  const [image, setImage] = useState(null); // state lưu ảnh sau khi chọn
+  //Image
+  const [diamondImage, setDiamondImage] = useState(null);
+  const [uploadedDiamondImages, setUploadedDiamondImages] = useState([]);
   const [proportionImage, setProportionImage] = useState(null);
   const [clarityCharacteristicImage, setClarityCharacteristicImage] =
     useState(null);
-  const [progress, setProgress] = useState(0); // state hiển thị phần trăm tải ảnh lên store
-  const [uploadedImages, setUploadedImages] = useState([]); // state hiển thị danh sách ảnh đã tải lên store
-  const resultStaff =
-    detail.valuationPrice === 0
-      ? null
-      : !detail.mode
-        ? {
-            staff: getStaffById(staffs, detail.diamondValuationAssign.staffId),
-            comment: detail.diamondValuationAssign.comment,
-          }
-        : detail.diamondValuationAssigns.map((item) => ({
-            staff: getStaffById(staffs, item.staffId),
-            comment: item.comment,
-          }));
-
-  function handleSelectImage(e) {
+  function handleSelectDiamondImage(e) {
     if (e.target.files[0]) {
-      setImage(e.target.files[0]);
+      setDiamondImage(e.target.files[0]);
     }
   }
-
   const imageLinks = `diamonds/${detailId}/images`;
   const getListAllImages = () => {
     const listRef = ref(storage, imageLinks);
@@ -249,13 +204,12 @@ const ValuationRequestDetailItem = ({
             return url;
           }),
         );
-        setUploadedImages(images);
+        setUploadedDiamondImages(images);
       })
       .catch((error) => {
         console.error("Error getting download URL:", error);
       });
   };
-
   useEffect(() => {
     getListAllImages();
     if (detail.diamondValuationNote?.proportions !== null) {
@@ -264,31 +218,21 @@ const ValuationRequestDetailItem = ({
         setProportionImage,
       );
     }
-    if (detail.diamondValuationNote?.clarityCharacteristic !== null) {
+    if (detail.diamondValuationNote?.clarityCharacteristicLink !== null) {
       loadImageByPath(
-        detail.diamondValuationNote?.clarityCharacteristic,
+        detail.diamondValuationNote?.clarityCharacteristicLink,
         setClarityCharacteristicImage,
       );
     }
   }, []);
-
   const handleUploadDiamondImage = () => {
-    const storageRef = ref(storage, `${imageLinks}/${image.name}`);
-
-    const uploadTask = uploadBytesResumable(storageRef, image, metadata);
-
-    // Register three observers:
-    // 1. 'state_changed' observer, called any time the state changes
-    // 2. Error observer, called on failure
-    // 3. Completion observer, called on successful completion
+    const storageRef = ref(storage, `${imageLinks}/${diamondImage.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, diamondImage, metadata);
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        // Observe state change events such as progress, pause, and resume
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgress(progress);
         console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
           case "paused":
@@ -304,15 +248,28 @@ const ValuationRequestDetailItem = ({
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setUploadedImages([downloadURL, ...uploadedImages]);
-          const imageLink = `${imageLinks}` / `${image.name}`;
-          setImage(null);
-          setProgress(0);
+          setUploadedDiamondImages([downloadURL, ...uploadedDiamondImages]);
+          const imageLink = `${imageLinks}` / `${diamondImage.name}`;
+          setDiamondImage(null);
           toast.success("Upload image successfully");
         });
       },
     );
   };
+
+  //ResultStaff after approve
+  const resultStaff =
+    detail.valuationPrice === 0
+      ? null
+      : !detail.mode
+        ? {
+            staff: getStaffById(staffs, detail.diamondValuationAssign.staffId),
+            comment: detail.diamondValuationAssign.comment,
+          }
+        : detail.diamondValuationAssigns.map((item) => ({
+            staff: getStaffById(staffs, item.staffId),
+            comment: item.comment,
+          }));
 
   return (
     <>
@@ -374,9 +331,9 @@ const ValuationRequestDetailItem = ({
             }}
           >
             <DiamondValuationUserInfor
-              infor={infor}
               sx={{ width: detail.valuationPrice === 0.0 ? "100%" : "50%" }}
             />
+
             {detail.valuationPrice !== 0.0 && (
               <Box
                 sx={{
@@ -446,11 +403,11 @@ const ValuationRequestDetailItem = ({
         <Box sx={{ position: "relative", width: "50%" }}>
           <DiamondValuationFieldGroup title="Diamond Images">
             <ImageList
-              sx={{ width: "100%", height: 328, rowGap: "10px" }}
+              sx={{ width: "100%", height: 339, rowGap: "10px" }}
               cols={3}
               rowHeight={164}
             >
-              {!image && (
+              {!diamondImage && (
                 <ImageListItem>
                   <Button
                     component="label"
@@ -463,12 +420,12 @@ const ValuationRequestDetailItem = ({
                     Upload file
                     <VisuallyHiddenInput
                       type="file"
-                      onChange={handleSelectImage}
+                      onChange={handleSelectDiamondImage}
                     />
                   </Button>
                 </ImageListItem>
               )}
-              {image && (
+              {diamondImage && (
                 <ImageListItem sx={{ position: "relative" }}>
                   <IconButton
                     aria-label="delete"
@@ -490,7 +447,7 @@ const ValuationRequestDetailItem = ({
                   </IconButton>
                   <Box sx={{ w: 164, h: 164 }}>
                     <img
-                      src={`${URL.createObjectURL(image)}`}
+                      src={`${URL.createObjectURL(diamondImage)}`}
                       alt="New upload image"
                       loading="lazy"
                       style={{ height: "164px", objectFit: "cover" }}
@@ -498,7 +455,7 @@ const ValuationRequestDetailItem = ({
                   </Box>
                 </ImageListItem>
               )}
-              {uploadedImages
+              {uploadedDiamondImages
                 .map((item) => ({ img: item, title: "Diamond Image" }))
                 .map((item, index) => (
                   <ImageListItem key={index} sx={{ position: "relative" }}>
@@ -530,7 +487,7 @@ const ValuationRequestDetailItem = ({
                   </ImageListItem>
                 ))}
             </ImageList>
-            {image && (
+            {diamondImage && (
               <Button
                 onClick={handleUploadDiamondImage}
                 variant={"outlined"}
@@ -550,7 +507,9 @@ const ValuationRequestDetailItem = ({
           setDiamondInfor={setDiamondInfor}
           detailState={detailState}
           proportionImage={proportionImage}
-          clarityCharacteristic={clarityCharacteristicImage}
+          clarityCharacteristicImage={clarityCharacteristicImage}
+          clarities={clarities}
+          handleClarities={handleClarities}
         />
       )}
       {(detailState.current === "ASSESSED" ||
@@ -569,4 +528,4 @@ const ValuationRequestDetailItem = ({
   );
 };
 
-export default ValuationRequestDetailItem;
+export default DetailItem;

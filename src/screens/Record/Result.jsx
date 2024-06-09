@@ -9,16 +9,16 @@ import { getDownloadURL, ref as loadImageRef } from "firebase/storage";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Margin, Resolution, usePDF } from "react-to-pdf";
-import CrystalImage from "../../assets/images/crystal.png";
-import FeatherImage from "../../assets/images/feather.png";
+import CrystalImage from "../../assets/images/clarity-characteristic/crystal.png";
+import FeatherImage from "../../assets/images/clarity-characteristic/feather.png";
+import NeedleImage from "../../assets/images/clarity-characteristic/needle.png";
+import PinpointImage from "../../assets/images/clarity-characteristic/pinpoint.png";
 import logo from "../../assets/images/logo.png";
-import NeedleImage from "../../assets/images/needle.png";
-import PinpointImage from "../../assets/images/pinpoint.png";
 import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.jsx";
 import { getValuationRequest } from "../../services/api.js";
-import { storage } from "../../services/firebase.js";
+import { storage } from "../../services/config/firebase.js";
 
-import { formattedMoney } from "../../utilities/Formatter.js";
+import { formattedMoney } from "../../utilities/formatter.js";
 
 const ScreenResult = () => {
   const { requestId } = useParams();

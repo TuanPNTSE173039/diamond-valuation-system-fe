@@ -1,9 +1,9 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ScreenAppLayout from "./screens/AppLayout.jsx";
 import ScreenDashboard from "./screens/Dashboard.jsx";
-import ScreenValuationRequestDetailItem from "./screens/Detail/Item.jsx";
+import ScreenDetailItem from "./screens/Detail/Item.jsx";
 import ScreenResult from "./screens/Record/Result.jsx";
-import ScreenValuationRequestItem from "./screens/Request/Item.jsx";
+import ScreenRequestItem from "./screens/Request/Item.jsx";
 import ScreenRequestList from "./screens/Request/List.jsx";
 import ScreenDiamondValuationItem from "./screens/Valuation/Item.jsx";
 import ScreenDiamondValuationList from "./screens/Valuation/List.jsx";
@@ -30,11 +30,11 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <ScreenValuationRequestItem />,
+                element: <ScreenRequestItem />,
               },
               {
                 path: ":detailId",
-                element: <ScreenValuationRequestDetailItem />,
+                element: <ScreenDetailItem />,
               },
               {
                 path: "result",

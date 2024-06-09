@@ -4,7 +4,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import Box from "@mui/material/Box";
 import * as React from "react";
 
-import { formatDateTime } from "../../utilities/Formatter.js";
+import { formatDateTime } from "../../utilities/formatter.js";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
 const DiamondValuationInfor = ({ valuationInfor, ...props }) => {

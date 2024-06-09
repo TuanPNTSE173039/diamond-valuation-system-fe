@@ -1,57 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useParams } from "react-router-dom";
+import ValuationRequestItem from "../../components/Request/Item.jsx";
 import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.jsx";
-import ValuationRequestItem from "../../components/ValuationRequest/Item.jsx";
-import {
-  getCustomers,
-  getStaffs,
-  getValuationRequest,
-} from "../../services/api.js";
-import { getCustomerByID, getStaffById } from "../../utilities/Filtering.js";
+import { useCustomer } from "../../services/customers.js";
+import { useRequest } from "../../services/requests.js";
+import { useStaffs } from "../../services/staffs.js";
 
-const ScreenValuationRequestItem = () => {
+const ScreenRequestItem = () => {
   const { requestId } = useParams();
-  const {
-    data: valuationRequest,
-    isLoading: isValuationRequestLoading,
-    error,
-  } = useQuery({
-    queryKey: ["valuationRequest", requestId],
-    queryFn: () => getValuationRequest(requestId),
-  });
-
-  const {
-    data: staffs,
-    isLoading: isStaffLoading,
-    error: staffError,
-  } = useQuery({
-    queryKey: ["staffs"],
-    queryFn: getStaffs,
-  });
-  const {
-    data: customers,
-    isLoading: isCustomerLoading,
-    error: customerError,
-  } = useQuery({
-    queryKey: ["customers"],
-    queryFn: getCustomers,
-  });
-
-  if (isValuationRequestLoading || isStaffLoading || isCustomerLoading) {
+  const { isPending: isStaffsPending } = useStaffs();
+  const { data: request, isPending: isRequestPending } = useRequest(requestId);
+  const { isPending: isCustomerPending } = useCustomer(request?.customerID);
+  if (isRequestPending || isCustomerPending || isStaffsPending) {
     return <UICircularIndeterminate />;
   }
 
-  const customer = getCustomerByID(customers, valuationRequest?.customerID);
-  const staff = getStaffById(staffs, valuationRequest?.staffID);
-  return (
-    <ValuationRequestItem
-      valuationRequest={valuationRequest}
-      customer={customer}
-      staff={staff}
-      staffs={staffs}
-    />
-  );
+  return <ValuationRequestItem />;
 };
 
-export default ScreenValuationRequestItem;
+export default ScreenRequestItem;

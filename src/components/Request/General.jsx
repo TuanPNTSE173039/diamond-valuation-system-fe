@@ -6,6 +6,7 @@ import LabelIcon from "@mui/icons-material/Label";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PersonIcon from "@mui/icons-material/Person";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -16,24 +17,44 @@ import Grid from "@mui/material/Grid";
 
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import * as React from "react";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateValuationRequest } from "../../services/api.js";
-import { axiosInstance } from "../../services/config.js";
+import { useCustomer } from "../../services/customers.js";
+import { useRequest } from "../../services/requests.js";
+import { useStaff, useStaffs } from "../../services/staffs.js";
 
-import { formattedMoney } from "../../utilities/Formatter.js";
+import { formattedMoney } from "../../utilities/formatter.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
 
-const ValuationRequestGeneral = ({
-  valuationRequest,
-  valuationData,
-  staffs,
-}) => {
+const RequestGeneral = () => {
+  const { requestId } = useParams();
+  const { data: request } = useRequest(requestId);
+  const { data: customer } = useCustomer(request.customerID);
+  const { data: staffs } = useStaffs();
+  const { data: staff } = useStaff(request.staffID);
+  // const staff = staffs.content.find((item) => item.id === request.staffID);
   const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body) => {
+      return updateValuationRequest(request.id, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["request", { requestId: requestId }],
+      });
+      toast.success("Consultant staff is assigned");
+    },
+  });
+  const [open, setOpen] = useState(false);
+  const [consultant, setConsultant] = useState(null);
+
   const consultantList = staffs.content
     .filter((item) => item.account.role === "CONSULTANT_STAFF")
     .map((item) => {
@@ -44,24 +65,6 @@ const ValuationRequestGeneral = ({
       };
     });
 
-  const { mutate, isPending, isError, isSuccess } = useMutation({
-    mutationFn: (body) => {
-      return updateValuationRequest(valuationRequest.id, body);
-    },
-    onSuccess: (_) => {
-      queryClient.invalidateQueries(["valuationRequest", valuationRequest.id]);
-      queryClient.invalidateQueries(["valuationRequests"]);
-      toast.success("Consultant staff is assigned");
-    },
-  });
-  const [open, setOpen] = useState(false);
-  const [consultant, setConsultant] = useState(consultantList[0]);
-  const { data, error, status } = useQuery({
-    queryKey: ["valuationRequest", valuationRequest.id],
-    queryFn: () =>
-      axiosInstance.get("/valuation-requests/" + valuationRequest.id),
-  });
-  console.log(data);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -73,12 +76,17 @@ const ValuationRequestGeneral = ({
 
   const handleSave = () => {
     const updatedValuationRequest = {
-      ...valuationRequest,
+      ...request,
       staffID: consultant.code,
       status: "PROCESSING",
     };
     mutate(updatedValuationRequest);
     setOpen(false);
+  };
+  const generalInfo = {
+    creationDate: request.creationDate,
+    returnedDate: request.returnDate,
+    totalFee: request.totalServicePrice,
   };
 
   return (
@@ -86,19 +94,20 @@ const ValuationRequestGeneral = ({
       <Grid container>
         <Grid item xs={4}>
           <ValuationRequestUserInfor icon={<PersonIcon />} title="Customer">
-            {valuationData.customerName}
+            <Avatar sx={{ width: 35, height: 35 }}>1</Avatar>
+            {customer.firstName + " " + customer.lastName}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<AssignmentIndIcon />} title="CCCD">
-            {valuationData.cccd}
+            {customer.identityDocument.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LocalPhoneIcon />} title="Phone">
-            {valuationData.phone}
+            {customer.phone.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<EmailIcon />} title="Email">
-            {valuationData.email}
+            {customer.email.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LocationOnIcon />} title="Adress">
-            {valuationData.address}
+            {customer.address.trim()}
           </ValuationRequestUserInfor>
         </Grid>
         <Grid item xs={4}>
@@ -106,15 +115,21 @@ const ValuationRequestGeneral = ({
             icon={<AssignmentIndIcon />}
             title="Assignee"
           >
-            {isPending ? (
-              "...assigning"
-            ) : valuationData.staff ? (
-              valuationData.staff.firstName + " " + valuationData.staff.lastName
-            ) : (
+            {staff && (
+              <>
+                <Avatar sx={{ width: 35, height: 35 }}>{staff.id}</Avatar>
+                <Typography>
+                  {staff.firstName + " " + staff.lastName}
+                </Typography>
+              </>
+            )}
+            {!staff && !isPending && (
               <Link onClick={handleClickOpen} sx={{ cursor: "pointer" }}>
                 Assign Consultant
               </Link>
             )}
+            {isPending && "...assigning"}
+
             <Dialog open={open} onClose={handleClose}>
               <DialogTitle>Assign Consultant</DialogTitle>
               <DialogContent>
@@ -138,30 +153,24 @@ const ValuationRequestGeneral = ({
             icon={<ElectricBoltIcon />}
             title="Service"
           >
-            {valuationData.service}
+            {request.service?.name}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LabelIcon />} title="Status">
-            {valuationData.status}
+            {request.status}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor
             icon={<CalendarMonthIcon />}
             title="Creation"
           >
-            {format(
-              new Date(valuationData.creationDate),
-              "yyyy/MM/dd - HH:mm:ss",
-            )}
+            {format(new Date(request.creationDate), "yyyy/MM/dd - HH:mm:ss")}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor
             icon={<CalendarMonthIcon />}
             title="Returned"
           >
-            {valuationData.returnedDate === null
+            {generalInfo.returnedDate === null
               ? "N/A"
-              : format(
-                  new Date(valuationData.returnedDate),
-                  "yyyy/MM/dd - HH:mm:ss",
-                )}
+              : format(new Date(request.returnDate), "yyyy/MM/dd - HH:mm:ss")}
           </ValuationRequestUserInfor>
         </Grid>
         <Grid item xs={4} sx={{ position: "relative" }}>
@@ -178,7 +187,7 @@ const ValuationRequestGeneral = ({
               Total Fee
             </Typography>
             <Box sx={{ fontSize: "4rem" }}>
-              {formattedMoney(valuationData.totalFee)}
+              {formattedMoney(request.totalServicePrice)}
             </Box>
           </Box>
         </Grid>
@@ -187,4 +196,4 @@ const ValuationRequestGeneral = ({
   );
 };
 
-export default ValuationRequestGeneral;
+export default RequestGeneral;

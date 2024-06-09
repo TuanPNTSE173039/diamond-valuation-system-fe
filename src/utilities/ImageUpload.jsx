@@ -6,7 +6,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import React, { useEffect, useState } from "react";
-import { storage } from "../services/firebase.js";
+import { storage } from "../services/config/firebase.js";
 
 const metadata = {
   contentType: "image/jpeg",

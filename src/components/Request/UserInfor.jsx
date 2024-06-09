@@ -12,7 +12,18 @@ export default function ValuationRequestUserInfor({ icon, title, children }) {
     >
       <Box sx={{ mb: 0.5, width: "8%" }}>{icon}</Box>
       <Box sx={{ width: "17%" }}>{title}</Box>
-      <Box sx={{ width: "75%", pl: 2 }}>{children}</Box>
+      <Box
+        sx={{
+          width: "75%",
+          pl: 2,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 }

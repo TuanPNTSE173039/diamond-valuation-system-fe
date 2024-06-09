@@ -10,7 +10,6 @@ import {
   postPayment,
   updateValuationRequest,
 } from "../../services/api.js";
-import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
 const RecordReturned = () => {
   const { requestId } = useParams();
@@ -23,9 +22,6 @@ const RecordReturned = () => {
     queryKey: ["valuationRequest", requestId],
     queryFn: () => getValuationRequest(requestId),
   });
-  if (isValuationRequestLoading) {
-    return <UICircularIndeterminate />;
-  }
   const { mutate: updateReceiptLink } = useMutation({
     mutationFn: (body) => {
       return updateValuationRequest(requestId, body);

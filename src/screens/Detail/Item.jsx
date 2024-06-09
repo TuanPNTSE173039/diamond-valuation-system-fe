@@ -1,74 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useParams } from "react-router-dom";
-import ValuationRequestDetailItem from "../../components/Detail/Item.jsx";
+import DetailItem from "../../components/Detail/Item.jsx";
 import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.jsx";
-import {
-  getCustomers,
-  getStaffs,
-  getValuationRequest,
-  getValuationRequestDetail,
-} from "../../services/api.js";
+import { useCustomer } from "../../services/customers.js";
+import { useDetail } from "../../services/details.js";
+import { useRequest } from "../../services/requests.js";
 
-import { getCustomerByID } from "../../utilities/Filtering.js";
-
-const ScreenValuationRequestDetailItem = () => {
+const ScreenDetailItem = () => {
   const { detailId, requestId } = useParams();
-  const {
-    data: detail,
-    isLoading: isDetailLoading,
-    error: detailError,
-  } = useQuery({
-    queryKey: ["Detail", detailId],
-    queryFn: () => getValuationRequestDetail(detailId),
-  });
-
-  const {
-    data: valuationRequest,
-    isLoading: isValuationRequestLoading,
-    error,
-  } = useQuery({
-    queryKey: ["valuationRequest", requestId],
-    queryFn: () => getValuationRequest(requestId),
-  });
-
-  const {
-    data: customers,
-    isLoading: isCustomerLoading,
-    error: customerError,
-  } = useQuery({
-    queryKey: ["customers"],
-    queryFn: getCustomers,
-  });
-
-  const {
-    data: staffs,
-    isLoading: isStaffLoading,
-    error: staffError,
-  } = useQuery({
-    queryKey: ["staffs"],
-    queryFn: getStaffs,
-  });
-
-  if (
-    isDetailLoading ||
-    isValuationRequestLoading ||
-    isCustomerLoading ||
-    isStaffLoading
-  ) {
+  const { isLoading: isDetailLoading } = useDetail(detailId);
+  const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
+  const { isLoading: isCustomerLoading } = useCustomer(
+    request ? request.customerID : undefined,
+  );
+  if (isDetailLoading || isRequestLoading || isCustomerLoading) {
     return <UICircularIndeterminate />;
   }
 
-  const customer = getCustomerByID(customers, valuationRequest?.customerID);
-
-  return (
-    <ValuationRequestDetailItem
-      detail={detail}
-      valuationRequests={valuationRequest}
-      customer={customer}
-      staffs={staffs}
-    />
-  );
+  return <DetailItem />;
 };
 
-export default ScreenValuationRequestDetailItem;
+export default ScreenDetailItem;

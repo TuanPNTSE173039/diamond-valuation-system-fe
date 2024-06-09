@@ -3,12 +3,14 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { format } from "date-fns";
 import * as React from "react";
 import { useState } from "react";
-import { getCustomerByID } from "../../utilities/Filtering.js";
-import { valuationRequestStatus } from "../../utilities/Status.js";
-import { RequestHeadCells } from "../../utilities/Table.js";
+import { useCustomers } from "../../services/customers.js";
+import { useRequests } from "../../services/requests.js";
+import { getCustomerByID } from "../../utilities/filtering.js";
+import { formatDateTime } from "../../utilities/formatter.js";
+import { valuationRequestStatus } from "../../utilities/Status.jsx";
+import { RequestHeadCells } from "../../utilities/table.js";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
@@ -19,7 +21,10 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const ValuationRequestList = ({ valuationRequests, customers }) => {
+const ValuationRequestList = () => {
+  const { data: requests } = useRequests();
+  const { data: customers } = useCustomers();
+
   const [statusIndex, setStatusIndex] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -30,9 +35,8 @@ const ValuationRequestList = ({ valuationRequests, customers }) => {
     console.log("Add Valuation Request");
   }
 
-  const requestRows = valuationRequests?.content.map((row) => {
+  const requestRows = requests.content.map((row) => {
     const customer = getCustomerByID(customers, row.customerID);
-
     const firstName = customer.firstName;
     const lastName = customer.lastName;
     return {
@@ -40,7 +44,7 @@ const ValuationRequestList = ({ valuationRequests, customers }) => {
       status: row.status,
       customerFirstName: firstName,
       customerLastName: lastName,
-      creationDate: format(new Date(row.creationDate), "yyyy/MM/dd - HH:mm:ss"),
+      creationDate: formatDateTime(row.creationDate),
       diamondAmount: row.diamondAmount,
       service: row.service.name,
     };

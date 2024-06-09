@@ -190,3 +190,42 @@ export const DetailHeadCells = [
     label: "Status",
   },
 ];
+
+export const StaffHeadCells = [
+  {
+    id: "number",
+    numeric: false,
+    disablePadding: false,
+    label: "ID",
+  },
+  {
+    id: "staffName",
+    numeric: false,
+    disablePadding: false,
+    label: "Staff Name",
+  },
+  {
+    id: "staffPhone",
+    numeric: false,
+    disablePadding: false,
+    label: "Phone",
+  },
+  {
+    id: "yearExperience",
+    numeric: true,
+    disablePadding: false,
+    label: "Experience",
+  },
+  {
+    id: "totalProjects",
+    numeric: true,
+    disablePadding: false,
+    label: "Total Projects",
+  },
+  {
+    id: "currentProjects",
+    numeric: true,
+    disablePadding: false,
+    label: "Current Projects",
+  },
+]

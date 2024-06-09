@@ -20,21 +20,30 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { assignValuationStaff, updateDetail } from "../../services/api.js";
+import { useDetail } from "../../services/details.js";
+import { useStaffs } from "../../services/staffs.js";
 
-import { getStaffById } from "../../utilities/Filtering.js";
-
-import UIAutocomplete from "../UI/Autocomplete.jsx";
+import { getStaffById } from "../../utilities/filtering.js";
+import { StaffHeadCells } from "../../utilities/table.js";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
+import UITable from "../UI/Table.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
-const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
+const DiamondValuationAssignTable = ({ detailState }) => {
   const { requestId, detailId } = useParams();
+  const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
+  const { data: staffs, isLoading: isStaffsLoading } = useStaffs();
+
+  //Mutate
   const queryClient = useQueryClient();
-  const { mutate: assign } = useMutation({
+  const { mutateAsync: assign } = useMutation({
     mutationFn: (data) => {
       return assignValuationStaff(data);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["valuationRequests"]);
+      queryClient.invalidateQueries({
+        queryKey: ["detail", { detailId: detailId }],
+      });
       toast.success("Valuation staff is assigned");
     },
   });
@@ -51,6 +60,8 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
       queryClient.invalidateQueries(["valuationRequests"]);
     },
   });
+
+  //Approve Valuation
   const { mutate: approve } = useMutation({
     mutationFn: (data) => {
       return updateDetail(detailId, data);
@@ -60,7 +71,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
       toast.success("Approved successfully");
     },
   });
-  const valuationAssignment = detail.diamondValuationAssigns.map((item) => {
+  const valuationAssignment = detail?.diamondValuationAssigns.map((item) => {
     const vStaff = getStaffById(staffs, item.staffId);
     return {
       id: item.id,
@@ -71,16 +82,25 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
       status: item.status ? "VALUATED" : "VALUATING",
     };
   });
-  const valuationStaffList = staffs.content
+  const [valuationMode, setValuationMode] = useState("One");
+  const [switches, setSwitches] = useState(
+    valuationAssignment?.map((row, index) => index === 0),
+  ); // Enable the first switch by default
+
+  //Assign Valuation Staff
+  const valuationStaffList = staffs?.content
     .filter((staff) => staff.account.role === "VALUATION_STAFF")
     .map((staff) => {
       return {
-        code: staff.id,
-        label: staff.firstName + " " + staff.lastName,
-        years: staff.experience,
+        number: staff.id,
+        staffName: staff.firstName + " " + staff.lastName,
+        staffPhone: staff.phone,
+        yearExperience: staff.experience,
+        totalProjects: staff.countProject,
+        currentProjects: staff.currentTotalProject,
       };
     });
-  const [valuationMode, setValuationMode] = useState("One");
+  const [selectedStaffs, setSelectedStaffs] = useState([]);
   const [valuationStaff, setValuationStaff] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleClickAssign = () => {
@@ -97,10 +117,6 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
     });
   };
 
-  const [switches, setSwitches] = useState(
-    valuationAssignment.map((row, index) => index === 0),
-  ); // Enable the first switch by default
-
   const handleValuationModeChange = (event) => {
     const isAverageMode = event.target.checked;
     setValuationMode(isAverageMode ? "Average" : "One");
@@ -114,6 +130,11 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
       setSwitches(switches.map((val, i) => (i === index ? !val : val)));
     }
   };
+
+  if (isStaffsLoading || isDetailLoading) {
+    return <UICircularIndeterminate />;
+  }
+
   return (
     <DiamondValuationFieldGroup
       title="Diamond Valuation Assignment"
@@ -191,6 +212,7 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
       <Box sx={{ position: "absolute", top: 0, right: 0 }}>
         {detailState.current === "ASSESSED" && (
           <>
@@ -202,13 +224,27 @@ const DiamondValuationAssignTable = ({ detailState, staffs, detail }) => {
             >
               Assign Valuation Staff
             </Button>
-            <Dialog open={isDialogOpen} onClose={handleClose}>
+            <Dialog
+              open={isDialogOpen}
+              onClose={handleClose}
+              sx={{ maxWidth: "100%" }}
+            >
               <DialogTitle>Assign Consultant</DialogTitle>
               <DialogContent>
-                <UIAutocomplete
-                  onChange={(event, newValue) => setValuationStaff(newValue)}
-                  value={valuationStaff}
-                  data={valuationStaffList}
+                <UITable
+                  rows={valuationStaffList}
+                  headCells={StaffHeadCells}
+                  readOnly={true}
+                  selectedAction={
+                    <Button
+                      variant={"contained"}
+                      onClick={() => {
+                        console.log(selectedStaffs);
+                      }}
+                    >
+                      Assign
+                    </Button>
+                  }
                 />
               </DialogContent>
               <DialogActions>

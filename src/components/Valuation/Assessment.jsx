@@ -6,115 +6,89 @@ import {
   InputAdornment,
   Radio,
   RadioGroup,
-  styled,
   TextField,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import * as React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import CrystalImage from "../../assets/images/crystal.png";
-import FeatherImage from "../../assets/images/feather.png";
-import NeedleImage from "../../assets/images/needle.png";
-import PinpointImage from "../../assets/images/pinpoint.png";
-import { storage } from "../../services/firebase.js";
+import { VisuallyHiddenInput } from "../../assets/styles/Input.jsx";
+import { storage } from "../../services/config/firebase.js";
 
-import { diamondAttribute } from "../../utilities/Status.js";
+import {
+  clarityCharacteristicList,
+  diamondAttribute,
+} from "../../utilities/Status.jsx";
 import { metadata } from "../Detail/Item.jsx";
 import UIDatePicker from "../UI/DatePicker.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
-
-const { origin, cut, clarity, color, shape, symmetry, polish, fluorescence } =
+const { cut, clarity, color, shape, symmetry, polish, fluorescence } =
   diamondAttribute;
 
 const DiamondValuationAssessment = ({
   diamondInfor,
   setDiamondInfor,
+  clarities,
+  handleClarities,
   detailState,
   proportionImage,
-  clarityCharacteristic,
+  clarityCharacteristicImage,
 }) => {
   const { detailId } = useParams();
-  const [open, setOpen] = React.useState(false);
+
+  //Open image in detail
+  const [imageOpen, setImageOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
+  const handleClickOpen = (image) => {
+    setSelectedImage(image);
+    setImageOpen(true);
+  };
+  const handleClose = () => {
+    setImageOpen(false);
+  };
+
+  //Proportion & ClarityCharacteristic
   const [proportionFile, setProportionFile] = useState(null);
   const [clarityCharacteristicFile, setClarityCharacteristicFile] =
     useState(null);
-
-  const handleClickOpen = (image) => {
-    setSelectedImage(image);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   function handleProportionChange(e) {
     if (e.target.files[0]) {
       setProportionFile(e.target.files[0]);
-      // setDiamondInfor((prevState) => ({
-      //   ...prevState,
-      //   proportions: `diamond/${detailId}/proportion/${e.target.files[0].name}`,
-      // }));
     }
   }
-
   function handleClarityCharacteristicChange(e) {
     if (e.target.files[0]) {
       setClarityCharacteristicFile(e.target.files[0]);
-      // setDiamondInfor((prevState) => ({
-      //   ...prevState,
-      //   clarityCharacteristics: `diamond/${detailId}/clarity/${e.target.files[0].name}`,
-      // }));
     }
   }
-
   const handleUploadProportion = () => {
     const storageRef = ref(
       storage,
       `diamonds/${detailId}/proportion/${proportionFile.name}`,
     );
-
     const uploadTask = uploadBytesResumable(
       storageRef,
       proportionFile,
       metadata,
     );
-
-    // Register three observers:
-    // 1. 'state_changed' observer, called any time the state changes
-    // 2. Error observer, called on failure
-    // 3. Completion observer, called on successful completion
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        // Observe state change events such as progress, pause, and resume
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log("Upload is " + progress + "% done");
@@ -136,33 +110,23 @@ const DiamondValuationAssessment = ({
           ...prevState,
           proportions: imageLink,
         }));
-
         toast.success("Upload image successfully");
       },
     );
   };
-
   function handleUploadClarityCharacteristic() {
     const storageRef = ref(
       storage,
       `diamonds/${detailId}/clarity/${clarityCharacteristicFile.name}`,
     );
-
     const uploadTask = uploadBytesResumable(
       storageRef,
       clarityCharacteristicFile,
       metadata,
     );
-
-    // Register three observers:
-    // 1. 'state_changed' observer, called any time the state changes
-    // 2. Error observer, called on failure
-    // 3. Completion observer, called on successful completion
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        // Observe state change events such as progress, pause, and resume
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log("Upload is " + progress + "% done");
@@ -182,7 +146,7 @@ const DiamondValuationAssessment = ({
         const imageLink = `diamonds/${detailId}/clarity/${clarityCharacteristicFile.name}`;
         setDiamondInfor((prevState) => ({
           ...prevState,
-          clarityCharacteristic: imageLink,
+          clarityCharacteristicLink: imageLink,
         }));
 
         toast.success("Upload image successfully");
@@ -200,9 +164,9 @@ const DiamondValuationAssessment = ({
       }}
     >
       <Box sx={{ width: "50%" }}>
-        <DiamondValuationFieldGroup title="GIA Report Detail" sx={{ mt: 0.5 }}>
+        <DiamondValuationFieldGroup title="Report Detail" sx={{ mt: 0.5 }}>
           <UIDatePicker
-            label="GIA Certificate Date"
+            label="Certificate Date"
             value={diamondInfor.giaCertDate}
             disabled={detailState.current !== "ASSESSING"}
             onChange={(newValue) =>
@@ -214,8 +178,8 @@ const DiamondValuationAssessment = ({
           />
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <TextField
-              label="GIA Report Number"
-              id="gia-report-number"
+              label="Report Number"
+              id="report-number"
               type="number"
               sx={{ width: "50%" }}
               value={diamondInfor.certificateId}
@@ -228,7 +192,7 @@ const DiamondValuationAssessment = ({
               }}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">GIA</InputAdornment>
+                  <InputAdornment position="start">No.</InputAdornment>
                 ),
               }}
             />
@@ -262,6 +226,7 @@ const DiamondValuationAssessment = ({
             </FormControl>
           </Box>
         </DiamondValuationFieldGroup>
+
         <DiamondValuationFieldGroup title="Grading Result" sx={{ mt: 2.5 }}>
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <TextField
@@ -347,6 +312,7 @@ const DiamondValuationAssessment = ({
             </TextField>
           </Box>
         </DiamondValuationFieldGroup>
+
         <DiamondValuationFieldGroup
           title="Additional Grading Information"
           sx={{ mt: 2.5 }}
@@ -437,6 +403,7 @@ const DiamondValuationAssessment = ({
           </Box>
         </DiamondValuationFieldGroup>
       </Box>
+
       <Box sx={{ width: "50%" }}>
         <DiamondValuationFieldGroup
           title="Proportions"
@@ -536,11 +503,12 @@ const DiamondValuationAssessment = ({
             </Box>
           )}
         </DiamondValuationFieldGroup>
+
         <DiamondValuationFieldGroup
           title="Clarity Characteristics"
           sx={{ mt: 2.5, position: "relative" }}
         >
-          {!clarityCharacteristic && clarityCharacteristicFile && (
+          {!clarityCharacteristicImage && clarityCharacteristicFile && (
             <Button
               variant={"outlined"}
               sx={{ position: "absolute", top: 0, right: 0 }}
@@ -550,7 +518,7 @@ const DiamondValuationAssessment = ({
               Upload
             </Button>
           )}
-          {!clarityCharacteristic && !clarityCharacteristicFile && (
+          {!clarityCharacteristicImage && !clarityCharacteristicFile && (
             <Button
               component="label"
               role={undefined}
@@ -566,7 +534,7 @@ const DiamondValuationAssessment = ({
               />
             </Button>
           )}
-          {!clarityCharacteristic && clarityCharacteristicFile && (
+          {!clarityCharacteristicImage && clarityCharacteristicFile && (
             <Box sx={{ position: "relative" }}>
               <img
                 src={URL.createObjectURL(clarityCharacteristicFile)}
@@ -599,10 +567,10 @@ const DiamondValuationAssessment = ({
               </IconButton>
             </Box>
           )}
-          {clarityCharacteristic && (
+          {clarityCharacteristicImage && (
             <Box sx={{ position: "relative" }}>
               <img
-                src={clarityCharacteristic}
+                src={clarityCharacteristicImage}
                 alt={"Clarity Characteristic"}
                 loading="lazy"
                 style={{
@@ -611,7 +579,7 @@ const DiamondValuationAssessment = ({
                   objectFit: "cover",
                   cursor: "pointer",
                 }}
-                onClick={() => handleClickOpen(clarityCharacteristic)}
+                onClick={() => handleClickOpen(clarityCharacteristicImage)}
               />
               <IconButton
                 aria-label="delete"
@@ -633,65 +601,108 @@ const DiamondValuationAssessment = ({
               </IconButton>
             </Box>
           )}
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{ justifyContent: "space-evenly", mt: 1 }}
+
+          <ToggleButtonGroup
+            value={clarities}
+            onChange={handleClarities}
+            aria-label="clarity-characteristic"
+            sx={{ mt: 1 }}
           >
-            <Stack
-              direction="row"
-              sx={{
-                alignItems: "center",
-                height: 30,
-                p: "2px",
-              }}
-            >
-              <img
-                src={CrystalImage}
-                alt="Crystal"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              />
-              <Typography sx={{ color: "gray" }}>Crystal</Typography>
-            </Stack>
-            <Stack
-              direction="row"
-              sx={{ alignItems: "center", height: 30, p: "2px" }}
-            >
-              <img
-                src={FeatherImage}
-                alt="Feather"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              />
-              <Typography sx={{ color: "gray", pl: 2 }}>Feather</Typography>
-            </Stack>
-            <Stack
-              direction="row"
-              sx={{ alignItems: "center", height: 30, p: "2px" }}
-            >
-              <img
-                src={NeedleImage}
-                alt="Needle"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              />
-              <Typography sx={{ color: "gray", pl: 1 }}>Needle</Typography>
-            </Stack>
-            <Stack
-              direction="row"
-              sx={{ alignItems: "center", height: 30, p: "2px" }}
-            >
-              <img
-                src={PinpointImage}
-                alt="Pinpoint"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              />
-              <Typography sx={{ color: "gray" }}>Pinpoint</Typography>
-            </Stack>
-          </Stack>
+            <Grid container spacing={0.5} justifyContent="center">
+              {clarityCharacteristicList.map((clarity, index) => {
+                return (
+                  <Grid key={clarity.code} item >
+                    <ToggleButton
+                      value={clarity.code}
+                      aria-label={clarity.label}
+                    >
+                      <Stack
+                        direction="row"
+                        sx={{
+                          alignItems: "center",
+                          height: 30,
+                          gap: 0.5,
+                        }}
+                      >
+                        <img
+                          src={clarity.image}
+                          alt={clarity.label}
+                          style={{
+                            width: "auto",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                        <Typography sx={{ color: "gray" }}>
+                          {clarity.label}
+                        </Typography>
+                      </Stack>
+                    </ToggleButton>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </ToggleButtonGroup>
+
+          {/*<Stack*/}
+          {/*  direction="row"*/}
+          {/*  spacing={2}*/}
+          {/*  sx={{ justifyContent: "space-evenly", mt: 1 }}*/}
+          {/*>*/}
+          {/*  <Stack*/}
+          {/*    direction="row"*/}
+          {/*    sx={{*/}
+          {/*      alignItems: "center",*/}
+          {/*      height: 30,*/}
+          {/*      p: "2px",*/}
+          {/*    }}*/}
+          {/*  >*/}
+          {/*    <img*/}
+          {/*      src={CrystalImage}*/}
+          {/*      alt="Crystal"*/}
+          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
+          {/*    />*/}
+          {/*    <Typography sx={{ color: "gray" }}>Crystal</Typography>*/}
+          {/*  </Stack>*/}
+          {/*  <Stack*/}
+          {/*    direction="row"*/}
+          {/*    sx={{ alignItems: "center", height: 30, p: "2px" }}*/}
+          {/*  >*/}
+          {/*    <img*/}
+          {/*      src={FeatherImage}*/}
+          {/*      alt="Feather"*/}
+          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
+          {/*    />*/}
+          {/*    <Typography sx={{ color: "gray", pl: 2 }}>Feather</Typography>*/}
+          {/*  </Stack>*/}
+          {/*  <Stack*/}
+          {/*    direction="row"*/}
+          {/*    sx={{ alignItems: "center", height: 30, p: "2px" }}*/}
+          {/*  >*/}
+          {/*    <img*/}
+          {/*      src={NeedleImage}*/}
+          {/*      alt="Needle"*/}
+          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
+          {/*    />*/}
+          {/*    <Typography sx={{ color: "gray", pl: 1 }}>Needle</Typography>*/}
+          {/*  </Stack>*/}
+          {/*  <Stack*/}
+          {/*    direction="row"*/}
+          {/*    sx={{ alignItems: "center", height: 30, p: "2px" }}*/}
+          {/*  >*/}
+          {/*    <img*/}
+          {/*      src={PinpointImage}*/}
+          {/*      alt="Pinpoint"*/}
+          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
+          {/*    />*/}
+          {/*    <Typography sx={{ color: "gray" }}>Pinpoint</Typography>*/}
+          {/*  </Stack>*/}
+          {/*</Stack>*/}
         </DiamondValuationFieldGroup>
       </Box>
 
       {/*Dialog for full image*/}
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={imageOpen} onClose={handleClose}>
         <DialogContent sx={{ height: "80vh" }}>
           <img
             src={selectedImage}
