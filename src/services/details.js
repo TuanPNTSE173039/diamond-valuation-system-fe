@@ -13,3 +13,13 @@ export const useDetail = (id) => {
     enabled: id !== undefined && id !== null,
   });
 };
+
+export const useDetails = () => {
+  return useQuery({
+    queryKey: ["details"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("valuation-request-details");
+      return response.data;
+    },
+  });
+}

@@ -3,9 +3,16 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
+import { useDetails } from "../../services/details.js";
+import { useRequests } from "../../services/requests.js";
+import { useStaffs } from "../../services/staffs.js";
+import { useValuations } from "../../services/valuations.js";
+import { getValuationRequestById } from "../../utilities/filtering.js";
+import { formatDateTime, formattedMoney } from "../../utilities/formatter.js";
 
 import { diamondValuationStatus } from "../../utilities/Status.jsx";
 import { ValuationHeadCells } from "../../utilities/table.js";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
@@ -15,9 +22,46 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const DiamondValuationList = ({ diamondValuations: rows }) => {
+const DiamondValuationList = () => {
   const [statusIndex, setStatusIndex] = useState(0);
+  const [selectedValuations, setSelectedValuations] = useState([]);
+  const {isLoading: isValuationLoading, data: valuations} = useValuations();
+  const {isLoading: isRequestLoading, data: requests} = useRequests();
+  const {isLoading: isDetailLoading, data: details} = useDetails();
+  const {isLoading: isStaffLoading, data: staffs} = useStaffs();
 
+  if (isRequestLoading || isValuationLoading || isStaffLoading || isDetailLoading) {
+    return <UICircularIndeterminate />;
+  }
+  const rows = valuations.content.map((valuation) => {
+    const valuationRequestDetail = details.content.find(
+      (detail) => detail.id === valuation.valuationRequestDetailId,
+    );
+    const valuationRequest = getValuationRequestById(
+      requests,
+      valuationRequestDetail.valuationRequestID,
+    );
+
+    const staff = staffs.content.find(
+      (staff) => staff.id === valuation.staffId,
+    );
+
+    const returnedDate = valuationRequest?.returnDate;
+
+    return {
+      number: valuation.id,
+      valuationStaffName: staff.firstName + " " + staff.lastName,
+      returnDate: returnedDate ? formatDateTime(returnedDate) : "",
+      service: valuationRequest?.service.name,
+      certificateId:
+        valuationRequestDetail?.diamondValuationNote?.certificateId,
+      diamondOrigin:
+        valuationRequestDetail?.diamondValuationNote?.diamondOrigin,
+      caratWeight: valuationRequestDetail?.diamondValuationNote?.caratWeight,
+      valuationPrice: formattedMoney(valuation.valuationPrice),
+      status: valuation.status ? "Valuated" : "Valuating",
+    };
+  });
   const handleChange = (event, newValue) => {
     setStatusIndex(newValue);
   };
@@ -62,7 +106,8 @@ const DiamondValuationList = ({ diamondValuations: rows }) => {
           heading="All Valuations"
           headCells={ValuationHeadCells}
           rows={rows}
-          readOnly
+          selected={selectedValuations}
+          setSelected={setSelectedValuations}
         />
       </UITabPanel>
 
@@ -71,6 +116,8 @@ const DiamondValuationList = ({ diamondValuations: rows }) => {
         .map((status, index) => (
           <UITabPanel key={index} index={index + 1} value={statusIndex}>
             <UITable
+              selected={selectedValuations}
+              setSelected={setSelectedValuations}
               heading={
                 statusIndex === index + 1 ? `${status.name} Valuations` : ""
               }
@@ -80,7 +127,6 @@ const DiamondValuationList = ({ diamondValuations: rows }) => {
                   ? rows.filter((row) => row.status === status.name)
                   : []
               }
-              readOnly
             />
           </UITabPanel>
         ))}
