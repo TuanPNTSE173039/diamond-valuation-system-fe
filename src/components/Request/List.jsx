@@ -26,6 +26,7 @@ const ValuationRequestList = () => {
   const { data: customers } = useCustomers();
 
   const [statusIndex, setStatusIndex] = useState(0);
+  const [selectedRequests, setSelectedRequests] = useState([])
 
   const handleChange = (event, newValue) => {
     setStatusIndex(newValue);
@@ -87,6 +88,8 @@ const ValuationRequestList = () => {
           heading="All Requests"
           headCells={RequestHeadCells}
           rows={requestRows}
+          selected={selectedRequests}
+          setSelected={setSelectedRequests}
         >
           <Button
             onClick={handleAddValuationRequest}

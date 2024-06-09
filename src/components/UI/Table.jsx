@@ -30,10 +30,12 @@ export default function UITable({
       <DeleteIcon />
     </IconButton>
   ),
+  selected = [],
+  setSelected,
 }) {
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("Date");
-  const [selected, setSelected] = React.useState([]);
+  // const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);

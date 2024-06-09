@@ -83,6 +83,18 @@ const DiamondValuationAssignTable = ({ detailState }) => {
     };
   });
   const [valuationMode, setValuationMode] = useState("One");
+  const handleValuationModeChange = (event) => {
+    const isAverageMode = event.target.checked;
+    setValuationMode(isAverageMode ? "Average" : "One");
+    setSwitches(switches.map(() => isAverageMode)); // Enable the first switch when valuation mode changes
+  };
+  const handleSwitchChange = (index) => {
+    if (valuationMode === "One") {
+      setSwitches(switches.map((val, i) => i === index)); // Enable only the selected switch
+    } else {
+      setSwitches(switches.map((val, i) => (i === index ? !val : val)));
+    }
+  };
   const [switches, setSwitches] = useState(
     valuationAssignment?.map((row, index) => index === 0),
   ); // Enable the first switch by default
@@ -115,20 +127,6 @@ const DiamondValuationAssignTable = ({ detailState }) => {
       ...detail,
       status: "VALUATING",
     });
-  };
-
-  const handleValuationModeChange = (event) => {
-    const isAverageMode = event.target.checked;
-    setValuationMode(isAverageMode ? "Average" : "One");
-    setSwitches(switches.map(() => isAverageMode)); // Enable the first switch when valuation mode changes
-  };
-
-  const handleSwitchChange = (index) => {
-    if (valuationMode === "One") {
-      setSwitches(switches.map((val, i) => i === index)); // Enable only the selected switch
-    } else {
-      setSwitches(switches.map((val, i) => (i === index ? !val : val)));
-    }
   };
 
   if (isStaffsLoading || isDetailLoading) {
@@ -224,22 +222,27 @@ const DiamondValuationAssignTable = ({ detailState }) => {
             >
               Assign Valuation Staff
             </Button>
-            <Dialog
-              open={isDialogOpen}
-              onClose={handleClose}
-              sx={{ maxWidth: "100%" }}
-            >
+            <Dialog open={isDialogOpen} onClose={handleClose} maxWidth={"md"}>
               <DialogTitle>Assign Consultant</DialogTitle>
               <DialogContent>
                 <UITable
                   rows={valuationStaffList}
                   headCells={StaffHeadCells}
                   readOnly={true}
+                  selected={selectedStaffs}
+                  setSelected={setSelectedStaffs}
                   selectedAction={
                     <Button
                       variant={"contained"}
                       onClick={() => {
-                        console.log(selectedStaffs);
+                        selectedStaffs.forEach((staff) => {
+                          const body = {
+                            staffId: staff,
+                            valuationRequestDetailId: detailId,
+                          };
+                          assign(body);
+                          handleClose();
+                        });
                       }}
                     >
                       Assign
@@ -248,11 +251,8 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                 />
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleClose} variant="text">
+                <Button onClick={handleClose} variant="outlined">
                   Cancel
-                </Button>
-                <Button onClick={handleSave} variant="contained">
-                  Save
                 </Button>
               </DialogActions>
             </Dialog>
