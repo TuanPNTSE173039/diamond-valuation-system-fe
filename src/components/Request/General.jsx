@@ -1,3 +1,4 @@
+import AddIcon from "@mui/icons-material/Add";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
@@ -14,8 +15,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Grid";
-
-import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -27,18 +26,23 @@ import { updateValuationRequest } from "../../services/api.js";
 import { useCustomer } from "../../services/customers.js";
 import { useRequest } from "../../services/requests.js";
 import { useStaff, useStaffs } from "../../services/staffs.js";
-
 import { formattedMoney } from "../../utilities/formatter.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
 
 const RequestGeneral = () => {
   const { requestId } = useParams();
-  const { data: request } = useRequest(requestId);
-  const { data: customer } = useCustomer(request.customerID);
-  const { data: staffs } = useStaffs();
-  const { data: staff } = useStaff(request.staffID);
-  // const staff = staffs.content.find((item) => item.id === request.staffID);
+  const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
+  const { data: customer, isLoading: isCustomerLoading } = useCustomer(
+    request.customerID,
+  );
+  const { data: staffs, isLoading: isStaffsLoading } = useStaffs();
+  const {
+    data: staff,
+    isLoading: isStaffLoading,
+    isPending: isStaffPending,
+  } = useStaff(request.staffID);
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
@@ -62,8 +66,11 @@ const RequestGeneral = () => {
         code: item.id,
         label: item.firstName + " " + item.lastName,
         years: item.experience,
+        curProjects: item.currentTotalProject,
+        totalProjects: item.countProject,
       };
-    });
+    })
+    .sort((a, b) => a.curProjects - b.curProjects);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -88,6 +95,15 @@ const RequestGeneral = () => {
     returnedDate: request.returnDate,
     totalFee: request.totalServicePrice,
   };
+
+  if (
+    isRequestLoading ||
+    isCustomerLoading ||
+    isStaffsLoading ||
+    isStaffLoading
+  ) {
+    return <UICircularIndeterminate />;
+  }
 
   return (
     <Box sx={{ flexGrow: 1, mt: 1, color: "primary" }}>
@@ -124,11 +140,17 @@ const RequestGeneral = () => {
               </>
             )}
             {!staff && !isPending && (
-              <Link onClick={handleClickOpen} sx={{ cursor: "pointer" }}>
+              <Button
+                size={"small"}
+                variant={"outlined"}
+                onClick={handleClickOpen}
+                sx={{ cursor: "pointer" }}
+                startIcon={<AddIcon />}
+              >
                 Assign Consultant
-              </Link>
+              </Button>
             )}
-            {isPending && "...assigning"}
+            {isPending && isStaffPending && "...assigning"}
 
             <Dialog open={open} onClose={handleClose}>
               <DialogTitle>Assign Consultant</DialogTitle>

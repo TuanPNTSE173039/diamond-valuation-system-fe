@@ -2,26 +2,17 @@ import { Card, CardActions, CardContent } from "@mui/material";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  getValuationRequest,
-  postPayment,
-  updateValuationRequest,
-} from "../../services/api.js";
+import { postPayment, updateValuationRequest } from "../../services/api.js";
+import { useRequest } from "../../services/requests.js";
 
 const RecordReturned = () => {
   const { requestId } = useParams();
   const queryClient = useQueryClient();
-  const {
-    data: valuationRequest,
-    isLoading: isValuationRequestLoading,
-    error,
-  } = useQuery({
-    queryKey: ["valuationRequest", requestId],
-    queryFn: () => getValuationRequest(requestId),
-  });
+
+  const { data: requests, isLoading: isRequestLoading } = useRequest(requestId);
   const { mutate: updateReceiptLink } = useMutation({
     mutationFn: (body) => {
       return updateValuationRequest(requestId, body);
@@ -34,7 +25,9 @@ const RecordReturned = () => {
         paymentMethod: { id: 1 },
       };
       newPayment(paymentBody);
-      queryClient.invalidateQueries(["valuationRequest", requestId]);
+      queryClient.invalidateQueries({
+        queryKey: ["request", { requestId: requestId }],
+      });
       toast.success("Update successfully");
     },
   });
@@ -43,7 +36,9 @@ const RecordReturned = () => {
       return postPayment(body);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["valuationRequest", requestId]);
+      queryClient.invalidateQueries({
+        queryKey: ["request", { requestId: requestId }],
+      });
     },
   });
 
@@ -69,7 +64,7 @@ const RecordReturned = () => {
             size="small"
             onClick={() => {
               const reqsBody = {
-                ...valuationRequest,
+                ...requests,
                 returnLink: "return.pdf",
               };
 
