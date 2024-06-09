@@ -20,6 +20,6 @@ export const useRequest = (id) => {
       const response = await axiosInstance.get(`valuation-requests/${id}`);
       return response.data;
     },
-    enabled: id !== undefined,
+    enabled: id !== undefined && id !== null,
   });
 };

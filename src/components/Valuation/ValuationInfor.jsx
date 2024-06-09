@@ -7,17 +7,26 @@ import * as React from "react";
 import { formatDateTime } from "../../utilities/formatter.js";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
-const DiamondValuationInfor = ({ valuationInfor, ...props }) => {
+const DiamondValuationInfor = ({ valuationInfor, diamondInfor, ...props }) => {
   return (
     <Box {...props}>
       <DiamondValuationInforItem icon={<PersonIcon />} title="Service">
         {valuationInfor.service}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<CalendarMonthIcon />} title="Deadline">
-        {formatDateTime(valuationInfor.deadline)}
+        {valuationInfor.deadline && formatDateTime(valuationInfor.deadline)}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LabelIcon />} title="Status">
         {valuationInfor.status}
+      </DiamondValuationInforItem>
+      <DiamondValuationInforItem
+        icon={<LabelIcon />}
+        title="Fair Price Estimate"
+      >
+        {diamondInfor.fairPrice}
+      </DiamondValuationInforItem>
+      <DiamondValuationInforItem icon={<LabelIcon />} title="Price Range">
+        {diamondInfor.rangePrice}
       </DiamondValuationInforItem>
     </Box>
   );

@@ -1,9 +1,20 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Avatar, AvatarGroup, ImageList, ImageListItem } from "@mui/material";
+import {
+  AvatarGroup,
+  DialogContentText,
+  ImageList,
+  ImageListItem,
+} from "@mui/material";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,11 +33,12 @@ import { toast } from "react-toastify";
 import { updateDetail, updateDiamondNote } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
 import { useDetail } from "../../services/details.js";
-
+import { useStaffs } from "../../services/staffs.js";
 import { getStaffById } from "../../utilities/filtering.js";
 import { formattedMoney } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDetailHeader from "../UI/UIDetailHeader.jsx";
 import DiamondValuationAssessment from "../Valuation/Assessment.jsx";
 import DiamondValuationAssignTable from "../Valuation/AssignTable.jsx";
@@ -48,10 +60,11 @@ const VisuallyHiddenInput = styled("input")({
 export const metadata = {
   contentType: "image/jpeg",
 };
-const DetailItem = ({ staffs }) => {
+const DetailItem = () => {
   const queryClient = useQueryClient();
   const { requestId, detailId } = useParams();
-  const { data: detail } = useDetail(detailId);
+  const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
+  const { data: staffs, isLoading: isStaffLoading } = useStaffs();
 
   //Mutate
   const { mutate: mutateDetail } = useMutation({
@@ -111,6 +124,7 @@ const DetailItem = ({ staffs }) => {
     previous: getPreviousStatus(detail.status),
     current: detail.status,
   });
+
   function handleAssessing() {
     setDetailState((prevState) => {
       return {
@@ -120,6 +134,7 @@ const DetailItem = ({ staffs }) => {
       };
     });
   }
+
   function handleCancelAssessing() {
     setDetailState((prevState) => {
       if (prevState.previous === "PENDING") {
@@ -135,6 +150,7 @@ const DetailItem = ({ staffs }) => {
       };
     });
   }
+
   function handleSaveAssessing() {
     setDetailState((prevState) => {
       return {
@@ -154,6 +170,7 @@ const DetailItem = ({ staffs }) => {
     };
     mutateAssessment(assessmentBody);
   }
+
   function handleEditAssessment() {
     setDetailState((prevState) => {
       return {
@@ -163,6 +180,7 @@ const DetailItem = ({ staffs }) => {
       };
     });
   }
+
   function handleConfirmAssessment() {
     setDetailState((prevState) => {
       return {
@@ -184,11 +202,13 @@ const DetailItem = ({ staffs }) => {
   const [proportionImage, setProportionImage] = useState(null);
   const [clarityCharacteristicImage, setClarityCharacteristicImage] =
     useState(null);
+
   function handleSelectDiamondImage(e) {
     if (e.target.files[0]) {
       setDiamondImage(e.target.files[0]);
     }
   }
+
   const imageLinks = `diamonds/${detailId}/images`;
   const getListAllImages = () => {
     const listRef = ref(storage, imageLinks);
@@ -265,11 +285,25 @@ const DetailItem = ({ staffs }) => {
         ? {
             staff: getStaffById(staffs, detail.diamondValuationAssign.staffId),
             comment: detail.diamondValuationAssign.comment,
+            commentDetail: detail.diamondValuationAssign.commentDetail,
           }
         : detail.diamondValuationAssigns.map((item) => ({
             staff: getStaffById(staffs, item.staffId),
             comment: item.comment,
+            commentDetail: item.commentDetail,
           }));
+  const [selectedValuationDetail, setSelectedValuationDetail] = useState(null);
+  const [moreDetail, setMoreDetail] = useState(false);
+  const handleClickOpen = () => {
+    setMoreDetail(true);
+  };
+  const handleClickClose = () => {
+    setMoreDetail(false);
+  };
+
+  if (isStaffLoading || isDetailLoading) {
+    return <UICircularIndeterminate />;
+  }
 
   return (
     <>
@@ -370,31 +404,91 @@ const DetailItem = ({ staffs }) => {
                 </AvatarGroup>
                 <Box>
                   {!detail.mode ? (
-                    <Typography>
-                      `${resultStaff.comment.replace(/<[^>]*>/g, "")}`
-                    </Typography>
+                    <Box sx={{ mt: 2 }}>
+                      <h2 className="text-xl mb-1/2 font-bold">
+                        {resultStaff.staff.firstName +
+                          " " +
+                          resultStaff.staff.lastName}
+                      </h2>
+                      <p>{resultStaff.comment}</p>
+                      <Link
+                        component="button"
+                        onClick={() => {
+                          setSelectedValuationDetail(resultStaff);
+                          handleClickOpen();
+                        }}
+                      >
+                        More
+                      </Link>
+                    </Box>
                   ) : (
                     <Carousel sx={{ mt: 5, height: "100%" }}>
-                      {resultStaff.map((item) => (
-                        // <Box>
-                        //   <Typography sx={{ fontSize: "1.5rem", mt: 5.5 }}>
-                        //     {item.staff.firstName}
-                        //   </Typography>
-                        //   <Typography sx={{ fontSize: "0.8rem", px: 3 }}>
-                        //     {item.comment}
-                        //   </Typography>
-                        // </Box>
-                        <Box sx={{ mt: 2 }}>
+                      {resultStaff.map((item, index) => (
+                        <Box sx={{ mt: 2 }} key={index}>
                           <h2 className="text-xl mb-1/2 font-bold">
                             {item.staff.firstName + " " + item.staff.lastName}
                           </h2>
-                          <p>{item.comment.replace(/<[^>]*>/g, "")}</p>
-                          {/*<Button className="CheckButton">Check it out!</Button>*/}
+                          <p>{item.comment}</p>
+                          <Link
+                            component="button"
+                            onClick={() => {
+                              setSelectedValuationDetail(item);
+                              handleClickOpen();
+                            }}
+                          >
+                            More
+                          </Link>
                         </Box>
                       ))}
                     </Carousel>
                   )}
                 </Box>
+                <Dialog
+                  open={moreDetail}
+                  onClose={handleClickClose}
+                  scroll={"body"}
+                  maxWidth={"md"}
+                  aria-labelledby="scroll-dialog-title"
+                  aria-describedby="scroll-dialog-description"
+                >
+                  <DialogTitle id="scroll-dialog-title">
+                    Valuation Detail
+                  </DialogTitle>
+                  <DialogContent dividers={scroll === "paper"}>
+                    <DialogContentText
+                      id="scroll-dialog-description"
+                      tabIndex={-1}
+                    >
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        sx={{ gap: 2 }}
+                      >
+                        <Avatar
+                          alt={selectedValuationDetail?.staff.id}
+                          src={""}
+                        />
+                        <Typography>
+                          {selectedValuationDetail?.staff.firstName +
+                            " " +
+                            selectedValuationDetail?.staff.lastName}
+                        </Typography>
+                        <Typography>
+                          {selectedValuationDetail?.comment}
+                        </Typography>
+                        <div
+                          className=""
+                          dangerouslySetInnerHTML={{
+                            __html: selectedValuationDetail?.commentDetail,
+                          }}
+                        ></div>
+                      </Box>
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClickClose}>Cancel</Button>
+                  </DialogActions>
+                </Dialog>
               </Box>
             )}
           </Box>

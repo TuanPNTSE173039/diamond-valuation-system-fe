@@ -12,3 +12,14 @@ export const useValuations = () => {
     },
   });
 };
+
+export const useValuation = (id) => {
+  return useQuery({
+    queryKey: ["valuation", {valuationId: id}],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get(`diamond-valuation-assigns/${id}`);
+      return data;
+    },
+    enabled: id !== null && id !== undefined
+  });
+}

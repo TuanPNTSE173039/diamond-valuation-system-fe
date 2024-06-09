@@ -10,7 +10,7 @@ import RequestGeneral from "./General.jsx";
 const ValuationRequestItem = () => {
   const { requestId } = useParams();
   const { data: request } = useRequest(requestId);
-
+  console.log(request);
   return (
     <>
       <CustomBreadCrumb level={request.id} />

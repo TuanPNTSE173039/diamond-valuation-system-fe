@@ -2,6 +2,8 @@ import Box from "@mui/material/Box";
 import StarterKit from "@tiptap/starter-kit";
 import {
   MenuButtonBold,
+  MenuButtonBulletedList,
+  MenuButtonIndent,
   MenuButtonItalic,
   MenuControlsContainer,
   MenuDivider,
@@ -17,22 +19,26 @@ const UIRichTextEditor = forwardRef(({ value, isDisabled }, ref) => {
     setContent: (content) => rteRef.current?.editor?.setContent(content),
   }));
   return (
-    <Box sx={{ height: 500 }}>
+    <Box>
       <RichTextEditor
         ref={rteRef}
         editable={!isDisabled}
         extensions={[StarterKit]} // Or any Tiptap extensions you wish!
         content={`${value}`} // Initial content for the editor
-        //expand height of the content full of the box container
-        style={{ height: "100%" }}
-        // Optionally include `renderControls` for a menu-bar atop the editor:
+        configureEditor={(editor) => {
+          // You can configure the editor here
+          // See: https://www.tiptap.dev/api/editor
+        }}
+        style={{ border: "1px solid #ccc", backgroundColor: "red" }}
         renderControls={() => (
           <MenuControlsContainer>
             <MenuSelectHeading />
             <MenuDivider />
             <MenuButtonBold />
             <MenuButtonItalic />
-            {/* Add more controls of your choosing here */}
+            <MenuButtonIndent />
+            <MenuButtonBulletedList />
+            {/*<MenuButtonUnderline />*/}
           </MenuControlsContainer>
         )}
       />

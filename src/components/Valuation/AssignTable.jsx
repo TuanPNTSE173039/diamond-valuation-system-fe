@@ -45,6 +45,10 @@ const DiamondValuationAssignTable = ({ detailState }) => {
         queryKey: ["detail", { detailId: detailId }],
       });
       toast.success("Valuation staff is assigned");
+      updateAssignStaff({
+        ...detail,
+        status: "VALUATING",
+      });
     },
   });
   const { mutate: updateAssignStaff } = useMutation({
@@ -52,12 +56,9 @@ const DiamondValuationAssignTable = ({ detailState }) => {
       return updateDetail(detailId, body);
     },
     onSuccess: () => {
-      const body = {
-        staffId: valuationStaff.code,
-        valuationRequestDetailId: detail.id,
-      };
-      assign(body);
-      queryClient.invalidateQueries(["valuationRequests"]);
+      queryClient.invalidateQueries({
+        queryKey: ["detail", { detailId: detailId }],
+      });
     },
   });
 
@@ -67,7 +68,9 @@ const DiamondValuationAssignTable = ({ detailState }) => {
       return updateDetail(detailId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["valuationRequests"]);
+      queryClient.invalidateQueries({
+        queryKey: ["detail", { detailId: detailId }],
+      });
       toast.success("Approved successfully");
     },
   });
@@ -121,13 +124,13 @@ const DiamondValuationAssignTable = ({ detailState }) => {
   const handleClose = () => {
     setIsDialogOpen(false);
   };
-  const handleSave = () => {
-    setIsDialogOpen(false);
-    updateAssignStaff({
-      ...detail,
-      status: "VALUATING",
-    });
-  };
+  // const handleSave = () => {
+  //   setIsDialogOpen(false);
+  //   updateAssignStaff({
+  //     ...detail,
+  //     status: "VALUATING",
+  //   });
+  // };
 
   if (isStaffsLoading || isDetailLoading) {
     return <UICircularIndeterminate />;

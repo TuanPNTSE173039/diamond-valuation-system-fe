@@ -16,6 +16,7 @@
     "@fileforge/react-print": "^0.1.134",
     "@fontsource/roboto": "^5.0.13",
     "@mui/icons-material": "^5.15.18",
+    "@mui/joy": "^5.0.0-beta.36",
     "@mui/lab": "^5.0.0-alpha.170",
     "@mui/material": "^5.15.18",
     "@mui/x-date-pickers": "^7.5.1",

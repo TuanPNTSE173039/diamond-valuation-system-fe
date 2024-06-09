@@ -18,10 +18,16 @@ import dayjs from "dayjs";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateDiamondValuation } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
+import { useDetail } from "../../services/details.js";
+import { useRequest } from "../../services/requests.js";
+import { useValuation } from "../../services/valuations.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
+import { getPreviousStatus } from "../../utilities/Status.jsx";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIRichTextEditor from "../UI/RichTexEditor.jsx";
 import DiamondValuationAssessment from "./Assessment.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
@@ -38,72 +44,45 @@ const VisuallyHiddenInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
-const DiamondValuationItem = ({ detail, valuation, request }) => {
+const DiamondValuationItem = () => {
+  const { valuationId } = useParams();
+  const { isLoading: isValuationLoading, data: valuation } =
+    useValuation(valuationId);
+  const { isLoading: isDetailLoading, data: detail } = useDetail(
+    valuation?.valuationRequestDetailId,
+  );
+  const { isLoading: isRequestLoading, data: request } = useRequest(
+    detail?.valuationRequestID,
+  );
+
+  //Update Diamond Valuation
   const queryClient = useQueryClient();
   const { mutate: saveMutate } = useMutation({
     mutationFn: (body) => {
       return updateDiamondValuation(valuation.id, body);
     },
     onSuccess: (body) => {
-      queryClient.invalidateQueries(["valuationRequests"]);
-      if (!body.status) toast.success("Save diamond valuation successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["valuations"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["valuation", { valuationId: valuationId }],
+      });
+
+      if (!body.data.status) toast.success("Save diamond valuation successfully");
       else {
         toast.success("Confirm diamond valuation successfully");
       }
     },
   });
+
+
+  //Loading Image from firebase
   const [proportionImage, setProportionImage] = useState(null);
   const [clarityCharacteristicImage, setClarityCharacteristicImage] =
     useState(null);
-  const [uploadedImages, setUploadedImages] = useState([]); // state hiển thị danh sách ảnh đã tải lên store
-  const valuationInfor = {
-    service: request.service.name,
-    deadline: request.returnDate,
-    status: !valuation.status ? "Valuating" : "Valuated",
-  };
-  const serverDiamondInfor = detail?.diamondValuationNote;
-  const [diamondInfor, setDiamondInfor] = useState({
-    giaCertDate: dayjs(new Date()),
-    certificateId: serverDiamondInfor?.certificateId,
-    diamondOrigin: serverDiamondInfor?.diamondOrigin,
-    caratWeight: serverDiamondInfor?.caratWeight,
-    color: serverDiamondInfor?.color,
-    clarity: serverDiamondInfor?.clarity,
-    cut: serverDiamondInfor?.cut,
-    shape: serverDiamondInfor?.shape,
-    symmetry: serverDiamondInfor?.symmetry,
-    polish: serverDiamondInfor?.polish,
-    fluorescence: serverDiamondInfor?.fluorescence,
-    proportions: serverDiamondInfor?.proportions,
-    clarityCharacteristics: serverDiamondInfor?.clarityCharacteristic,
-  });
-  const getPreviousStatus = (currentStatus) => {
-    switch (currentStatus) {
-      case "PENDING":
-        return "PENDING";
-      case "ASSESSING":
-        return "PENDING";
-      case "ASSESSED":
-        return "ASSESSING";
-      case "VALUATING":
-        return "ASSESSED";
-      case "VALUATED":
-        return "VALUATING";
-      case "APPROVED":
-        return "APPROVED";
-    }
-  };
-  const [detailState, setDetailState] = useState({
-    previous: getPreviousStatus(detail.status),
-    current: detail.status,
-  });
-  const [valuationPrice, setValuationPrice] = useState(
-    valuation.valuationPrice === 0 ? "" : valuation.valuationPrice,
-  );
-  const editorRef = useRef();
-  const comment = valuation.comment === null ? "" : valuation.comment;
-
-  const imageLinks = `diamonds/${detail.id}/images`;
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const imageLinks = `diamonds/${detail?.id}/images`;
   const getListAllImages = () => {
     const listRef = ref(storage, imageLinks);
 
@@ -124,22 +103,75 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
         console.error("Error getting download URL:", error);
       });
   };
-
   useEffect(() => {
     getListAllImages();
-    if (detail.diamondValuationNote?.proportions !== null) {
+    if (detail?.diamondValuationNote?.proportions !== null) {
       loadImageByPath(
-        detail.diamondValuationNote?.proportions,
+        detail?.diamondValuationNote?.proportions,
         setProportionImage,
       );
     }
-    if (detail.diamondValuationNote?.clarityCharacteristic !== null) {
+    if (detail?.diamondValuationNote?.clarityCharacteristicLink !== null) {
       loadImageByPath(
-        detail.diamondValuationNote?.clarityCharacteristic,
+        detail?.diamondValuationNote?.clarityCharacteristicLink,
         setClarityCharacteristicImage,
       );
     }
   }, []);
+
+  //General Infor
+  const valuationInfor = {
+    service: request?.service?.name,
+    deadline: request?.returnDate,
+    status: !valuation?.status ? "Valuating" : "Valuated",
+  };
+  const serverDiamondInfor = detail?.diamondValuationNote;
+  const [diamondInfor, setDiamondInfor] = useState({
+    giaCertDate: dayjs(new Date()),
+    certificateId: serverDiamondInfor?.certificateId,
+    diamondOrigin: serverDiamondInfor?.diamondOrigin,
+    caratWeight: serverDiamondInfor?.caratWeight,
+    color: serverDiamondInfor?.color,
+    clarity: serverDiamondInfor?.clarity,
+    cut: serverDiamondInfor?.cut,
+    shape: serverDiamondInfor?.shape,
+    symmetry: serverDiamondInfor?.symmetry,
+    polish: serverDiamondInfor?.polish,
+    fluorescence: serverDiamondInfor?.fluorescence,
+    proportions: serverDiamondInfor?.proportions,
+    clarityCharacteristicLink: serverDiamondInfor?.clarityCharacteristicLink,
+    clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
+    fairPrice: serverDiamondInfor?.fairPrice,
+    rangePrice:
+      serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
+  });
+
+  //Clarity Characteristic List
+  const [clarities, setClarities] = useState(
+    diamondInfor.clarityCharacteristic === null
+      ? []
+      : () => diamondInfor.clarityCharacteristic,
+  );
+  const handleClarities = (event, newClarity) => {
+    setClarities(newClarity);
+  };
+
+  //Valuation Infor
+  const [valuationPrice, setValuationPrice] = useState(
+    valuation.valuationPrice === 0 ? "" : valuation.valuationPrice,
+  );
+  const [comment, setComment] = useState(
+    valuation.comment === null ? "" : valuation.comment,
+  );
+  const editorRef = useRef();
+  const commentDetail =
+    valuation.commentDetail === null ? "" : valuation.commentDetail;
+
+  //State button mgt
+  const [detailState, setDetailState] = useState({
+    previous: getPreviousStatus(detail?.status),
+    current: detail?.status,
+  });
 
   function handleCancelValuating() {
     setDetailState((prevState) => {
@@ -180,7 +212,8 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
     });
     const body = {
       ...valuation,
-      comment: editorRef.current.getContent(),
+      commentDetail: editorRef.current.getContent(),
+      comment: comment,
       valuationPrice,
     };
     saveMutate(body);
@@ -219,6 +252,11 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
       };
     });
   }
+
+  if (isRequestLoading || isValuationLoading || isDetailLoading) {
+    return <UICircularIndeterminate />;
+  }
+  console.log(detailState);
   return (
     <>
       <Stack
@@ -286,6 +324,7 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
               <DiamondValuationInfor
                 sx={{ width: "50%" }}
                 valuationInfor={valuationInfor}
+                diamondInfor={diamondInfor}
               />
 
               <Box sx={{ width: "50%" }}>
@@ -326,11 +365,33 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
                 </FormControl>
               </Box>
             </Stack>
-            <UIRichTextEditor
-              ref={editorRef}
-              value={comment}
-              isDisabled={detailState.current !== "VALUATING"}
-            />
+            <Box>
+              <label
+                htmlFor={"brief-comment"}
+                style={{
+                  marginTop: 2,
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: "primary.main",
+                }}
+              >
+                Brief Comment
+              </label>
+              <textarea
+                id={"brief-comment"}
+                style={{
+                  width: "100%",
+                  height: "110px",
+                  resize: "none",
+                  outline: "1px solid #333",
+                  borderRadius: 4,
+                  padding: "8px 16px",
+                }}
+                onChange={(e) => setComment(e.target.value)}
+                disabled={detailState.current !== "VALUATING"}
+                value={comment}
+              />
+            </Box>
           </Box>
         </DiamondValuationFieldGroup>
 
@@ -390,12 +451,25 @@ const DiamondValuationItem = ({ detail, valuation, request }) => {
         </Box>
       </Box>
 
+      <DiamondValuationFieldGroup
+        title="Valuation Detail Comment"
+        sx={{ mt: 2 }}
+      >
+        <UIRichTextEditor
+          ref={editorRef}
+          value={commentDetail}
+          isDisabled={detailState.current !== "VALUATING"}
+        />
+      </DiamondValuationFieldGroup>
+
       <DiamondValuationAssessment
         diamondInfor={diamondInfor}
         setDiamondInfor={setDiamondInfor}
         detailState={detailState}
         proportionImage={proportionImage}
-        clarityCharacteristic={clarityCharacteristicImage}
+        clarityCharacteristicImage={clarityCharacteristicImage}
+        clarities={clarities}
+        handleClarities={handleClarities}
       />
     </>
   );

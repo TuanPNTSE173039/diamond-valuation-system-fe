@@ -2,14 +2,11 @@ import { Card, CardActions, CardContent } from "@mui/material";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  getValuationRequest,
-  postPayment,
-  updateValuationRequest,
-} from "../../services/api.js";
+import { postPayment, updateValuationRequest } from "../../services/api.js";
+import { useRequest } from "../../services/requests.js";
 
 const RecordReceipt = () => {
   const { requestId } = useParams();
@@ -18,10 +15,7 @@ const RecordReceipt = () => {
     data: valuationRequest,
     isLoading: isValuationRequestLoading,
     error,
-  } = useQuery({
-    queryKey: ["request", requestId],
-    queryFn: () => getValuationRequest(requestId),
-  });
+  } = useRequest(requestId);
 
   const { mutate: updateReceiptLink } = useMutation({
     mutationFn: (body) => {
@@ -35,7 +29,9 @@ const RecordReceipt = () => {
         paymentMethod: { id: 1 },
       };
       newPayment(paymentBody);
-      queryClient.invalidateQueries(["valuationRequest", requestId]);
+      queryClient.invalidateQueries({
+        queryKey: ["request", { requestId: requestId }],
+      });
       toast.success("Update successfully");
     },
   });
@@ -44,7 +40,9 @@ const RecordReceipt = () => {
       return postPayment(body);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["valuationRequest", requestId]);
+      queryClient.invalidateQueries({
+        queryKey: ["request", { requestId: requestId }],
+      });
     },
   });
 
