@@ -72,7 +72,9 @@ const DetailItem = () => {
       return updateDetail(detail.id, body);
     },
     onSuccess: (body) => {
-      queryClient.invalidateQueries(["valuationRequests"]);
+      queryClient.invalidateQueries({
+        queryKey: ["detail", {detailId: detailId}]
+      });
     },
   });
   const { mutate: mutateAssessment } = useMutation({
@@ -83,9 +85,9 @@ const DetailItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["detail", { detailId: detailId }],
       });
-      if (body.status === "ASSESSING")
+      if (body.data.status === "ASSESSING")
         toast.success("Save assessment successfully");
-      else if (body.status === "ASSESSED")
+      else if (body.data.status === "ASSESSED")
         toast.success("Confirm assessment successfully");
     },
   });
@@ -124,7 +126,6 @@ const DetailItem = () => {
     previous: getPreviousStatus(detail.status),
     current: detail.status,
   });
-
   function handleAssessing() {
     setDetailState((prevState) => {
       return {
@@ -134,7 +135,6 @@ const DetailItem = () => {
       };
     });
   }
-
   function handleCancelAssessing() {
     setDetailState((prevState) => {
       if (prevState.previous === "PENDING") {
@@ -150,7 +150,6 @@ const DetailItem = () => {
       };
     });
   }
-
   function handleSaveAssessing() {
     setDetailState((prevState) => {
       return {
@@ -170,7 +169,6 @@ const DetailItem = () => {
     };
     mutateAssessment(assessmentBody);
   }
-
   function handleEditAssessment() {
     setDetailState((prevState) => {
       return {
@@ -180,7 +178,6 @@ const DetailItem = () => {
       };
     });
   }
-
   function handleConfirmAssessment() {
     setDetailState((prevState) => {
       return {
@@ -202,13 +199,11 @@ const DetailItem = () => {
   const [proportionImage, setProportionImage] = useState(null);
   const [clarityCharacteristicImage, setClarityCharacteristicImage] =
     useState(null);
-
   function handleSelectDiamondImage(e) {
     if (e.target.files[0]) {
       setDiamondImage(e.target.files[0]);
     }
   }
-
   const imageLinks = `diamonds/${detailId}/images`;
   const getListAllImages = () => {
     const listRef = ref(storage, imageLinks);
@@ -595,7 +590,15 @@ const DetailItem = () => {
         </Box>
       </Box>
 
-      {detailState.current !== "PENDING" && (
+      {detail.status === "CANCEL" && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant={"h6"}>Request has been canceled</Typography>
+          <Typography>{detail.cancelReason}</Typography>
+        </Box>
+      )}
+
+      {detail.status !== "CANCEL" &&
+      detailState.current !== "PENDING" && (
         <DiamondValuationAssessment
           diamondInfor={diamondInfor}
           setDiamondInfor={setDiamondInfor}
@@ -606,7 +609,9 @@ const DetailItem = () => {
           handleClarities={handleClarities}
         />
       )}
-      {(detailState.current === "ASSESSED" ||
+
+      {detail.status !== "CANCEL" &&
+        (detailState.current === "ASSESSED" ||
         detailState.current === "VALUATING" ||
         detailState.current === "DRAFT_VALUATING" ||
         detailState.current === "VALUATED") && (

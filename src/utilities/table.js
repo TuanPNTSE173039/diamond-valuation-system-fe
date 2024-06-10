@@ -55,7 +55,7 @@ export const ValuationHeadCells = [
     id: "certificateId",
     numeric: false,
     disablePadding: true,
-    label: "GIA",
+    label: "Report Number",
   },
   {
     id: "diamondOrigin",

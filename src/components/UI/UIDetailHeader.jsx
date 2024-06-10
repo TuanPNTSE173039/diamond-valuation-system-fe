@@ -5,34 +5,31 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-
-import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { checkDiamond } from "../../services/api.js";
 
 export default function UIDetailHeader({ title, detail }) {
+  const { detailId, requestId } = useParams();
   const queryClient = useQueryClient();
-  const { mutate, isPending, isError } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: (body) => {
       return checkDiamond(detail.id, body);
     },
     onSuccess: (body) => {
-      queryClient.invalidateQueries(["valuationRequests"]);
-      if (body.status === "CANCEL") {
-        toast.error("This detail is not diamond");
-      } else {
-        toast.success("Diamond is checked");
-      }
+      queryClient.invalidateQueries({
+        queryKey: ["detail", { detailId: detailId }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["request", { requestId: requestId }],
+      });
+      toast.success("Request has been canceled");
     },
   });
   const [anchorEl, setAnchorEl] = useState(null);
@@ -49,44 +46,18 @@ export default function UIDetailHeader({ title, detail }) {
   const handleCancelDetail = () => {
     setCancelDialogOpen(true);
   };
-
   const handleCancelDialogClose = () => {
     setCancelDialogOpen(false);
   };
-
   const handleCancelDialogSave = () => {
-    setCancelDialogOpen(false);
-  };
-
-  const [checkDiamondDialogOpen, setCheckDiamondDialogOpen] = useState(false);
-  const [isDiamond, setIsDiamond] = useState(null);
-  const [diamondSize, setDiamondSize] = useState("");
-
-  const handleCheckDiamondDialogOpen = () => {
-    setCheckDiamondDialogOpen(true);
-  };
-
-  const handleCheckDiamondDialogClose = () => {
-    setCheckDiamondDialogOpen(false);
-  };
-
-  const handleCheckDiamondDialogSave = () => {
     const body = {
       ...detail,
-      diamond: isDiamond === "yes",
-      size: diamondSize && isDiamond === "yes" ? parseFloat(diamondSize) : 0,
-      status: isDiamond === "no" ? "CANCEL" : "PENDING",
+      status: "CANCEL",
+      cancelReason: reason,
+      diamond: false,
     };
     mutate(body);
-    setCheckDiamondDialogOpen(false);
-  };
-
-  const handleIsDiamondChange = (event) => {
-    setIsDiamond(event.target.value);
-  };
-
-  const handleDiamondSizeChange = (event) => {
-    setDiamondSize(event.target.value);
+    setCancelDialogOpen(false);
   };
 
   return (
@@ -129,61 +100,38 @@ export default function UIDetailHeader({ title, detail }) {
           <MenuItem onClick={handleCancelDetail}>
             Cancel request detail
           </MenuItem>
-          <MenuItem onClick={handleCheckDiamondDialogOpen}>
-            Check Diamond
+          <MenuItem>
+            <Link to={`/records/result/${detailId}`}>View Record Result</Link>
           </MenuItem>
         </Menu>
-        <Dialog open={cancelDialogOpen} onClose={handleCancelDialogClose}>
+        <Dialog
+          open={cancelDialogOpen}
+          onClose={handleCancelDialogClose}
+          maxWidth="sm"
+          fullWidth
+        >
           <DialogTitle>Cancel Request</DialogTitle>
           <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="reason"
-              label="Reason"
-              type="text"
-              fullWidth
+            <label
+              htmlFor="message"
+              className="block mb-2 text-md font-medium text-gray-900"
+            >
+              Your Reason
+            </label>
+            <textarea
+              id="message"
+              rows="4"
+              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:primary.main focus:border-blue-500"
+              placeholder="Write your reason here..."
               value={reason}
               onChange={(event) => setReason(event.target.value)}
-            />
+            ></textarea>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCancelDialogClose}>Cancel</Button>
-            <Button onClick={handleCancelDialogSave}>Save</Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          open={checkDiamondDialogOpen}
-          onClose={handleCheckDiamondDialogClose}
-        >
-          <DialogTitle>Check Diamond</DialogTitle>
-          <DialogContent>
-            <FormControl component="fieldset">
-              <RadioGroup
-                aria-label="isDiamond"
-                value={isDiamond}
-                onChange={handleIsDiamondChange}
-              >
-                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                <FormControlLabel value="no" control={<Radio />} label="No" />
-              </RadioGroup>
-            </FormControl>
-            {isDiamond === "yes" && (
-              <TextField
-                autoFocus
-                margin="dense"
-                id="diamondSize"
-                label="Diamond Size"
-                type="text"
-                fullWidth
-                value={diamondSize}
-                onChange={handleDiamondSizeChange}
-              />
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCheckDiamondDialogClose}>Cancel</Button>
-            <Button onClick={handleCheckDiamondDialogSave}>Save</Button>
+            <Button onClick={handleCancelDialogSave} variant={"contained"}>
+              Save
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

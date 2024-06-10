@@ -89,6 +89,10 @@ const DetailList = () => {
     };
     mutate(body);
     setOpenEdit(false);
+    setSelectedDetail({
+      id: undefined,
+      diamondSize: undefined,
+    });
   };
 
   const [openAdd, setOpenAdd] = useState(false);
