@@ -9,7 +9,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 import * as React from "react";
 
 export default function UIAccountMenu() {
@@ -24,7 +23,7 @@ export default function UIAccountMenu() {
   return (
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
-        <Typography sx={{ minWidth: 100 }}>Welcome, Tuan Pham</Typography>
+        {/*<Typography sx={{ minWidth: 100 }}>Welcome, Tuan Pham</Typography>*/}
         <Tooltip title="Account settings">
           <IconButton
             onClick={handleClick}

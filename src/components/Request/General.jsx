@@ -156,7 +156,7 @@ const RequestGeneral = () => {
               <DialogTitle>Assign Consultant</DialogTitle>
               <DialogContent>
                 <UIAutocomplete
-                  onChange={(event, newValue) => setConsultant(newValue)}
+                  onChange={(newValue) => setConsultant(newValue)}
                   value={consultant}
                   data={consultantList}
                 />

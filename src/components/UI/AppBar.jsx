@@ -6,6 +6,7 @@ import { styled } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import NotificationMenu from "../Notification/Menu.jsx";
 import Logo from "./../../assets/images/logo.png";
 import UIAccountMenu from "./AccountMenu.jsx";
 import UISearch from "./Search.jsx";
@@ -83,6 +84,7 @@ const UIAppBar = ({ handleDrawerOpen, open }) => {
 
         <Box sx={{ flexGrow: 1 }} />
         {/* Missing userAccount, Notification*/}
+        <NotificationMenu />
         <UIAccountMenu />
       </Toolbar>
     </AppBar>

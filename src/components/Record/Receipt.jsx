@@ -13,8 +13,6 @@ const RecordReceipt = () => {
   const queryClient = useQueryClient();
   const {
     data: valuationRequest,
-    isLoading: isValuationRequestLoading,
-    error,
   } = useRequest(requestId);
 
   const { mutate: updateReceiptLink } = useMutation({
@@ -45,7 +43,6 @@ const RecordReceipt = () => {
       });
     },
   });
-
   return (
     <Paper elevation={3} sx={{ mb: 0.5, minWidth: "275px" }}>
       <Card variant="outlined">
