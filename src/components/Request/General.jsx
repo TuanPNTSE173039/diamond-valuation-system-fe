@@ -53,11 +53,10 @@ const RequestGeneral = () => {
       queryClient.invalidateQueries({
         queryKey: ["request", { requestId: requestId }],
       });
+
       toast.success("Consultant staff is assigned");
     },
   });
-  const [open, setOpen] = useState(false);
-  const [consultant, setConsultant] = useState(null);
 
   const consultantList = staffs.content
     .filter((item) => item.account.role === "CONSULTANT_STAFF")
@@ -71,6 +70,9 @@ const RequestGeneral = () => {
       };
     })
     .sort((a, b) => a.curProjects - b.curProjects);
+  const [open, setOpen] = useState(false);
+  const [consultant, setConsultant] = useState(consultantList[0]);
+  console.log(consultant);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -156,7 +158,7 @@ const RequestGeneral = () => {
               <DialogTitle>Assign Consultant</DialogTitle>
               <DialogContent>
                 <UIAutocomplete
-                  onChange={(newValue) => setConsultant(newValue)}
+                  onChange={(event, newValue) => setConsultant(newValue)}
                   value={consultant}
                   data={consultantList}
                 />

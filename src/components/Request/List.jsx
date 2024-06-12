@@ -11,6 +11,7 @@ import { getCustomerByID } from "../../utilities/filtering.js";
 import { formatDateTime } from "../../utilities/formatter.js";
 import { valuationRequestStatus } from "../../utilities/Status.jsx";
 import { RequestHeadCells } from "../../utilities/table.js";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
@@ -21,12 +22,12 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const ValuationRequestList = () => {
-  const { data: requests } = useRequests();
-  const { data: customers } = useCustomers();
+const RequestList = () => {
+  const { data: requests, isFetching: isRequestPending } = useRequests();
+  const { data: customers, isPending: isCustomerPending } = useCustomers();
 
   const [statusIndex, setStatusIndex] = useState(0);
-  const [selectedRequests, setSelectedRequests] = useState([])
+  const [selectedRequests, setSelectedRequests] = useState([]);
 
   const handleChange = (event, newValue) => {
     setStatusIndex(newValue);
@@ -50,6 +51,9 @@ const ValuationRequestList = () => {
       service: row.service.name,
     };
   });
+  if (isCustomerPending || isRequestPending) {
+    return <UICircularIndeterminate />;
+  }
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -123,4 +127,4 @@ const ValuationRequestList = () => {
   );
 };
 
-export default ValuationRequestList;
+export default RequestList;

@@ -14,11 +14,11 @@ import FeatherImage from "../../assets/images/clarity-characteristic/feather.png
 import NeedleImage from "../../assets/images/clarity-characteristic/needle.png";
 import PinpointImage from "../../assets/images/clarity-characteristic/pinpoint.png";
 import logo from "../../assets/images/logo.png";
-import UICircularIndeterminate from "../../components/UI/CircularIndeterminate.jsx";
 import { getValuationRequest } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
 
 import { formattedMoney } from "../../utilities/formatter.js";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
 const ScreenResult = () => {
   const { requestId } = useParams();

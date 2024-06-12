@@ -35,10 +35,9 @@ export default function UITable({
 }) {
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("Date");
-  // const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(7);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -195,7 +194,7 @@ export default function UITable({
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 35]}
+          rowsPerPageOptions={[7, 10, 25, 35]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}

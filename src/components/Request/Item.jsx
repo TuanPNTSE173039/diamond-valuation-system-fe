@@ -7,7 +7,7 @@ import CustomBreadCrumb from "../UI/BreadCrumb.jsx";
 import UIRequestHeader from "../UI/UIRequestHeader.jsx";
 import RequestGeneral from "./General.jsx";
 
-const ValuationRequestItem = () => {
+const RequestItem = () => {
   const { requestId } = useParams();
   const { data: request } = useRequest(requestId);
   console.log(request);
@@ -23,4 +23,4 @@ const ValuationRequestItem = () => {
   );
 };
 
-export default ValuationRequestItem;
+export default RequestItem;

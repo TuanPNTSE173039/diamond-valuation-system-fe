@@ -1,40 +1,40 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ScreenAppLayout from "./screens/AppLayout.jsx";
-import ScreenDashboard from "./screens/Dashboard.jsx";
-import ScreenDetailItem from "./screens/Detail/Item.jsx";
-import ScreenResult from "./screens/Record/Result.jsx";
-import ScreenRequestItem from "./screens/Request/Item.jsx";
-import ScreenRequestList from "./screens/Request/List.jsx";
-import ScreenDiamondValuationItem from "./screens/Valuation/Item.jsx";
-import ScreenDiamondValuationList from "./screens/Valuation/List.jsx";
+import AppLayout from "./components/AppLayout.jsx";
+import Dashboard from "./components/Dashboard.jsx";
+import DetailItem from "./components/Detail/Item.jsx";
+import ScreenResult from "./components/Record/ScreenResult.jsx";
+import RequestItem from "./components/Request/Item.jsx";
+import RequestList from "./components/Request/List.jsx";
+import DiamondValuationItem from "./components/Valuation/Item.jsx";
+import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ScreenAppLayout />,
+    element: <AppLayout />,
     children: [
       {
         index: true,
-        element: <ScreenDashboard />,
+        element: <Dashboard />,
       },
       {
         path: "requests",
         children: [
           {
             index: true,
-            element: <ScreenRequestList />,
+            element: <RequestList />,
           },
           {
             path: ":requestId",
             children: [
               {
                 index: true,
-                element: <ScreenRequestItem />,
+                element: <RequestItem />,
               },
               {
                 path: ":detailId",
-                element: <ScreenDetailItem />,
+                element: <DetailItem />,
               },
               {
                 path: "result",
@@ -49,11 +49,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <ScreenDiamondValuationList />,
+            element: <DiamondValuationList />,
           },
           {
             path: ":valuationId",
-            element: <ScreenDiamondValuationItem />,
+            element: <DiamondValuationItem />,
           },
         ],
       },
