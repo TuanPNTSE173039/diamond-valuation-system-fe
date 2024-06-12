@@ -37,7 +37,7 @@ const RequestList = () => {
     console.log("Add Valuation Request");
   }
 
-  const requestRows = requests.content.map((row) => {
+  const requestRows = requests?.content.map((row) => {
     const customer = getCustomerByID(customers, row.customerID);
     const firstName = customer.firstName;
     const lastName = customer.lastName;
@@ -88,7 +88,7 @@ const RequestList = () => {
       </Box>
 
       <UITabPanel index={0} value={statusIndex}>
-        <UITale
+        <UITable
           heading="All Requests"
           headCells={RequestHeadCells}
           rows={requestRows}
@@ -103,7 +103,7 @@ const RequestList = () => {
           >
             Add
           </Button>
-        </UITale>
+        </UITable>
       </UITabPanel>
 
       {valuationRequestStatus

@@ -28,7 +28,7 @@ import {
 import * as React from "react";
 import { useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateDetail, updateDiamondNote } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
@@ -38,6 +38,7 @@ import { getStaffById } from "../../utilities/filtering.js";
 import { formattedMoney } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
+import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDetailHeader from "../UI/UIDetailHeader.jsx";
 import DiamondValuationAssessment from "../Valuation/Assessment.jsx";
@@ -66,6 +67,9 @@ const DetailItem = () => {
   const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
   const { data: staffs, isLoading: isStaffLoading } = useStaffs();
 
+  const location = useLocation();
+  const pathNames = location.pathname.split("/").filter((x) => x);
+
   //Mutate
   const { mutate: mutateDetail } = useMutation({
     mutationFn: (body) => {
@@ -73,13 +77,13 @@ const DetailItem = () => {
     },
     onSuccess: (body) => {
       queryClient.invalidateQueries({
-        queryKey: ["detail", {detailId: detailId}]
+        queryKey: ["detail", { detailId: detailId }],
       });
     },
   });
   const { mutate: mutateAssessment } = useMutation({
     mutationFn: (body) => {
-      return updateDiamondNote(detail.diamondValuationNote.id, body);
+      return updateDiamondNote(detail?.diamondValuationNote.id, body);
     },
     onSuccess: (body) => {
       queryClient.invalidateQueries({
@@ -93,7 +97,7 @@ const DetailItem = () => {
   });
 
   //DiamondInfor
-  const serverDiamondInfor = detail.diamondValuationNote;
+  const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({
     giaCertDate: dayjs(new Date()), //xu ly sau
     certificateId: serverDiamondInfor?.certificateId,
@@ -123,8 +127,8 @@ const DetailItem = () => {
 
   //Assessing State
   const [detailState, setDetailState] = useState({
-    previous: getPreviousStatus(detail.status),
-    current: detail.status,
+    previous: getPreviousStatus(detail?.status),
+    current: detail?.status,
   });
   function handleAssessing() {
     setDetailState((prevState) => {
@@ -227,15 +231,15 @@ const DetailItem = () => {
   };
   useEffect(() => {
     getListAllImages();
-    if (detail.diamondValuationNote?.proportions !== null) {
+    if (detail?.diamondValuationNote?.proportions !== null) {
       loadImageByPath(
-        detail.diamondValuationNote?.proportions,
+        detail?.diamondValuationNote?.proportions,
         setProportionImage,
       );
     }
-    if (detail.diamondValuationNote?.clarityCharacteristicLink !== null) {
+    if (detail?.diamondValuationNote?.clarityCharacteristicLink !== null) {
       loadImageByPath(
-        detail.diamondValuationNote?.clarityCharacteristicLink,
+        detail?.diamondValuationNote?.clarityCharacteristicLink,
         setClarityCharacteristicImage,
       );
     }
@@ -274,15 +278,15 @@ const DetailItem = () => {
 
   //ResultStaff after approve
   const resultStaff =
-    detail.valuationPrice === 0
+    detail?.valuationPrice === 0
       ? null
-      : !detail.mode
+      : !detail?.mode
         ? {
-            staff: getStaffById(staffs, detail.diamondValuationAssign.staffId),
-            comment: detail.diamondValuationAssign.comment,
-            commentDetail: detail.diamondValuationAssign.commentDetail,
+            staff: getStaffById(staffs, detail?.diamondValuationAssign.staffId),
+            comment: detail?.diamondValuationAssign.comment,
+            commentDetail: detail?.diamondValuationAssign.commentDetail,
           }
-        : detail.diamondValuationAssigns.map((item) => ({
+        : detail?.diamondValuationAssigns.map((item) => ({
             staff: getStaffById(staffs, item.staffId),
             comment: item.comment,
             commentDetail: item.commentDetail,
@@ -311,6 +315,7 @@ const DetailItem = () => {
           justifyContent: "space-between",
         }}
       >
+        <UIBreadCrumb pathNames={pathNames} />
         <UIDetailHeader title={"Valuation Request Detail"} detail={detail} />
 
         {detailState.current === "PENDING" && (
@@ -597,8 +602,7 @@ const DetailItem = () => {
         </Box>
       )}
 
-      {detail.status !== "CANCEL" &&
-      detailState.current !== "PENDING" && (
+      {detail.status !== "CANCEL" && detailState.current !== "PENDING" && (
         <DiamondValuationAssessment
           diamondInfor={diamondInfor}
           setDiamondInfor={setDiamondInfor}
@@ -612,17 +616,17 @@ const DetailItem = () => {
 
       {detail.status !== "CANCEL" &&
         (detailState.current === "ASSESSED" ||
-        detailState.current === "VALUATING" ||
-        detailState.current === "DRAFT_VALUATING" ||
-        detailState.current === "VALUATED") && (
-        <>
-          <DiamondValuationAssignTable
-            detailState={detailState}
-            staffs={staffs}
-            detail={detail}
-          />
-        </>
-      )}
+          detailState.current === "VALUATING" ||
+          detailState.current === "DRAFT_VALUATING" ||
+          detailState.current === "VALUATED") && (
+          <>
+            <DiamondValuationAssignTable
+              detailState={detailState}
+              staffs={staffs}
+              detail={detail}
+            />
+          </>
+        )}
     </>
   );
 };

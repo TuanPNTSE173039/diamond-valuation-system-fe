@@ -58,7 +58,7 @@ const RequestGeneral = () => {
     },
   });
 
-  const consultantList = staffs.content
+  const consultantList = staffs?.content
     .filter((item) => item.account.role === "CONSULTANT_STAFF")
     .map((item) => {
       return {
@@ -71,7 +71,7 @@ const RequestGeneral = () => {
     })
     .sort((a, b) => a.curProjects - b.curProjects);
   const [open, setOpen] = useState(false);
-  const [consultant, setConsultant] = useState(consultantList[0]);
+  const [consultant, setConsultant] = useState(null);
   console.log(consultant);
 
   const handleClickOpen = () => {

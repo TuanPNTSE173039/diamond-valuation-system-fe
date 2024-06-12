@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateDiamondValuation } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
@@ -27,6 +27,7 @@ import { useRequest } from "../../services/requests.js";
 import { useValuation } from "../../services/valuations.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
+import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIRichTextEditor from "../UI/RichTexEditor.jsx";
 import DiamondValuationAssessment from "./Assessment.jsx";
@@ -69,13 +70,13 @@ const DiamondValuationItem = () => {
         queryKey: ["valuation", { valuationId: valuationId }],
       });
 
-      if (!body.data.status) toast.success("Save diamond valuation successfully");
+      if (!body.data.status)
+        toast.success("Save diamond valuation successfully");
       else {
         toast.success("Confirm diamond valuation successfully");
       }
     },
   });
-
 
   //Loading Image from firebase
   const [proportionImage, setProportionImage] = useState(null);
@@ -158,14 +159,14 @@ const DiamondValuationItem = () => {
 
   //Valuation Infor
   const [valuationPrice, setValuationPrice] = useState(
-    valuation.valuationPrice === 0 ? "" : valuation.valuationPrice,
+    valuation?.valuationPrice === 0 ? "" : valuation?.valuationPrice,
   );
   const [comment, setComment] = useState(
-    valuation.comment === null ? "" : valuation.comment,
+    valuation?.comment === null ? "" : valuation?.comment,
   );
   const editorRef = useRef();
   const commentDetail =
-    valuation.commentDetail === null ? "" : valuation.commentDetail;
+    valuation?.commentDetail === null ? "" : valuation?.commentDetail;
 
   //State button mgt
   const [detailState, setDetailState] = useState({
@@ -256,21 +257,16 @@ const DiamondValuationItem = () => {
   if (isRequestLoading || isValuationLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
   }
-  console.log(detailState);
+  const location = useLocation();
+  const pathNames = location.pathname.split("/").filter((x) => x);
   return (
     <>
       <Stack
         direction="row"
         sx={{ alignItems: "center", justifyContent: "space-between" }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 3,
-          }}
-        >
+        <Box>
+          <UIBreadCrumb pathNames={pathNames} />
           <Typography
             variant="h3"
             component="p"

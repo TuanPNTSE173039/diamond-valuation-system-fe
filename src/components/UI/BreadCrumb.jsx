@@ -1,26 +1,26 @@
-import * as React from "react";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Typography from "@mui/material/Typography";
-// import Link from "@mui/material/Link";
-import { Link } from "react-router-dom";
-import Stack from "@mui/material/Stack";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import * as React from "react";
+// import Link from "@mui/material/Link";
+import { Link as RouterLink, useParams } from "react-router-dom";
 
-function handleClick(event) {
-  event.preventDefault();
-  console.info("You clicked a breadcrumb.");
+function LinkRouter(props) {
+  return <Link {...props} component={RouterLink} />;
 }
 
-export default function CustomBreadCrumb({ level }) {
-  const breadcrumbs = [
-    <Link key="0" to={".."} relative="path">
-      Requests
-    </Link>,
+export default function UIBreadCrumb({ pathNames }) {
+  const { requestId, detailId, valuationId } = useParams();
 
-    <Typography key="1" color="text.primary">
-      {level}
-    </Typography>,
-  ];
+  const breadcrumbNameMap = {
+    "/requests": "Requests",
+    [`/requests/${requestId}`]: requestId,
+    [`/requests/${requestId}/${detailId}`]: detailId,
+    "/valuations": "Valuations",
+    [`/valuations/${valuationId}`]: valuationId,
+  };
 
   return (
     <Stack spacing={2}>
@@ -28,7 +28,20 @@ export default function CustomBreadCrumb({ level }) {
         separator={<NavigateNextIcon fontSize="small" />}
         aria-label="breadcrumb"
       >
-        {breadcrumbs}
+        {pathNames.map((value, index) => {
+          const last = index === pathNames.length - 1;
+          const to = `/${pathNames.slice(0, index + 1).join("/")}`;
+
+          return last ? (
+            <Typography color="text.primary" key={to}>
+              {breadcrumbNameMap[to]}
+            </Typography>
+          ) : (
+            <LinkRouter underline="hover" color="inherit" to={to} key={to}>
+              {breadcrumbNameMap[to]}
+            </LinkRouter>
+          );
+        })}
       </Breadcrumbs>
     </Stack>
   );
