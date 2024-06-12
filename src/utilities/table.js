@@ -26,6 +26,13 @@ export function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+export function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
 export const ValuationHeadCells = [
   {
     id: "number",
@@ -228,4 +235,4 @@ export const StaffHeadCells = [
     disablePadding: false,
     label: "Current Projects",
   },
-]
+];

@@ -13,6 +13,18 @@ export const useRequests = () => {
   });
 };
 
+export const useBriefRequests = (pageNo, pageSize) => {
+  return useQuery({
+    queryKey: ["briefRequests", { pageNo, pageSize }],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `valuation-requests/response?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc&sortBy=creationDate`,
+      );
+      return response.data;
+    },
+  });
+};
+
 export const useRequest = (id) => {
   return useQuery({
     queryKey: ["request", { requestId: id }],

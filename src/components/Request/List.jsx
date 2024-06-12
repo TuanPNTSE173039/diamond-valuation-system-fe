@@ -5,54 +5,55 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
-import { useCustomers } from "../../services/customers.js";
-import { useRequests } from "../../services/requests.js";
-import { getCustomerByID } from "../../utilities/filtering.js";
+import { useBriefRequests } from "../../services/requests.js";
 import { formatDateTime } from "../../utilities/formatter.js";
 import { valuationRequestStatus } from "../../utilities/Status.jsx";
-import { RequestHeadCells } from "../../utilities/table.js";
+import { a11yProps, RequestHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
 const RequestList = () => {
-  const { data: requests, isFetching: isRequestPending } = useRequests();
-  const { data: customers, isPending: isCustomerPending } = useCustomers();
+  // const { data: requests, isFetching: isRequestPending } = useRequests();
+  // const { data: customers, isPending: isCustomerPending } = useCustomers();
 
-  const [statusIndex, setStatusIndex] = useState(0);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { data: requests, isFetching: isRequestFetching } = useBriefRequests(
+    page,
+    rowsPerPage,
+  );
+
   const [selectedRequests, setSelectedRequests] = useState([]);
 
+  //Tab control
+  const [statusIndex, setStatusIndex] = useState(0);
   const handleChange = (event, newValue) => {
     setStatusIndex(newValue);
   };
 
-  function handleAddValuationRequest() {
-    console.log("Add Valuation Request");
-  }
-
+  //Showing
   const requestRows = requests?.content.map((row) => {
-    const customer = getCustomerByID(customers, row.customerID);
-    const firstName = customer.firstName;
-    const lastName = customer.lastName;
     return {
       number: row.id,
       status: row.status,
-      customerFirstName: firstName,
-      customerLastName: lastName,
+      customerFirstName: row.customerFirstName,
+      customerLastName: row.customerLastName,
       creationDate: formatDateTime(row.creationDate),
       diamondAmount: row.diamondAmount,
-      service: row.service.name,
+      service: row.serviceName,
     };
   });
-  if (isCustomerPending || isRequestPending) {
+  console.log(requestRows);
+
+  if (isRequestFetching) {
     return <UICircularIndeterminate />;
+  }
+
+  // New Request
+  function handleAddValuationRequest() {
+    console.log("Add Valuation Request");
   }
 
   return (
@@ -94,6 +95,11 @@ const RequestList = () => {
           rows={requestRows}
           selected={selectedRequests}
           setSelected={setSelectedRequests}
+          page={page}
+          setPage={setPage}
+          count={requests?.totalElement}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
         >
           <Button
             onClick={handleAddValuationRequest}
@@ -120,6 +126,13 @@ const RequestList = () => {
                   ? requestRows.filter((row) => row.status === status.name)
                   : []
               }
+              selected={selectedRequests}
+              setSelected={setSelectedRequests}
+              page={page}
+              setPage={setPage}
+              count={requests?.totalElement}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
             />
           </UITabPanel>
         ))}

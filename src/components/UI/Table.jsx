@@ -1,4 +1,5 @@
 import DeleteIcon from "@mui/icons-material/Delete";
+import { TablePagination } from "@mui/material";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -9,7 +10,6 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import * as React from "react";
 import { Link } from "react-router-dom";
@@ -32,12 +32,17 @@ export default function UITable({
   ),
   selected = [],
   setSelected,
+  page,
+  setPage,
+  count,
+  rowsPerPage,
+  setRowsPerPage,
 }) {
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("Date");
-  const [page, setPage] = React.useState(0);
+  // const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(7);
+  // const [rowsPerPage, setRowsPerPage] = React.useState(7);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -90,14 +95,15 @@ export default function UITable({
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - count) : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage,
-      ),
+      // stableSort(rows, getComparator(order, orderBy)).slice(
+      //   page * rowsPerPage,
+      //   page * rowsPerPage + rowsPerPage,
+      // ),
+      stableSort(rows, getComparator(order, orderBy)),
     [order, orderBy, page, rowsPerPage],
   );
 
@@ -194,9 +200,9 @@ export default function UITable({
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[7, 10, 25, 35]}
+          rowsPerPageOptions={[5, 10, 25, 35]}
           component="div"
-          count={rows.length}
+          count={count}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
