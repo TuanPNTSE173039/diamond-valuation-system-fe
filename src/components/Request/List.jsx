@@ -88,7 +88,7 @@ const RequestList = () => {
       </Box>
 
       <UITabPanel index={0} value={statusIndex}>
-        <UITable
+        <UITale
           heading="All Requests"
           headCells={RequestHeadCells}
           rows={requestRows}
@@ -103,7 +103,7 @@ const RequestList = () => {
           >
             Add
           </Button>
-        </UITable>
+        </UITale>
       </UITabPanel>
 
       {valuationRequestStatus
