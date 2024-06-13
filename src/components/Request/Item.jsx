@@ -16,11 +16,6 @@ const RequestItem = () => {
   }
   const location = useLocation();
   const pathNames = location.pathname.split("/").filter((x) => x);
-  pathNames.forEach((value, index) => {
-    const last = index === pathNames.length - 1;
-    const to = `/${pathNames.slice(0, index + 1).join("/")}`;
-    console.log(index, last, to);
-  });
   return (
     <>
       <UIBreadCrumb pathNames={pathNames} />

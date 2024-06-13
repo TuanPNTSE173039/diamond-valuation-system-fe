@@ -45,7 +45,6 @@ const RequestList = () => {
       service: row.serviceName,
     };
   });
-  console.log(requestRows);
 
   if (isRequestFetching) {
     return <UICircularIndeterminate />;

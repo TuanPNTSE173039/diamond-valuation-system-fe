@@ -306,6 +306,7 @@ const DetailItem = () => {
 
   return (
     <>
+      <UIBreadCrumb pathNames={pathNames} />
       {/*HEADING*/}
       <Box
         sx={{
@@ -315,7 +316,6 @@ const DetailItem = () => {
           justifyContent: "space-between",
         }}
       >
-        <UIBreadCrumb pathNames={pathNames} />
         <UIDetailHeader title={"Valuation Request Detail"} detail={detail} />
 
         {detailState.current === "PENDING" && (

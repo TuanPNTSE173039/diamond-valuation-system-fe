@@ -32,32 +32,14 @@ import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
 
 const RequestGeneral = () => {
+  //Get data
   const { requestId } = useParams();
   const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
   const { data: customer, isLoading: isCustomerLoading } = useCustomer(
-    request.customerID,
+    request?.customerID,
   );
+  const { data: staff, isLoading: isStaffLoading } = useStaff(request?.staffID);
   const { data: staffs, isLoading: isStaffsLoading } = useStaffs();
-  const {
-    data: staff,
-    isLoading: isStaffLoading,
-    isPending: isStaffPending,
-  } = useStaff(request.staffID);
-  const queryClient = useQueryClient();
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: (body) => {
-      return updateValuationRequest(request.id, body);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["request", { requestId: requestId }],
-      });
-
-      toast.success("Consultant staff is assigned");
-    },
-  });
-
   const consultantList = staffs?.content
     .filter((item) => item.account.role === "CONSULTANT_STAFF")
     .map((item) => {
@@ -70,10 +52,23 @@ const RequestGeneral = () => {
       };
     })
     .sort((a, b) => a.curProjects - b.curProjects);
+
+  //Mutate data
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body) => {
+      return updateValuationRequest(requestId, body);
+    },
+    onSuccess: (body) => {
+      queryClient.invalidateQueries({
+        queryKey: ["request", { requestId: requestId }],
+      });
+      toast.success("Consultant staff is assigned");
+    },
+  });
+
   const [open, setOpen] = useState(false);
   const [consultant, setConsultant] = useState(null);
-  console.log(consultant);
-
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -93,15 +88,15 @@ const RequestGeneral = () => {
     setOpen(false);
   };
   const generalInfo = {
-    creationDate: request.creationDate,
-    returnedDate: request.returnDate,
-    totalFee: request.totalServicePrice,
+    creationDate: request?.creationDate,
+    returnedDate: request?.returnDate,
+    totalFee: request?.totalServicePrice,
   };
 
   if (
     isRequestLoading ||
-    isCustomerLoading ||
     isStaffsLoading ||
+    isCustomerLoading ||
     isStaffLoading
   ) {
     return <UICircularIndeterminate />;
@@ -113,19 +108,19 @@ const RequestGeneral = () => {
         <Grid item xs={4}>
           <ValuationRequestUserInfor icon={<PersonIcon />} title="Customer">
             <Avatar sx={{ width: 35, height: 35 }}>1</Avatar>
-            {customer.firstName + " " + customer.lastName}
+            {customer?.firstName + " " + customer?.lastName}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<AssignmentIndIcon />} title="CCCD">
-            {customer.identityDocument.trim()}
+            {customer?.identityDocument.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LocalPhoneIcon />} title="Phone">
-            {customer.phone.trim()}
+            {customer?.phone.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<EmailIcon />} title="Email">
-            {customer.email.trim()}
+            {customer?.email.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LocationOnIcon />} title="Adress">
-            {customer.address.trim()}
+            {customer?.address.trim()}
           </ValuationRequestUserInfor>
         </Grid>
         <Grid item xs={4}>
@@ -135,9 +130,9 @@ const RequestGeneral = () => {
           >
             {staff && (
               <>
-                <Avatar sx={{ width: 35, height: 35 }}>{staff.id}</Avatar>
+                <Avatar sx={{ width: 35, height: 35 }}>{staff?.id}</Avatar>
                 <Typography>
-                  {staff.firstName + " " + staff.lastName}
+                  {staff?.firstName + " " + staff?.lastName}
                 </Typography>
               </>
             )}
@@ -152,7 +147,7 @@ const RequestGeneral = () => {
                 Assign Consultant
               </Button>
             )}
-            {isPending && isStaffPending && "...assigning"}
+            {isPending && "...assigning"}
 
             <Dialog open={open} onClose={handleClose}>
               <DialogTitle>Assign Consultant</DialogTitle>
@@ -177,16 +172,16 @@ const RequestGeneral = () => {
             icon={<ElectricBoltIcon />}
             title="Service"
           >
-            {request.service?.name}
+            {request?.service.name}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LabelIcon />} title="Status">
-            {request.status}
+            {request?.status}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor
             icon={<CalendarMonthIcon />}
             title="Creation"
           >
-            {format(new Date(request.creationDate), "yyyy/MM/dd - HH:mm:ss")}
+            {format(new Date(request?.creationDate), "yyyy/MM/dd - HH:mm:ss")}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor
             icon={<CalendarMonthIcon />}
@@ -194,7 +189,7 @@ const RequestGeneral = () => {
           >
             {generalInfo.returnedDate === null
               ? "N/A"
-              : format(new Date(request.returnDate), "yyyy/MM/dd - HH:mm:ss")}
+              : format(new Date(request?.returnDate), "yyyy/MM/dd - HH:mm:ss")}
           </ValuationRequestUserInfor>
         </Grid>
         <Grid item xs={4} sx={{ position: "relative" }}>
@@ -211,7 +206,7 @@ const RequestGeneral = () => {
               Total Fee
             </Typography>
             <Box sx={{ fontSize: "4rem" }}>
-              {formattedMoney(request.totalServicePrice)}
+              {formattedMoney(request?.totalServicePrice)}
             </Box>
           </Box>
         </Grid>

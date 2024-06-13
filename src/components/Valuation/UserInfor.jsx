@@ -10,31 +10,36 @@ import { useParams } from "react-router-dom";
 import { useCustomer } from "../../services/customers.js";
 import { useDetail } from "../../services/details.js";
 import { useRequest } from "../../services/requests.js";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
 const DiamondValuationUserInfor = ({ ...props }) => {
   const { requestId, detailId } = useParams();
-  const { data: detail } = useDetail(detailId);
-  const { data: request } = useRequest(requestId);
-  const { data: customer } = useCustomer(
-    request ? request.customerID : undefined,
+  const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
+  const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
+  const { data: customer, isLoading: isCustomerLoading } = useCustomer(
+    request?.customerID,
   );
   const infor = {
-    phone: customer.phone.trim(),
-    email: customer.email.trim(),
-    size: detail.size,
-    service: request.service.name,
-    servicePrice: detail.servicePrice,
-    status: detail.status,
+    phone: customer?.phone.trim(),
+    email: customer?.email.trim(),
+    size: detail?.size,
+    service: request?.service.name,
+    servicePrice: detail?.servicePrice,
+    status: detail?.status,
     fairPriceEstimate:
-      detail.diamondValuationNote?.fairPrice === undefined
+      detail?.diamondValuationNote?.fairPrice === undefined
         ? "N/A"
-        : detail.diamondValuationNote?.fairPrice,
+        : detail?.diamondValuationNote?.fairPrice,
     estimateRange:
-      detail.diamondValuationNote?.minPrice +
+      detail?.diamondValuationNote?.minPrice +
       " - " +
-      detail.diamondValuationNote?.maxPrice,
+      detail?.diamondValuationNote?.maxPrice,
   };
+
+  if (isDetailLoading || isRequestLoading || isCustomerLoading) {
+    return <UICircularIndeterminate />;
+  }
   return (
     <Box {...props}>
       <DiamondValuationInforItem icon={<PersonIcon />} title="Customer">
