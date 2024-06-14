@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AppLayout from "./components/AppLayout.jsx";
+import AuthSignIn from "./components/Auth/SignIn.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
 import ScreenResult from "./components/Record/ScreenResult.jsx";
@@ -56,6 +57,15 @@ const router = createBrowserRouter([
             element: <DiamondValuationItem />,
           },
         ],
+      },
+    ],
+  },
+  {
+    path: "/auth",
+    children: [
+      {
+        path: "login",
+        element: <AuthSignIn />,
       },
     ],
   },
