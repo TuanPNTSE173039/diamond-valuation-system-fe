@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import AuthService from "../services/auth.service.js";
 import { setMessage } from "./messageSlide.js";
 
-const user = JSON.parse(localStorage.getItem("auth"))?.user;
+const user = JSON.parse(localStorage.getItem("auth"))?.userInformation;
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -18,9 +18,19 @@ export const login = createAsyncThunk(
     }
   },
 );
-//isAuthenticated: false
-//isInitialized: false
-//user
+
+export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
+  try {
+    await AuthService.logout();
+    return null;
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error.message || error.toString();
+    thunkAPI.dispatch(setMessage(message));
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 const initialState = user
   ? { isLoggedIn: true, user }
   : { isLoggedIn: false, user: null };
@@ -36,6 +46,10 @@ const authSlice = createSlice({
         state.user = action.payload.user;
       })
       .addCase(login.rejected, (state) => {
+        state.isLoggedIn = false;
+        state.user = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
         state.isLoggedIn = false;
         state.user = null;
       });

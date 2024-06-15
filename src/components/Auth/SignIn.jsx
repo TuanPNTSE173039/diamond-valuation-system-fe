@@ -69,6 +69,7 @@ export default function AuthSignIn() {
   if (isLoggedIn) {
     return <Navigate to={"/"} />;
   }
+  console.log(message);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -129,7 +130,7 @@ export default function AuthSignIn() {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            {loading && <UICircularIndeterminate />}
+            {loading && <UICircularIndeterminate color={"secondary"} />}
             Sign In
           </Button>
           <Grid container>

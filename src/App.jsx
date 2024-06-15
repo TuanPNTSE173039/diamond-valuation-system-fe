@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AppLayout from "./components/AppLayout.jsx";
+import AuthGuard from "./components/Auth/AuthGuard.jsx";
+import GuestGuard from "./components/Auth/GuestGuard.jsx";
 import AuthSignIn from "./components/Auth/SignIn.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
@@ -13,7 +15,11 @@ import "react-toastify/dist/ReactToastify.css";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: (
+      <AuthGuard>
+        <AppLayout />
+      </AuthGuard>
+    ),
     children: [
       {
         index: true,
@@ -65,7 +71,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "login",
-        element: <AuthSignIn />,
+        element: (
+          <GuestGuard>
+            <AuthSignIn />
+          </GuestGuard>
+        ),
       },
     ],
   },

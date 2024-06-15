@@ -10,6 +10,7 @@ import {
 
 const Dashboard = () => {
   const count = useSelector((state) => state.counter.value);
+  const { user: currentUser } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   return (
     <div>

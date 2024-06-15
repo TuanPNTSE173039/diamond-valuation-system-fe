@@ -18,6 +18,10 @@ const login = async (username, password) => {
   return response.data;
 };
 
+const logout = () => {
+  localStorage.removeItem("auth");
+};
+
 const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem("auth"))?.userInformation;
 };
@@ -28,6 +32,7 @@ const getCurrentToken = () => {
 
 const AuthService = {
   login,
+  logout,
   getCurrentUser,
   getCurrentToken,
 };
