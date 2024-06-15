@@ -14,7 +14,7 @@ export const login = createAsyncThunk(
       const message =
         error?.response?.data?.message || error.message || error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue(message);
+      return thunkAPI.rejectWithValue(1);
     }
   },
 );
@@ -38,7 +38,6 @@ const initialState = user
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, action) => {

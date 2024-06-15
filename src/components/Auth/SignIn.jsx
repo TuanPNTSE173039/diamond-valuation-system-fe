@@ -52,8 +52,8 @@ export default function AuthSignIn() {
   const handleLogin = async (formValue) => {
     const { username, password } = formValue;
     setLoading(true);
-    const user = await dispatch(login({ username, password }));
-    if (user) {
+    const response = await dispatch(login({ username, password }));
+    if (response.payload.user) {
       navigate("/", { replace: true });
     } else {
       setLoading(false);
@@ -69,7 +69,6 @@ export default function AuthSignIn() {
   if (isLoggedIn) {
     return <Navigate to={"/"} />;
   }
-  console.log(message);
 
   return (
     <Container component="main" maxWidth="xs">
