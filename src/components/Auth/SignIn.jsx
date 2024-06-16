@@ -34,7 +34,7 @@ export default function AuthSignIn() {
   let navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const { isLoggedIn, user } = useSelector((state) => state.auth);
+  // const { isLoggedIn, user } = useSelector((state) => state.auth);
   const { message } = useSelector((state) => state.message);
   const dispatch = useDispatch();
   useEffect(() => {
