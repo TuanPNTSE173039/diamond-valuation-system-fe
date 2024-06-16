@@ -3,20 +3,28 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import { useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useBriefRequests } from "../../services/requests.js";
 import { formatDateTime } from "../../utilities/formatter.js";
 import { valuationRequestStatus } from "../../utilities/Status.jsx";
 import { a11yProps, RequestHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
+import UISearch from "../UI/Search.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
 const RequestList = () => {
   // const { data: requests, isFetching: isRequestPending } = useRequests();
   // const { data: customers, isPending: isCustomerPending } = useCustomers();
+
+  const queryClient = useQueryClient();
+
+  const { user: currentUser } = useSelector((state) => state.auth);
+  const userRole = currentUser?.account.role;
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -31,6 +39,10 @@ const RequestList = () => {
   const [statusIndex, setStatusIndex] = useState(0);
   const handleChange = (event, newValue) => {
     setStatusIndex(newValue);
+    console.log(newValue);
+    queryClient.invalidateQueries({
+      queryKey: ["briefRequests", { page, rowsPerPage, newValue }],
+    });
   };
 
   //Showing
@@ -66,25 +78,29 @@ const RequestList = () => {
           alignItems: "center",
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={statusIndex}
-            onChange={handleChange}
-            aria-label="valuation requests status"
-          >
-            <Tab label="All" {...a11yProps(0)} />
-            {valuationRequestStatus
-              .filter((status, index) => index !== 0)
-              .map((status, index) => (
-                <Tab
-                  key={status.id}
-                  label={status.name}
-                  {...a11yProps(index + 1)}
-                />
-              ))}
-          </Tabs>
-        </Box>
+        <UISearch />
+        <Box sx={{ flexGrow: 1 }} />
         <UIDateRangePicker />
+        {/* Use redux to search here*/}
+      </Box>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs
+          value={statusIndex}
+          onChange={handleChange}
+          aria-label="valuation requests status"
+        >
+          <Tab label="All" {...a11yProps(0)} />
+          {valuationRequestStatus
+            .filter((status, index) => index !== 0)
+            .filter((status) => status.roles.includes(userRole))
+            .map((status, index) => (
+              <Tab
+                key={status.id}
+                label={status.name}
+                {...a11yProps(index + 1)}
+              />
+            ))}
+        </Tabs>
       </Box>
 
       <UITabPanel index={0} value={statusIndex}>
@@ -113,6 +129,7 @@ const RequestList = () => {
 
       {valuationRequestStatus
         .filter((status, index) => index !== 0)
+        .filter((status) => status.roles.includes(userRole))
         .map((status, index) => (
           <UITabPanel key={index} index={index + 1} value={statusIndex}>
             <UITable

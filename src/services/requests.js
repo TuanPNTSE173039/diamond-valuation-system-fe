@@ -13,13 +13,15 @@ export const useRequests = () => {
   });
 };
 
-export const useBriefRequests = (pageNo, pageSize) => {
+export const useBriefRequests = (pageNo, pageSize, status) => {
+  let url = `valuation-requests/response?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc&sortBy=creationDate`;
+  if (status) {
+    url += `&status=${status}`;
+  }
   return useQuery({
-    queryKey: ["briefRequests", { pageNo, pageSize }],
+    queryKey: ["briefRequests", { pageNo, pageSize, status }],
     queryFn: async () => {
-      const response = await axiosInstance.get(
-        `valuation-requests/response?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc&sortBy=creationDate`,
-      );
+      const response = await axiosInstance.get(url);
       return response.data;
     },
   });

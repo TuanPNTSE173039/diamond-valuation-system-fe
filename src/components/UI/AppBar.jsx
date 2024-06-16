@@ -9,7 +9,6 @@ import * as React from "react";
 import NotificationMenu from "../Notification/Menu.jsx";
 import Logo from "./../../assets/images/logo.png";
 import UIAccountMenu from "./AccountMenu.jsx";
-import UISearch from "./Search.jsx";
 
 const drawerWidth = 240;
 const AppBar = styled(MuiAppBar, {
@@ -78,9 +77,6 @@ const UIAppBar = ({ handleDrawerOpen, open }) => {
         >
           H&T Diamond
         </Typography>
-        <Box sx={{ flexGrow: 1 }} />
-        {/* Use redux to search here*/}
-        <UISearch />
 
         <Box sx={{ flexGrow: 1 }} />
         {/* Missing userAccount, Notification*/}

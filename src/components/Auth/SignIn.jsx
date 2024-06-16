@@ -14,10 +14,11 @@ import { useFormik } from "formik";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { login } from "../../redux/authSlice.js";
 import { clearMessage } from "../../redux/messageSlide.js";
+import Role from "../../utilities/Role.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
 export default function AuthSignIn() {
@@ -33,7 +34,7 @@ export default function AuthSignIn() {
   let navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
   const { message } = useSelector((state) => state.message);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -53,8 +54,27 @@ export default function AuthSignIn() {
     const { username, password } = formValue;
     setLoading(true);
     const response = await dispatch(login({ username, password }));
-    if (response.payload.user) {
-      navigate("/", { replace: true });
+    const user = response.payload.user;
+    if (user) {
+      let roleBasedLink = "";
+      switch (user?.account.role) {
+        case Role.ADMIN:
+          roleBasedLink = "/";
+          break;
+        case Role.MANAGER:
+          roleBasedLink = "/";
+          break;
+        case Role.CONSULTANT:
+          roleBasedLink = "/requests";
+          break;
+        case Role.VALUATION:
+          roleBasedLink = "/valuations";
+          break;
+        default:
+          roleBasedLink = "/";
+          break;
+      }
+      navigate(`${roleBasedLink}`, { replace: true });
     } else {
       setLoading(false);
     }
@@ -66,9 +86,9 @@ export default function AuthSignIn() {
     onSubmit: handleLogin,
   });
 
-  if (isLoggedIn) {
-    return <Navigate to={"/"} />;
-  }
+  // if (isLoggedIn) {
+  //   return <Navigate to={roleBasedLink} />;
+  // }
 
   return (
     <Container component="main" maxWidth="xs">

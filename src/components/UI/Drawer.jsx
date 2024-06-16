@@ -10,6 +10,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { checkRole } from "../../utilities/DrawerItem.jsx";
 
@@ -64,6 +65,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const UIDrawer = ({ theme, handleDrawerClose, ...props }) => {
+  const { user: currentUser } = useSelector((state) => state.auth);
   return (
     <Drawer variant="permanent" {...props}>
       <DrawerHeader>
@@ -79,7 +81,7 @@ const UIDrawer = ({ theme, handleDrawerClose, ...props }) => {
       </DrawerHeader>
       <Divider />
       <List>
-        {checkRole(1).map((item) => {
+        {checkRole(currentUser?.account.role).map((item) => {
           const link = item.link;
           return (
             <NavLink to={link} key={item.id}>

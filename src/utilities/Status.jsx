@@ -13,6 +13,7 @@ import natural from "../assets/images/clarity-characteristic/natural.png";
 import needle from "../assets/images/clarity-characteristic/needle.png";
 import pinpoint from "../assets/images/clarity-characteristic/pinpoint.png";
 import twinningWisp from "../assets/images/clarity-characteristic/twining_wisp.png";
+import Role from "./Role.js";
 
 export const diamondAttribute = {
   origin: [
@@ -108,30 +109,47 @@ export const valuationRequestStatus = [
   {
     id: 0,
     name: "ALL",
+    roles: [Role.MANAGER, Role.CONSULTANT],
   },
   {
     id: 1,
     name: "PENDING",
+    roles: [Role.MANAGER],
   },
   {
     id: 2,
     name: "PROCESSING",
+    roles: [Role.MANAGER, Role.CONSULTANT],
   },
   {
     id: 3,
     name: "RECEIVED",
+    roles: [Role.MANAGER, Role.CONSULTANT],
   },
   {
     id: 4,
-    name: "COMPLETED",
+    name: "VALUATING",
+    roles: [Role.MANAGER, Role.CONSULTANT],
   },
   {
     id: 5,
-    name: "SEALED",
+    name: "COMPLETED",
+    roles: [Role.MANAGER, Role.CONSULTANT],
   },
   {
     id: 6,
+    name: "SEALED",
+    roles: [Role.MANAGER, Role.CONSULTANT],
+  },
+  {
+    id: 7,
     name: "CANCELLED",
+    roles: [Role.MANAGER, Role.CONSULTANT],
+  },
+  {
+    id: 8,
+    name: "FINISHED",
+    roles: [Role.MANAGER, Role.CONSULTANT],
   },
 ];
 export const diamondValuationStatus = [

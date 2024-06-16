@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AppLayout from "./components/AppLayout.jsx";
 import AuthGuard from "./components/Auth/AuthGuard.jsx";
 import GuestGuard from "./components/Auth/GuestGuard.jsx";
+import RoleBasedGuard from "./components/Auth/RoleBasedGuard.jsx";
 import AuthSignIn from "./components/Auth/SignIn.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
@@ -11,6 +12,7 @@ import RequestList from "./components/Request/List.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
+import Role from "./utilities/Role.js";
 
 const router = createBrowserRouter([
   {
@@ -23,25 +25,45 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: (
+          <RoleBasedGuard allowedRoles={[Role.ADMIN, Role.MANAGER]}>
+            <Dashboard />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "requests",
         children: [
           {
             index: true,
-            element: <RequestList />,
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.CONSULTANT, Role.MANAGER]}>
+                <RequestList />
+              </RoleBasedGuard>
+            ),
           },
           {
             path: ":requestId",
             children: [
               {
                 index: true,
-                element: <RequestItem />,
+                element: (
+                  <RoleBasedGuard
+                    allowedRoles={[Role.CONSULTANT, Role.MANAGER]}
+                  >
+                    <RequestItem />
+                  </RoleBasedGuard>
+                ),
               },
               {
                 path: ":detailId",
-                element: <DetailItem />,
+                element: (
+                  <RoleBasedGuard
+                    allowedRoles={[Role.CONSULTANT, Role.MANAGER]}
+                  >
+                    <DetailItem />
+                  </RoleBasedGuard>
+                ),
               },
               {
                 path: "result",
@@ -56,11 +78,19 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <DiamondValuationList />,
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.VALUATION, Role.MANAGER]}>
+                <DiamondValuationList />
+              </RoleBasedGuard>
+            ),
           },
           {
             path: ":valuationId",
-            element: <DiamondValuationItem />,
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.VALUATION, Role.MANAGER]}>
+                <DiamondValuationItem />
+              </RoleBasedGuard>
+            ),
           },
         ],
       },

@@ -1,10 +1,13 @@
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import BookIcon from "@mui/icons-material/Book";
+import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import DiamondIcon from "@mui/icons-material/Diamond";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PersonIcon from "@mui/icons-material/Person";
 import * as React from "react";
+import Role from "./Role.js";
 
 const drawers = [
   {
@@ -12,64 +15,59 @@ const drawers = [
     name: "Dashboard",
     icon: <DashboardIcon />,
     link: "/",
-    roles: [1],
+    roles: [Role.ADMIN, Role.MANAGER],
   },
   {
     id: 2,
     name: "Valuation Requests",
     icon: <AssignmentIcon />,
     link: "/requests",
-    roles: [1, 2],
+    roles: [Role.MANAGER, Role.CONSULTANT],
   },
   {
     id: 3,
     name: "Diamond Valuations",
     icon: <DiamondIcon />,
     link: "/valuations",
-    roles: [1, 2, 3],
+    roles: [Role.MANAGER, Role.VALUATION],
   },
   {
     id: 4,
-    name: "Prices",
+    name: "Diamond Prices",
     link: "/prices",
     icon: <AttachMoneyIcon />,
-    roles: [1],
+    roles: [Role.MANAGER],
   },
   {
     id: 5,
-    name: "Staffs Mgt",
-    icon: <PeopleAltIcon />,
-    link: "/staffs",
-    roles: [1],
+    name: "Services Mgt",
+    link: "/services",
+    icon: <CurrencyYenIcon />,
+    roles: [Role.MANAGER],
   },
   {
     id: 6,
+    name: "Staffs Mgt",
+    icon: <PeopleAltIcon />,
+    link: "/staffs",
+    roles: [Role.ADMIN],
+  },
+  {
+    id: 7,
     name: "Customers Mgt",
     icon: <PersonIcon />,
-    link: "/Customer",
-    roles: [1],
+    link: "/customers",
+    roles: [Role.ADMIN],
+  },
+  {
+    id: 8,
+    name: "Blog Mgt",
+    icon: <BookIcon />,
+    link: "/blogs",
+    roles: [Role.ADMIN],
   },
 ];
 
-const role = [
-  {
-    id: 1,
-    name: "MANAGER",
-  },
-  {
-    id: 2,
-    name: "CONSULTANT",
-  },
-  {
-    id: 3,
-    name: "VALUATION",
-  },
-  {
-    id: 4,
-    name: "ADMIN",
-  },
-];
-
-export const checkRole = (roleId) => {
-  return drawers.filter((item) => item.roles.includes(roleId));
+export const checkRole = (role) => {
+  return drawers.filter((item) => item.roles.includes(role));
 };
