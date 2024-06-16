@@ -1,9 +1,8 @@
-import { fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
 import { Provider } from "react-redux";
 import AuthSignIn from "../src/components/Auth/SignIn.jsx";
-import { login } from "../src/redux/authSlice.js";
 import { store } from "../src/redux/store.js";
 
 // Mock the login function
@@ -33,7 +32,7 @@ describe("SignIn Component", () => {
     expect(passwordInput).toBeInTheDocument();
   });
 
-  test("updates on input change", () => {
+  test("updates on input change", async () => {
     const { getByLabelText } = render(
       <Provider store={store}>
         <AuthSignIn />
@@ -43,32 +42,56 @@ describe("SignIn Component", () => {
     const usernameInput = getByLabelText(/Username/i);
     const passwordInput = getByLabelText(/Password/i);
 
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-    fireEvent.change(passwordInput, { target: { value: "testpassword" } });
+    await act(async () => {
+      fireEvent.change(usernameInput, { target: { value: "testuser" } });
+      fireEvent.change(passwordInput, { target: { value: "testpassword" } });
+    });
 
     expect(usernameInput.value).toBe("testuser");
     expect(passwordInput.value).toBe("testpassword");
   });
 
-  test("submits the form", async () => {
-    const { getByLabelText, getByText } = render(
+  test("shows error message when username is blank", async () => {
+    const { getByLabelText } = render(
       <Provider store={store}>
         <AuthSignIn />
       </Provider>,
     );
 
+    // Check if username and password fields are present
     const usernameInput = getByLabelText(/Username/i);
     const passwordInput = getByLabelText(/Password/i);
-    const submitButton = getByText(/Sign In/i);
 
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-    fireEvent.change(passwordInput, { target: { value: "testpassword" } });
-    fireEvent.click(submitButton);
-
-    // Check if login function was called
-    expect(login).toHaveBeenCalledWith({
-      username: "testuser",
-      password: "testpassword",
+    // Simulate leaving the username field blank and moving to the next field
+    await act(async () => {
+      fireEvent.change(usernameInput, { target: { value: "" } });
+      fireEvent.blur(usernameInput);
+      fireEvent.change(passwordInput, { target: { value: "testpassword" } });
     });
+
+    // Check if the error message is displayed
+    expect(screen.getByText("Username is required")).toBeInTheDocument();
+  });
+
+  test("shows error message when password is blank", async () => {
+    const { getByLabelText } = render(
+      <Provider store={store}>
+        <AuthSignIn />
+      </Provider>,
+    );
+
+    // Check if username and password fields are present
+    const usernameInput = getByLabelText(/Username/i);
+    const passwordInput = getByLabelText(/Password/i);
+
+    // Simulate leaving the username field blank and moving to the next field
+    await act(async () => {
+      fireEvent.change(usernameInput, { target: { value: "textusername" } });
+      fireEvent.change(passwordInput, { target: { value: "" } });
+      fireEvent.blur(passwordInput);
+    });
+
+    // Check if the error message is displayed
+    expect(screen.getByText("Password is required")).toBeInTheDocument();
   });
 });

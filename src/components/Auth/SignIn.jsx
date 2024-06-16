@@ -150,7 +150,7 @@ export default function AuthSignIn() {
             sx={{ mt: 3, mb: 2 }}
           >
             {loading && <UICircularIndeterminate color={"secondary"} />}
-            Sign In
+            Login
           </Button>
           <Grid container>
             <Grid item xs>
