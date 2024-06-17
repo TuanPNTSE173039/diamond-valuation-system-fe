@@ -11,11 +11,12 @@ import RequestGeneral from "./General.jsx";
 const RequestItem = () => {
   const { requestId } = useParams();
   const { data: request, isLoading } = useRequest(requestId);
+
+  const location = useLocation();
+  const pathNames = location.pathname.split("/").filter((x) => x);
   if (isLoading) {
     return <UICircularIndeterminate />;
   }
-  const location = useLocation();
-  const pathNames = location.pathname.split("/").filter((x) => x);
   return (
     <>
       <UIBreadCrumb pathNames={pathNames} />

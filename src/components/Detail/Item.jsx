@@ -63,7 +63,7 @@ export const metadata = {
 };
 const DetailItem = () => {
   const queryClient = useQueryClient();
-  const { requestId, detailId } = useParams();
+  const { detailId } = useParams();
   const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
   const { data: staffs, isLoading: isStaffLoading } = useStaffs();
 
@@ -127,9 +127,18 @@ const DetailItem = () => {
 
   //Assessing State
   const [detailState, setDetailState] = useState({
-    previous: getPreviousStatus(detail?.status),
-    current: detail?.status,
+    previous: null,
+    current: null,
   });
+
+  useEffect(() => {
+    if (detail) {
+      setDetailState({
+        previous: getPreviousStatus(detail?.status),
+        current: detail?.status,
+      });
+    }
+  }, [detail]);
   function handleAssessing() {
     setDetailState((prevState) => {
       return {
@@ -215,7 +224,7 @@ const DetailItem = () => {
     listAll(listRef)
       .then(async (res) => {
         res.prefixes.forEach((folderRef) => {
-          console.log("folderRef", folderRef);
+          // console.log("folderRef", folderRef);
         });
         const images = await Promise.all(
           res.items.map(async (itemRef) => {
@@ -243,7 +252,7 @@ const DetailItem = () => {
         setClarityCharacteristicImage,
       );
     }
-  }, []);
+  }, [detail]);
   const handleUploadDiamondImage = () => {
     const storageRef = ref(storage, `${imageLinks}/${diamondImage.name}`);
     const uploadTask = uploadBytesResumable(storageRef, diamondImage, metadata);
@@ -252,13 +261,13 @@ const DetailItem = () => {
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("Upload is " + progress + "% done");
+        // console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
           case "paused":
-            console.log("Upload is paused");
+            // console.log("Upload is paused");
             break;
           case "running":
-            console.log("Upload is running");
+            // console.log("Upload is running");
             break;
         }
       },
@@ -602,19 +611,20 @@ const DetailItem = () => {
         </Box>
       )}
 
-      {detail.status !== "CANCEL" && detailState.current !== "PENDING" && (
-        <DiamondValuationAssessment
-          diamondInfor={diamondInfor}
-          setDiamondInfor={setDiamondInfor}
-          detailState={detailState}
-          proportionImage={proportionImage}
-          clarityCharacteristicImage={clarityCharacteristicImage}
-          clarities={clarities}
-          handleClarities={handleClarities}
-        />
-      )}
+      {detailState.current !== "CANCEL" &&
+        detailState.current !== "PENDING" && (
+          <DiamondValuationAssessment
+            diamondInfor={diamondInfor}
+            setDiamondInfor={setDiamondInfor}
+            detailState={detailState}
+            proportionImage={proportionImage}
+            clarityCharacteristicImage={clarityCharacteristicImage}
+            clarities={clarities}
+            handleClarities={handleClarities}
+          />
+        )}
 
-      {detail.status !== "CANCEL" &&
+      {detailState.current !== "CANCEL" &&
         (detailState.current === "ASSESSED" ||
           detailState.current === "VALUATING" ||
           detailState.current === "DRAFT_VALUATING" ||

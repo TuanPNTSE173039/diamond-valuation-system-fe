@@ -9,3 +9,11 @@ export const formattedMoney = (money) =>
     style: "currency",
     currency: "USD",
   }).format(money);
+
+export const formattedDiamondSize = (size) => {
+  return `${size} mm`;
+};
+
+export const formattedCaratWeight = (weight) => {
+  return `${weight} .ct`;
+};

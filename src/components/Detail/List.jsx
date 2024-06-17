@@ -43,7 +43,7 @@ const DetailList = () => {
     },
   });
 
-  const details = request.valuationRequestDetails.map((item) => {
+  const details = request?.valuationRequestDetails?.map((item) => {
     return {
       number: item.id,
       returnedDate: request.returnDate
@@ -63,6 +63,20 @@ const DetailList = () => {
       status: item.status,
     };
   });
+  // const { data: detailItems } = useQueries(
+  //   request?.valuationRequestDetails?.map((item) => {
+  //     return {
+  //       queryKey: ["detail", { detailId: item.number }],
+  //       queryFn: async () => {
+  //         const response = await axiosInstance.get(
+  //           `valuation-request-details/${item.number}`,
+  //         );
+  //         return response.data;
+  //       },
+  //       enabled: item.number !== null && item.number !== undefined,
+  //     };
+  //   }),
+  // );
 
   const [selectedDetail, setSelectedDetail] = useState({
     id: undefined,
@@ -157,7 +171,7 @@ const DetailList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {details.map((row) => (
+            {details?.map((row) => (
               <StyledTableRow key={row.number}>
                 <StyledTableCell component="th" scope="row">
                   <Link to={`/requests/${requestId}/${row.number}`}>
@@ -166,18 +180,18 @@ const DetailList = () => {
                     </Typography>
                   </Link>
                 </StyledTableCell>
-                <StyledTableCell align="right">
+                <StyledTableCell align="left">
                   {row.returnedDate}
                 </StyledTableCell>
-                <StyledTableCell align="right">{row.service}</StyledTableCell>
+                <StyledTableCell align="left">{row.service}</StyledTableCell>
                 <StyledTableCell align="right">{row.size}</StyledTableCell>
                 <StyledTableCell align="right">
                   {row.servicePrice}
                 </StyledTableCell>
-                <StyledTableCell align="right">
+                <StyledTableCell align="left">
                   {row.certificateId}
                 </StyledTableCell>
-                <StyledTableCell align="right">
+                <StyledTableCell align="left">
                   {row.diamondOrigin}
                 </StyledTableCell>
                 <StyledTableCell align="right">
@@ -186,7 +200,7 @@ const DetailList = () => {
                 <StyledTableCell align="right">
                   {row.valuationPrice}
                 </StyledTableCell>
-                <StyledTableCell align="right">{row.status}</StyledTableCell>
+                <StyledTableCell align="left">{row.status}</StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton
                     color="primary"
