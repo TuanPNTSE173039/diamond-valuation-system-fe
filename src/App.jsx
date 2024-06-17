@@ -66,7 +66,7 @@ const router = createBrowserRouter([
                 ),
               },
               {
-                path: "result",
+                path: "results",
                 element: <ScreenResult />,
               },
             ],

@@ -1,6 +1,7 @@
 import DownloadIcon from "@mui/icons-material/Download";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -9,23 +10,24 @@ import { getDownloadURL, ref as loadImageRef } from "firebase/storage";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Margin, Resolution, usePDF } from "react-to-pdf";
-import CrystalImage from "../../assets/images/clarity-characteristic/crystal.png";
-import FeatherImage from "../../assets/images/clarity-characteristic/feather.png";
-import NeedleImage from "../../assets/images/clarity-characteristic/needle.png";
-import PinpointImage from "../../assets/images/clarity-characteristic/pinpoint.png";
 import logo from "../../assets/images/logo.png";
 import { getValuationRequest } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
 
 import { formattedMoney } from "../../utilities/formatter.js";
+import { clarityCharacteristicConverter } from "../../utilities/Status.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
 const ScreenResult = () => {
   const { requestId } = useParams();
+  console.log(requestId);
+
+  // Image Links
   const [proportionImages, setProportionImages] = useState([]);
   const [clarityCharacteristicImages, setClarityCharacteristicImages] =
     useState([]);
-  const ref = useRef(); // Create a reference
+
+  // PDF render
   const options = {
     // default is `save`
     filename: "ahi.pdf",
@@ -63,25 +65,21 @@ const ScreenResult = () => {
     },
   };
   const { toPDF, targetRef } = usePDF(options);
-  const {
-    data: { valuationRequestDetails },
-    isLoading: isValuationRequestLoading,
-    error,
-  } = useQuery({
-    queryKey: ["valuationRequest", requestId],
+
+  const { data: request, isLoading: isValuationRequestLoading } = useQuery({
+    queryKey: ["request", { requestId: requestId }],
     queryFn: () => getValuationRequest(requestId),
     select: (data) => {
       return {
         ...data,
-        valuationRequestDetails: data.valuationRequestDetails.filter(
+        valuationRequestDetails: data?.valuationRequestDetails.filter(
           (item) => item.status === "APPROVED",
         ),
       };
     },
   });
-  if (isValuationRequestLoading) {
-    return <UICircularIndeterminate />;
-  }
+
+  console.log(request);
   const loadImage = async (imagePath, setLink) => {
     const imageRef = loadImageRef(storage, imagePath);
     try {
@@ -91,26 +89,37 @@ const ScreenResult = () => {
       console.error("Error loading image by path:", error);
     }
   };
+  const valuationRequestDetails = request?.valuationRequestDetails;
 
   useEffect(() => {
-    if (proportionImages.length === 0) {
-      for (let i = 0; i < valuationRequestDetails.length; i++) {
+    if (proportionImages.length === 0 && valuationRequestDetails !== null) {
+      for (let i = 0; i < valuationRequestDetails?.length; i++) {
         loadImage(
           valuationRequestDetails[i].diamondValuationNote.proportions,
           setProportionImages,
         );
       }
     }
-    if (clarityCharacteristicImages.length === 0) {
-      for (let i = 0; i < valuationRequestDetails.length; i++) {
+    if (
+      clarityCharacteristicImages.length === 0 &&
+      valuationRequestDetails !== null
+    ) {
+      for (let i = 0; i < valuationRequestDetails?.length; i++) {
         loadImage(
-          valuationRequestDetails[i].diamondValuationNote.clarityCharacteristic,
+          valuationRequestDetails[i].diamondValuationNote
+            .clarityCharacteristicLink,
           setClarityCharacteristicImages,
         );
       }
     }
-  }, []);
+  }, [valuationRequestDetails]);
+  console.log(clarityCharacteristicImages);
 
+  const ref = useRef(); // Create a reference
+
+  if (isValuationRequestLoading) {
+    return <UICircularIndeterminate />;
+  }
   return (
     <div>
       <div>
@@ -135,7 +144,7 @@ const ScreenResult = () => {
         </Stack>
       </div>
       <div ref={targetRef}>
-        {valuationRequestDetails.map((item, index) => (
+        {valuationRequestDetails?.map((item, index) => (
           <main
             key={item.id}
             className="text-slate-800 mt-24 h-[161vh] flex flex-col w-full"
@@ -166,6 +175,7 @@ const ScreenResult = () => {
                         <p className="p-0 mb-1">Polish</p>
                         <p className="p-0 mb-1">Symmetry</p>
                         <p className="p-0 mb-1">Fluorescence</p>
+                        <p className="p-0 mb-1">Clarity Characteristics</p>
                       </div>
                       <div className="w-1/2 text-right">
                         <p className="p-0 mb-1">
@@ -194,6 +204,13 @@ const ScreenResult = () => {
                         </p>
                         <p className="p-0 mb-1">
                           {item.diamondValuationNote.fluorescence}
+                        </p>
+                        <p className="p-0 mb-1">
+                          {clarityCharacteristicConverter(
+                            item.diamondValuationNote.clarityCharacteristic,
+                          )
+                            .map((item) => item.label)
+                            .join(", ")}
                         </p>
                       </div>
                     </div>
@@ -230,13 +247,48 @@ const ScreenResult = () => {
                       loading="lazy"
                       style={{
                         height: "auto",
-                        width: "100%",
+                        width: "70%",
                         objectFit: "cover",
                         cursor: "pointer",
+                        margin: "0 auto",
                       }}
                     />
+                    <Grid container spacing={0.5} justifyContent="center">
+                      {clarityCharacteristicConverter(
+                        item.diamondValuationNote.clarityCharacteristic,
+                      ).map((clarity, index) => {
+                        return (
+                          <Grid key={clarity.code} item>
+                            <Stack
+                              direction="row"
+                              sx={{
+                                alignItems: "center",
+                                height: 30,
+                                gap: 0.5,
+                                border: "1px solid #e0e0e0",
+                                p: 1,
+                              }}
+                            >
+                              <img
+                                src={clarity.image}
+                                alt={clarity.label}
+                                style={{
+                                  width: "auto",
+                                  height: "100%",
+                                  objectFit: "contain",
+                                }}
+                              />
+                              <Typography sx={{ color: "gray" }}>
+                                {clarity.label}
+                              </Typography>
+                            </Stack>
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
                   </div>
 
+                  {/*
                   <Stack
                     direction="row"
                     spacing={2}
@@ -311,6 +363,7 @@ const ScreenResult = () => {
                       <Typography sx={{ color: "gray" }}>Pinpoint</Typography>
                     </Stack>
                   </Stack>
+                  */}
                 </div>
 
                 <div className="h-px bg-gray-300 my-4" />

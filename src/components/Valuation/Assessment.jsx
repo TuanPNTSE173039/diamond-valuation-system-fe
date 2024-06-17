@@ -611,7 +611,7 @@ const DiamondValuationAssessment = ({
             <Grid container spacing={0.5} justifyContent="center">
               {clarityCharacteristicList.map((clarity, index) => {
                 return (
-                  <Grid key={clarity.code} item >
+                  <Grid key={clarity.code} item>
                     <ToggleButton
                       value={clarity.code}
                       aria-label={clarity.label}
@@ -643,61 +643,6 @@ const DiamondValuationAssessment = ({
               })}
             </Grid>
           </ToggleButtonGroup>
-
-          {/*<Stack*/}
-          {/*  direction="row"*/}
-          {/*  spacing={2}*/}
-          {/*  sx={{ justifyContent: "space-evenly", mt: 1 }}*/}
-          {/*>*/}
-          {/*  <Stack*/}
-          {/*    direction="row"*/}
-          {/*    sx={{*/}
-          {/*      alignItems: "center",*/}
-          {/*      height: 30,*/}
-          {/*      p: "2px",*/}
-          {/*    }}*/}
-          {/*  >*/}
-          {/*    <img*/}
-          {/*      src={CrystalImage}*/}
-          {/*      alt="Crystal"*/}
-          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
-          {/*    />*/}
-          {/*    <Typography sx={{ color: "gray" }}>Crystal</Typography>*/}
-          {/*  </Stack>*/}
-          {/*  <Stack*/}
-          {/*    direction="row"*/}
-          {/*    sx={{ alignItems: "center", height: 30, p: "2px" }}*/}
-          {/*  >*/}
-          {/*    <img*/}
-          {/*      src={FeatherImage}*/}
-          {/*      alt="Feather"*/}
-          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
-          {/*    />*/}
-          {/*    <Typography sx={{ color: "gray", pl: 2 }}>Feather</Typography>*/}
-          {/*  </Stack>*/}
-          {/*  <Stack*/}
-          {/*    direction="row"*/}
-          {/*    sx={{ alignItems: "center", height: 30, p: "2px" }}*/}
-          {/*  >*/}
-          {/*    <img*/}
-          {/*      src={NeedleImage}*/}
-          {/*      alt="Needle"*/}
-          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
-          {/*    />*/}
-          {/*    <Typography sx={{ color: "gray", pl: 1 }}>Needle</Typography>*/}
-          {/*  </Stack>*/}
-          {/*  <Stack*/}
-          {/*    direction="row"*/}
-          {/*    sx={{ alignItems: "center", height: 30, p: "2px" }}*/}
-          {/*  >*/}
-          {/*    <img*/}
-          {/*      src={PinpointImage}*/}
-          {/*      alt="Pinpoint"*/}
-          {/*      style={{ width: "100%", height: "100%", objectFit: "contain" }}*/}
-          {/*    />*/}
-          {/*    <Typography sx={{ color: "gray" }}>Pinpoint</Typography>*/}
-          {/*  </Stack>*/}
-          {/*</Stack>*/}
         </DiamondValuationFieldGroup>
       </Box>
 

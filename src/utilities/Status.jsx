@@ -255,6 +255,12 @@ export const clarityCharacteristicList = [
   },
 ];
 
+export const clarityCharacteristicConverter = (characteristic) => {
+  return characteristic.map((item) => {
+    return clarityCharacteristicList.find((clarity) => clarity.code === item);
+  });
+};
+
 export const statusConverter = (status) => {
   switch (status) {
     case "PENDING":
