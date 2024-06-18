@@ -32,6 +32,8 @@ const RequestList = () => {
   const { data: requests, isFetching: isRequestFetching } = useBriefRequests(
     page,
     rowsPerPage,
+    userRole,
+    currentUser?.id,
   );
 
   const [selectedRequests, setSelectedRequests] = useState([]);

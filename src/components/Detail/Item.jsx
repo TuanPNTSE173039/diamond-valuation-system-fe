@@ -28,6 +28,7 @@ import {
 import * as React from "react";
 import { useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
+import { useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateDetail, updateDiamondNote } from "../../services/api.js";
@@ -37,6 +38,7 @@ import { useStaffs } from "../../services/staffs.js";
 import { getStaffById } from "../../utilities/filtering.js";
 import { formattedMoney } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
+import Role from "../../utilities/Role.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
@@ -62,10 +64,12 @@ export const metadata = {
   contentType: "image/jpeg",
 };
 const DetailItem = () => {
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.account.role;
   const queryClient = useQueryClient();
   const { detailId } = useParams();
   const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
-  const { data: staffs, isLoading: isStaffLoading } = useStaffs();
+  const { data: staffs, isLoading: isStaffLoading } = useStaffs(Role.VALUATION);
 
   const location = useLocation();
   const pathNames = location.pathname.split("/").filter((x) => x);
@@ -628,7 +632,8 @@ const DetailItem = () => {
         (detailState.current === "ASSESSED" ||
           detailState.current === "VALUATING" ||
           detailState.current === "DRAFT_VALUATING" ||
-          detailState.current === "VALUATED") && (
+          detailState.current === "VALUATED") &&
+        role === Role.MANAGER && (
           <>
             <DiamondValuationAssignTable
               detailState={detailState}

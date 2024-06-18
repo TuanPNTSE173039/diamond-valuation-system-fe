@@ -170,9 +170,19 @@ const DiamondValuationItem = () => {
 
   //State button mgt
   const [detailState, setDetailState] = useState({
-    previous: getPreviousStatus(detail?.status),
-    current: detail?.status,
+    previous: null,
+    current: null,
   });
+
+  useEffect(() => {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: getPreviousStatus(valuation?.status),
+        current: valuation?.status ? "VALUATED" : "ASSESSED",
+      };
+    });
+  }, [detail]);
 
   function handleCancelValuating() {
     setDetailState((prevState) => {
@@ -350,7 +360,7 @@ const DiamondValuationItem = () => {
                     inputProps={{
                       "aria-label": "valuation-price",
                     }}
-                    sx={{ fontSize: 28 }}
+                    sx={{ fontSize: 28, textAlign: "center" }}
                     type="number"
                     value={valuationPrice}
                     onChange={(e) => {

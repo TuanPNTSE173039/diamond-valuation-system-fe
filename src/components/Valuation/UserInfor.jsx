@@ -29,7 +29,7 @@ const DiamondValuationUserInfor = ({ ...props }) => {
   );
   const infor = {
     phone: customer?.phone.trim(),
-    email: customer?.email.trim(),
+    email: customer?.account.email.trim(),
     size: detail?.size,
     service: request?.service.name,
     servicePrice: detail?.servicePrice,

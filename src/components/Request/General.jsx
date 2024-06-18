@@ -27,6 +27,7 @@ import { useCustomer } from "../../services/customers.js";
 import { useRequest } from "../../services/requests.js";
 import { useStaff, useStaffs } from "../../services/staffs.js";
 import { formattedMoney } from "../../utilities/formatter.js";
+import Role from "../../utilities/Role.js";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
@@ -39,9 +40,10 @@ const RequestGeneral = () => {
     request?.customerID,
   );
   const { data: staff, isLoading: isStaffLoading } = useStaff(request?.staffID);
-  const { data: staffs, isLoading: isStaffsLoading } = useStaffs();
+  const { data: staffs, isLoading: isStaffsLoading } = useStaffs(
+    Role.CONSULTANT,
+  );
   const consultantList = staffs?.content
-    .filter((item) => item.account.role === "CONSULTANT_STAFF")
     .map((item) => {
       return {
         code: item.id,
@@ -117,7 +119,7 @@ const RequestGeneral = () => {
             {customer?.phone.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<EmailIcon />} title="Email">
-            {customer?.email.trim()}
+            {customer?.account.email.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LocationOnIcon />} title="Adress">
             {customer?.address.trim()}

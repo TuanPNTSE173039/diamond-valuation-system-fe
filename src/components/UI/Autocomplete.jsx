@@ -31,10 +31,10 @@ const UIAutocomplete = ({ value, onChange, data }) => {
           <Tooltip title="Years Experience">
             <Typography sx={{ width: "10%" }}>{option.years} yrs</Typography>
           </Tooltip>
-          <Tooltip title="Current Projects">
+          <Tooltip title="Current Appointments">
             <Typography sx={{ width: "10%" }}>{option.curProjects}</Typography>
           </Tooltip>
-          <Tooltip title="Total Projects">
+          <Tooltip title="Total Appointments">
             <Typography sx={{ width: "10%" }}>
               {option.totalProjects}
             </Typography>

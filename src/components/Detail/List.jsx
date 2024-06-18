@@ -25,7 +25,11 @@ import { StyledBadge } from "../../assets/styles/Badge.jsx";
 import { StyledTableCell, StyledTableRow } from "../../assets/styles/Table.jsx";
 import { checkDiamond } from "../../services/api.js";
 import { useRequest } from "../../services/requests.js";
-import { formatDateTime, formattedMoney } from "../../utilities/formatter.js";
+import {
+  formatDateTime,
+  formattedDiamondSize,
+  formattedMoney,
+} from "../../utilities/formatter.js";
 
 const DetailList = () => {
   const { requestId } = useParams();
@@ -50,9 +54,8 @@ const DetailList = () => {
         ? formatDateTime(request.returnDate)
         : "N/A",
       service: request.service.name,
-      size: (item.size === 0 && "N/A") || item.size,
-      servicePrice:
-        item.servicePrice === 0 ? "N/A" : formattedMoney(item.servicePrice),
+      size: !item.size ? "N/A" : item.size,
+      servicePrice: formattedMoney(item.servicePrice),
       certificateId: item.diamondValuationNote?.certificateId || "N/A",
       diamondOrigin: item.diamondValuationNote?.diamondOrigin || "N/A",
       caratWeight: item.diamondValuationNote?.caratWeight || "N/A",
@@ -158,15 +161,15 @@ const DetailList = () => {
           <TableHead>
             <TableRow>
               <StyledTableCell>Number</StyledTableCell>
-              <StyledTableCell align="right">Date</StyledTableCell>
-              <StyledTableCell align="right">Service</StyledTableCell>
+              <StyledTableCell align="left">Date</StyledTableCell>
+              <StyledTableCell align="left">Service</StyledTableCell>
               <StyledTableCell align="right">Size</StyledTableCell>
               <StyledTableCell align="right">Service Price</StyledTableCell>
               <StyledTableCell align="right">Certificate</StyledTableCell>
-              <StyledTableCell align="right">Origin</StyledTableCell>
+              <StyledTableCell align="left">Origin</StyledTableCell>
               <StyledTableCell align="right">Carat</StyledTableCell>
               <StyledTableCell align="right">Valuation Price</StyledTableCell>
-              <StyledTableCell align="right">Status</StyledTableCell>
+              <StyledTableCell align="center">Status</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </TableRow>
           </TableHead>
@@ -184,11 +187,13 @@ const DetailList = () => {
                   {row.returnedDate}
                 </StyledTableCell>
                 <StyledTableCell align="left">{row.service}</StyledTableCell>
-                <StyledTableCell align="right">{row.size}</StyledTableCell>
+                <StyledTableCell align="right">
+                  {formattedDiamondSize(row.size)}
+                </StyledTableCell>
                 <StyledTableCell align="right">
                   {row.servicePrice}
                 </StyledTableCell>
-                <StyledTableCell align="left">
+                <StyledTableCell align="right">
                   {row.certificateId}
                 </StyledTableCell>
                 <StyledTableCell align="left">
@@ -200,7 +205,7 @@ const DetailList = () => {
                 <StyledTableCell align="right">
                   {row.valuationPrice}
                 </StyledTableCell>
-                <StyledTableCell align="left">{row.status}</StyledTableCell>
+                <StyledTableCell align="center">{row.status}</StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton
                     color="primary"

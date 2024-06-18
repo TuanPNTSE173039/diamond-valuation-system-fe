@@ -2,7 +2,7 @@ import { axiosInstance } from "./config/axiosInstance.js";
 
 const login = async (username, password) => {
   const response = await axiosInstance.post("/auth/login", {
-    username,
+    usernameOrEmail: username,
     password,
   });
   // check the response status code oke or not

@@ -24,6 +24,7 @@ import { useDetail } from "../../services/details.js";
 import { useStaffs } from "../../services/staffs.js";
 
 import { getStaffById } from "../../utilities/filtering.js";
+import Role from "../../utilities/Role.js";
 import { StaffHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UITable from "../UI/Table.jsx";
@@ -32,7 +33,9 @@ import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 const DiamondValuationAssignTable = ({ detailState }) => {
   const { requestId, detailId } = useParams();
   const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
-  const { data: staffs, isLoading: isStaffsLoading } = useStaffs();
+  const { data: staffs, isLoading: isStaffsLoading } = useStaffs(
+    Role.VALUATION,
+  );
 
   //Mutate
   const queryClient = useQueryClient();
@@ -103,18 +106,16 @@ const DiamondValuationAssignTable = ({ detailState }) => {
   ); // Enable the first switch by default
 
   //Assign Valuation Staff
-  const valuationStaffList = staffs?.content
-    .filter((staff) => staff.account.role === "VALUATION_STAFF")
-    .map((staff) => {
-      return {
-        number: staff.id,
-        staffName: staff.firstName + " " + staff.lastName,
-        staffPhone: staff.phone,
-        yearExperience: staff.experience,
-        totalProjects: staff.countProject,
-        currentProjects: staff.currentTotalProject,
-      };
-    });
+  const valuationStaffList = staffs?.content.map((staff) => {
+    return {
+      number: staff.id,
+      staffName: staff.firstName + " " + staff.lastName,
+      staffPhone: staff.phone,
+      yearExperience: staff.experience,
+      totalProjects: staff.countProject,
+      currentProjects: staff.currentTotalProject,
+    };
+  });
   const [selectedStaffs, setSelectedStaffs] = useState([]);
   const [valuationStaff, setValuationStaff] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

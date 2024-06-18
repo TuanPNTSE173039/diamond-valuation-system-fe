@@ -227,12 +227,12 @@ export const StaffHeadCells = [
     id: "totalProjects",
     numeric: true,
     disablePadding: false,
-    label: "Total Projects",
+    label: "Total Valuations",
   },
   {
     id: "currentProjects",
     numeric: true,
     disablePadding: false,
-    label: "Current Projects",
+    label: "Current Valuations",
   },
 ];
