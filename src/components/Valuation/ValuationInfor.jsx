@@ -1,10 +1,14 @@
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import LabelIcon from "@mui/icons-material/Label";
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import PersonIcon from "@mui/icons-material/Person";
 import Box from "@mui/material/Box";
 import * as React from "react";
 
-import { formattedDateTime } from "../../utilities/formatter.js";
+import {
+  formattedDateTime,
+  formattedMoney,
+} from "../../utilities/formatter.js";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
 const DiamondValuationInfor = ({ valuationInfor, diamondInfor, ...props }) => {
@@ -20,13 +24,14 @@ const DiamondValuationInfor = ({ valuationInfor, diamondInfor, ...props }) => {
         {valuationInfor.status}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem
-        icon={<LabelIcon />}
+        icon={<LocalAtmIcon />}
         title="Fair Price Estimate"
       >
-        {diamondInfor.fairPrice}
+        {formattedMoney(diamondInfor.fairPrice)}
       </DiamondValuationInforItem>
-      <DiamondValuationInforItem icon={<LabelIcon />} title="Price Range">
-        {diamondInfor.rangePrice}
+      <DiamondValuationInforItem icon={<LocalAtmIcon />} title="Price Range">
+        {formattedMoney(diamondInfor.minPrice)} -{" "}
+        {formattedMoney(diamondInfor.maxPrice)}
       </DiamondValuationInforItem>
     </Box>
   );

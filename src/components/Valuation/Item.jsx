@@ -106,19 +106,19 @@ const DiamondValuationItem = () => {
   };
   useEffect(() => {
     getListAllImages();
-    if (detail?.diamondValuationNote?.proportions !== null) {
+    if (detail?.diamondValuationNote?.proportions) {
       loadImageByPath(
         detail?.diamondValuationNote?.proportions,
         setProportionImage,
       );
     }
-    if (detail?.diamondValuationNote?.clarityCharacteristicLink !== null) {
+    if (detail?.diamondValuationNote?.clarityCharacteristicLink) {
       loadImageByPath(
         detail?.diamondValuationNote?.clarityCharacteristicLink,
         setClarityCharacteristicImage,
       );
     }
-  }, []);
+  }, [detail]);
 
   //General Infor
   const valuationInfor = {
@@ -127,55 +127,57 @@ const DiamondValuationItem = () => {
     status: !valuation?.status ? "Valuating" : "Valuated",
   };
   const serverDiamondInfor = detail?.diamondValuationNote;
-  const [diamondInfor, setDiamondInfor] = useState({
-    certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
-    certificateId: serverDiamondInfor?.certificateId,
-    diamondOrigin: serverDiamondInfor?.diamondOrigin,
-    cutScore: serverDiamondInfor?.cutScore,
-    caratWeight: serverDiamondInfor?.caratWeight,
-    color: serverDiamondInfor?.color,
-    clarity: serverDiamondInfor?.clarity,
-    cut: serverDiamondInfor?.cut,
-    shape: serverDiamondInfor?.shape,
-    symmetry: serverDiamondInfor?.symmetry,
-    polish: serverDiamondInfor?.polish,
-    fluorescence: serverDiamondInfor?.fluorescence,
-    proportions: serverDiamondInfor?.proportions,
-    clarityCharacteristicLink: serverDiamondInfor?.clarityCharacteristicLink,
-    clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
-    fairPrice: serverDiamondInfor?.fairPrice,
-    rangePrice:
-      serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
-  });
-  console.log(diamondInfor);
-
-  //Clarity Characteristic List
-  const [clarities, setClarities] = useState(
-    diamondInfor.clarityCharacteristic === null
-      ? []
-      : () => diamondInfor.clarityCharacteristic,
-  );
-  const handleClarities = (event, newClarity) => {
-    setClarities(newClarity);
-  };
+  const [diamondInfor, setDiamondInfor] = useState({});
 
   //Valuation Infor
-  const [valuationPrice, setValuationPrice] = useState(
-    valuation?.valuationPrice === 0 ? "" : valuation?.valuationPrice,
-  );
-  const [comment, setComment] = useState(
-    valuation?.comment === null ? "" : valuation?.comment,
-  );
+  const [valuationPrice, setValuationPrice] = useState(null);
+  const [comment, setComment] = useState("");
   const editorRef = useRef();
   const commentDetail =
     valuation?.commentDetail === null ? "" : valuation?.commentDetail;
+  const [clarities, setClarities] = useState([]);
+
+  useEffect(() => {
+    if (detail) {
+      setDiamondInfor((prev) => {
+        return {
+          ...prev,
+          certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
+          certificateId: serverDiamondInfor?.certificateId,
+          diamondOrigin: serverDiamondInfor?.diamondOrigin,
+          cutScore: serverDiamondInfor?.cutScore,
+          caratWeight: serverDiamondInfor?.caratWeight,
+          color: serverDiamondInfor?.color,
+          clarity: serverDiamondInfor?.clarity,
+          cut: serverDiamondInfor?.cut,
+          shape: serverDiamondInfor?.shape,
+          symmetry: serverDiamondInfor?.symmetry,
+          polish: serverDiamondInfor?.polish,
+          fluorescence: serverDiamondInfor?.fluorescence,
+          proportions: serverDiamondInfor?.proportions,
+          clarityCharacteristicLink:
+            serverDiamondInfor?.clarityCharacteristicLink,
+          clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
+          fairPrice: serverDiamondInfor?.fairPrice,
+          minPrice: serverDiamondInfor?.minPrice,
+          maxPrice: serverDiamondInfor?.maxPrice,
+        };
+      });
+      setClarities(serverDiamondInfor?.clarityCharacteristic);
+    }
+    if (valuation) {
+      setValuationPrice(
+        valuation?.valuationPrice === 0 ? "" : valuation?.valuationPrice,
+      );
+      setComment(valuation?.comment);
+    }
+  }, [detail, valuation]);
 
   //State button mgt
   const [detailState, setDetailState] = useState({
     previous: null,
     current: null,
   });
-
   useEffect(() => {
     setDetailState((prevState) => {
       return {
@@ -184,7 +186,7 @@ const DiamondValuationItem = () => {
         current: valuation?.status ? "VALUATED" : "ASSESSED",
       };
     });
-  }, [detail]);
+  }, [valuation]);
 
   function handleCancelValuating() {
     setDetailState((prevState) => {
@@ -322,29 +324,24 @@ const DiamondValuationItem = () => {
           mt: 2.5,
         }}
       >
-        <DiamondValuationFieldGroup title="Description" sx={{ width: "50%" }}>
-          <Box sx={{ height: 329 }}>
+        <DiamondValuationFieldGroup title="Description" className="w-1/2">
+          <Box className="h-[329px]">
             <Stack
               direction="row"
               spacing={4}
-              sx={{ justifyContent: "space-between", alignItems: "flex-start" }}
+              className="justify-between items-start"
             >
               <DiamondValuationInfor
-                sx={{ width: "50%" }}
+                className="w-3/5"
                 valuationInfor={valuationInfor}
                 diamondInfor={diamondInfor}
               />
 
-              <Box sx={{ width: "50%" }}>
+              <Box className="w-2/5">
                 <FormControl sx={{ width: "100%" }} variant="outlined">
                   <label
                     htmlFor="valuation-price"
-                    style={{
-                      textAlign: "center",
-                      fontSize: 20,
-                      fontWeight: 600,
-                      color: "primary.main",
-                    }}
+                    className="text-left text-xl font-semibold text-primary"
                   >
                     Valuation Price
                   </label>
@@ -362,7 +359,7 @@ const DiamondValuationItem = () => {
                     inputProps={{
                       "aria-label": "valuation-price",
                     }}
-                    sx={{ fontSize: 28, textAlign: "center" }}
+                    sx={{ fontSize: 28 }}
                     type="number"
                     value={valuationPrice}
                     onChange={(e) => {
@@ -477,7 +474,6 @@ const DiamondValuationItem = () => {
         proportionImage={proportionImage}
         clarityCharacteristicImage={clarityCharacteristicImage}
         clarities={clarities}
-        handleClarities={handleClarities}
       />
     </>
   );

@@ -101,59 +101,38 @@ const DetailItem = () => {
 
   //DiamondInfor
   const serverDiamondInfor = detail?.diamondValuationNote;
-  const [diamondInfor, setDiamondInfor] = useState({
-    certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
-    certificateId: serverDiamondInfor?.certificateId,
-    diamondOrigin: serverDiamondInfor?.diamondOrigin,
-    cutScore: serverDiamondInfor?.cutScore,
-    caratWeight: serverDiamondInfor?.caratWeight,
-    color: serverDiamondInfor?.color,
-    clarity: serverDiamondInfor?.clarity,
-    cut: serverDiamondInfor?.cut,
-    shape: serverDiamondInfor?.shape,
-    symmetry: serverDiamondInfor?.symmetry,
-    polish: serverDiamondInfor?.polish,
-    fluorescence: serverDiamondInfor?.fluorescence,
-    proportions: serverDiamondInfor?.proportions,
-    clarityCharacteristicLink: serverDiamondInfor?.clarityCharacteristicLink,
-    clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
-    fairPrice: serverDiamondInfor?.fairPrice,
-    rangePrice:
-      serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
-  });
-  // useEffect(() => {
-  //   setDiamondInfor((prev) => {
-  //     return {
-  //       ...prev,
-  //       certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
-  //       certificateId: serverDiamondInfor?.certificateId,
-  //       diamondOrigin: serverDiamondInfor?.diamondOrigin,
-  //       cutScore: serverDiamondInfor?.cutScore,
-  //       caratWeight: serverDiamondInfor?.caratWeight,
-  //       color: serverDiamondInfor?.color,
-  //       clarity: serverDiamondInfor?.clarity,
-  //       cut: serverDiamondInfor?.cut,
-  //       shape: serverDiamondInfor?.shape,
-  //       symmetry: serverDiamondInfor?.symmetry,
-  //       polish: serverDiamondInfor?.polish,
-  //       fluorescence: serverDiamondInfor?.fluorescence,
-  //       proportions: serverDiamondInfor?.proportions,
-  //       clarityCharacteristicLink:
-  //         serverDiamondInfor?.clarityCharacteristicLink,
-  //       clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
-  //       fairPrice: serverDiamondInfor?.fairPrice,
-  //       rangePrice:
-  //         serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
-  //     };
-  //   });
-  // }, [serverDiamondInfor]);
+  const [diamondInfor, setDiamondInfor] = useState({});
+  useEffect(() => {
+    if (detail) {
+      setDiamondInfor((prev) => {
+        return {
+          ...prev,
+          certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
+          certificateId: serverDiamondInfor?.certificateId,
+          diamondOrigin: serverDiamondInfor?.diamondOrigin,
+          cutScore: serverDiamondInfor?.cutScore,
+          caratWeight: serverDiamondInfor?.caratWeight,
+          color: serverDiamondInfor?.color,
+          clarity: serverDiamondInfor?.clarity,
+          cut: serverDiamondInfor?.cut,
+          shape: serverDiamondInfor?.shape,
+          symmetry: serverDiamondInfor?.symmetry,
+          polish: serverDiamondInfor?.polish,
+          fluorescence: serverDiamondInfor?.fluorescence,
+          proportions: serverDiamondInfor?.proportions,
+          clarityCharacteristicLink:
+            serverDiamondInfor?.clarityCharacteristicLink,
+          clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
+          fairPrice: serverDiamondInfor?.fairPrice,
+          minPrice: serverDiamondInfor?.minPrice,
+          maxPrice: serverDiamondInfor?.maxPrice,
+        };
+      });
+      setClarities(serverDiamondInfor?.clarityCharacteristic);
+    }
+  }, [detail]);
 
-  //Clarity Characteristic List
-  const [clarities, setClarities] = useState(
-    diamondInfor.clarityCharacteristic === null
-      ? []
-      : () => diamondInfor.clarityCharacteristic,
-  );
+  const [clarities, setClarities] = useState([]);
   const handleClarities = (event, newClarity) => {
     setClarities(newClarity);
   };
@@ -274,13 +253,13 @@ const DetailItem = () => {
   };
   useEffect(() => {
     getListAllImages();
-    if (detail?.diamondValuationNote?.proportions !== null) {
+    if (detail?.diamondValuationNote?.proportions) {
       loadImageByPath(
         detail?.diamondValuationNote?.proportions,
         setProportionImage,
       );
     }
-    if (detail?.diamondValuationNote?.clarityCharacteristicLink !== null) {
+    if (detail?.diamondValuationNote?.clarityCharacteristicLink) {
       loadImageByPath(
         detail?.diamondValuationNote?.clarityCharacteristicLink,
         setClarityCharacteristicImage,

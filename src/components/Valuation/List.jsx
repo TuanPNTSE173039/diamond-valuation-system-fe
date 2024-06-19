@@ -3,12 +3,10 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
 import { useState } from "react";
-import { useDetails } from "../../services/details.js";
-import { useRequests } from "../../services/requests.js";
-import { useStaffs } from "../../services/staffs.js";
+import { useSelector } from "react-redux";
 import { useValuations } from "../../services/valuations.js";
-import { getValuationRequestById } from "../../utilities/filtering.js";
 import {
+  formattedCaratWeight,
   formattedDateTime,
   formattedMoney,
 } from "../../utilities/formatter.js";
@@ -26,46 +24,32 @@ function a11yProps(index) {
   };
 }
 const DiamondValuationList = () => {
+  const { user: currentUser } = useSelector((state) => state.auth);
+  const userRole = currentUser?.account.role;
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const [statusIndex, setStatusIndex] = useState(0);
   const [selectedValuations, setSelectedValuations] = useState([]);
-  const { isLoading: isValuationLoading, data: valuations } = useValuations();
-  const { isLoading: isRequestLoading, data: requests } = useRequests();
-  const { isLoading: isDetailLoading, data: details } = useDetails();
-  const { isLoading: isStaffLoading, data: staffs } = useStaffs();
+  const { isLoading: isValuationLoading, data: valuations } = useValuations(
+    page,
+    rowsPerPage,
+    userRole,
+    currentUser?.id,
+  );
 
-  if (
-    isRequestLoading ||
-    isValuationLoading ||
-    isStaffLoading ||
-    isDetailLoading
-  ) {
+  if (isValuationLoading) {
     return <UICircularIndeterminate />;
   }
   const rows = valuations.content.map((valuation) => {
-    const valuationRequestDetail = details.content.find(
-      (detail) => detail.id === valuation.valuationRequestDetailId,
-    );
-    const valuationRequest = getValuationRequestById(
-      requests,
-      valuationRequestDetail.valuationRequestID,
-    );
-
-    const staff = staffs.content.find(
-      (staff) => staff.id === valuation.staffId,
-    );
-
-    const returnedDate = valuationRequest?.returnDate;
-
     return {
       number: valuation.id,
-      valuationStaffName: staff.firstName + " " + staff.lastName,
-      returnDate: returnedDate ? formattedDateTime(returnedDate) : "",
-      service: valuationRequest?.service.name,
-      certificateId:
-        valuationRequestDetail?.diamondValuationNote?.certificateId,
-      diamondOrigin:
-        valuationRequestDetail?.diamondValuationNote?.diamondOrigin,
-      caratWeight: valuationRequestDetail?.diamondValuationNote?.caratWeight,
+      valuationStaffName: valuation.staffName,
+      deadline: formattedDateTime(valuation.deadline),
+      service: valuation.serviceName,
+      certificateId: valuation.certificateId,
+      diamondOrigin: valuation.diamondOrigin,
+      caratWeight: formattedCaratWeight(valuation?.caratWeight),
       valuationPrice: formattedMoney(valuation.valuationPrice),
       status: valuation.status ? "Valuated" : "Valuating",
     };
@@ -116,6 +100,11 @@ const DiamondValuationList = () => {
           rows={rows}
           selected={selectedValuations}
           setSelected={setSelectedValuations}
+          page={page}
+          setPage={setPage}
+          count={valuations.totalElement}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
         />
       </UITabPanel>
 
@@ -135,6 +124,11 @@ const DiamondValuationList = () => {
                   ? rows.filter((row) => row.status === status.name)
                   : []
               }
+              page={page}
+              setPage={setPage}
+              count={valuations.totalElement}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
             />
           </UITabPanel>
         ))}
