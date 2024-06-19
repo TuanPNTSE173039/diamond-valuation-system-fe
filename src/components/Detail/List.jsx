@@ -26,7 +26,7 @@ import { StyledTableCell, StyledTableRow } from "../../assets/styles/Table.jsx";
 import { checkDiamond } from "../../services/api.js";
 import { useRequest } from "../../services/requests.js";
 import {
-  formatDateTime,
+  formattedDateTime,
   formattedDiamondSize,
   formattedMoney,
 } from "../../utilities/formatter.js";
@@ -51,7 +51,7 @@ const DetailList = () => {
     return {
       number: item.id,
       returnedDate: request.returnDate
-        ? formatDateTime(request.returnDate)
+        ? formattedDateTime(request.returnDate)
         : "N/A",
       service: request.service.name,
       size: !item.size ? "N/A" : item.size,

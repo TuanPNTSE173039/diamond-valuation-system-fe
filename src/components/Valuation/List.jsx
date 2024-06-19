@@ -8,7 +8,10 @@ import { useRequests } from "../../services/requests.js";
 import { useStaffs } from "../../services/staffs.js";
 import { useValuations } from "../../services/valuations.js";
 import { getValuationRequestById } from "../../utilities/filtering.js";
-import { formatDateTime, formattedMoney } from "../../utilities/formatter.js";
+import {
+  formattedDateTime,
+  formattedMoney,
+} from "../../utilities/formatter.js";
 
 import { diamondValuationStatus } from "../../utilities/Status.jsx";
 import { ValuationHeadCells } from "../../utilities/table.js";
@@ -25,12 +28,17 @@ function a11yProps(index) {
 const DiamondValuationList = () => {
   const [statusIndex, setStatusIndex] = useState(0);
   const [selectedValuations, setSelectedValuations] = useState([]);
-  const {isLoading: isValuationLoading, data: valuations} = useValuations();
-  const {isLoading: isRequestLoading, data: requests} = useRequests();
-  const {isLoading: isDetailLoading, data: details} = useDetails();
-  const {isLoading: isStaffLoading, data: staffs} = useStaffs();
+  const { isLoading: isValuationLoading, data: valuations } = useValuations();
+  const { isLoading: isRequestLoading, data: requests } = useRequests();
+  const { isLoading: isDetailLoading, data: details } = useDetails();
+  const { isLoading: isStaffLoading, data: staffs } = useStaffs();
 
-  if (isRequestLoading || isValuationLoading || isStaffLoading || isDetailLoading) {
+  if (
+    isRequestLoading ||
+    isValuationLoading ||
+    isStaffLoading ||
+    isDetailLoading
+  ) {
     return <UICircularIndeterminate />;
   }
   const rows = valuations.content.map((valuation) => {
@@ -51,7 +59,7 @@ const DiamondValuationList = () => {
     return {
       number: valuation.id,
       valuationStaffName: staff.firstName + " " + staff.lastName,
-      returnDate: returnedDate ? formatDateTime(returnedDate) : "",
+      returnDate: returnedDate ? formattedDateTime(returnedDate) : "",
       service: valuationRequest?.service.name,
       certificateId:
         valuationRequestDetail?.diamondValuationNote?.certificateId,

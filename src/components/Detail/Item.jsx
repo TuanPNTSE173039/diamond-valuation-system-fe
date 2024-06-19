@@ -18,7 +18,6 @@ import Link from "@mui/material/Link";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import dayjs from "dayjs";
 import {
   getDownloadURL,
   listAll,
@@ -36,7 +35,7 @@ import { storage } from "../../services/config/firebase.js";
 import { useDetail } from "../../services/details.js";
 import { useStaffs } from "../../services/staffs.js";
 import { getStaffById } from "../../utilities/filtering.js";
-import { formattedMoney } from "../../utilities/formatter.js";
+import { formattedDate, formattedMoney } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
 import Role from "../../utilities/Role.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
@@ -103,9 +102,10 @@ const DetailItem = () => {
   //DiamondInfor
   const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({
-    giaCertDate: dayjs(new Date()), //xu ly sau
+    certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
     certificateId: serverDiamondInfor?.certificateId,
     diamondOrigin: serverDiamondInfor?.diamondOrigin,
+    cutScore: serverDiamondInfor?.cutScore,
     caratWeight: serverDiamondInfor?.caratWeight,
     color: serverDiamondInfor?.color,
     clarity: serverDiamondInfor?.clarity,
@@ -117,7 +117,36 @@ const DetailItem = () => {
     proportions: serverDiamondInfor?.proportions,
     clarityCharacteristicLink: serverDiamondInfor?.clarityCharacteristicLink,
     clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
+    fairPrice: serverDiamondInfor?.fairPrice,
+    rangePrice:
+      serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
   });
+  // useEffect(() => {
+  //   setDiamondInfor((prev) => {
+  //     return {
+  //       ...prev,
+  //       certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
+  //       certificateId: serverDiamondInfor?.certificateId,
+  //       diamondOrigin: serverDiamondInfor?.diamondOrigin,
+  //       cutScore: serverDiamondInfor?.cutScore,
+  //       caratWeight: serverDiamondInfor?.caratWeight,
+  //       color: serverDiamondInfor?.color,
+  //       clarity: serverDiamondInfor?.clarity,
+  //       cut: serverDiamondInfor?.cut,
+  //       shape: serverDiamondInfor?.shape,
+  //       symmetry: serverDiamondInfor?.symmetry,
+  //       polish: serverDiamondInfor?.polish,
+  //       fluorescence: serverDiamondInfor?.fluorescence,
+  //       proportions: serverDiamondInfor?.proportions,
+  //       clarityCharacteristicLink:
+  //         serverDiamondInfor?.clarityCharacteristicLink,
+  //       clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
+  //       fairPrice: serverDiamondInfor?.fairPrice,
+  //       rangePrice:
+  //         serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
+  //     };
+  //   });
+  // }, [serverDiamondInfor]);
 
   //Clarity Characteristic List
   const [clarities, setClarities] = useState(
@@ -183,6 +212,7 @@ const DetailItem = () => {
     const assessmentBody = {
       ...diamondInfor,
       clarityCharacteristic: clarities,
+      certificateDate: null,
     };
     mutateAssessment(assessmentBody);
   }

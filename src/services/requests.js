@@ -23,9 +23,9 @@ export const useBriefRequests = (
 ) => {
   let url;
   if (userRole === Role.CONSULTANT) {
-    url = `staffs/${userId}/valuation-requests??pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc&sortBy=creationDate`;
+    url = `staffs/${userId}/valuation-requests??pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc`;
   } else {
-    url = `valuation-requests/response?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc&sortBy=creationDate`;
+    url = `valuation-requests/response?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc`;
   }
   if (status) {
     url += `&status=${status}`;

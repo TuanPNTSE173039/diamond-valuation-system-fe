@@ -1,7 +1,14 @@
 import { format } from "date-fns";
 
-export function formatDateTime(date) {
+export function formattedDateTime(date) {
   return format(new Date(date), "yyyy/MM/dd - HH:mm:ss");
+}
+
+export function formattedDate(date) {
+  if (!date) {
+    return "N/A";
+  }
+  return format(new Date(date), "yyyy/MM/dd");
 }
 
 export const formattedMoney = (money) => {

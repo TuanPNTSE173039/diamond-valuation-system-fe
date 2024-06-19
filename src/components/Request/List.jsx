@@ -8,7 +8,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useBriefRequests } from "../../services/requests.js";
-import { formatDateTime } from "../../utilities/formatter.js";
+import { formattedDateTime } from "../../utilities/formatter.js";
 import Role from "../../utilities/Role.js";
 import { valuationRequestStatus } from "../../utilities/Status.jsx";
 import { a11yProps, RequestHeadCells } from "../../utilities/table.js";
@@ -53,7 +53,7 @@ const RequestList = () => {
             status: row.status,
             customerFirstName: row.customerFirstName,
             customerLastName: row.customerLastName,
-            creationDate: formatDateTime(row.creationDate),
+            creationDate: formattedDateTime(row.creationDate),
             diamondAmount: row.diamondAmount,
             service: row.serviceName,
           };
@@ -66,7 +66,7 @@ const RequestList = () => {
               status: row.status,
               customerFirstName: row.customerFirstName,
               customerLastName: row.customerLastName,
-              creationDate: formatDateTime(row.creationDate),
+              creationDate: formattedDateTime(row.creationDate),
               diamondAmount: row.diamondAmount,
               service: row.serviceName,
             };

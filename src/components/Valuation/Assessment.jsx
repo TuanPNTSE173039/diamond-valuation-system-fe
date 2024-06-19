@@ -1,5 +1,6 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EventIcon from "@mui/icons-material/Event";
 import {
   FormControl,
   FormLabel,
@@ -28,13 +29,11 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { VisuallyHiddenInput } from "../../assets/styles/Input.jsx";
 import { storage } from "../../services/config/firebase.js";
-
 import {
   clarityCharacteristicList,
   diamondAttribute,
 } from "../../utilities/Status.jsx";
 import { metadata } from "../Detail/Item.jsx";
-import UIDatePicker from "../UI/DatePicker.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
 const { cut, clarity, color, shape, symmetry, polish, fluorescence } =
@@ -165,37 +164,52 @@ const DiamondValuationAssessment = ({
     >
       <Box sx={{ width: "50%" }}>
         <DiamondValuationFieldGroup title="Report Detail" sx={{ mt: 0.5 }}>
-          <UIDatePicker
-            label="Certificate Date"
-            value={diamondInfor.giaCertDate}
-            disabled={detailState.current !== "ASSESSING"}
-            onChange={(newValue) =>
-              setDiamondInfor((prevState) => ({
-                ...prevState,
-                giaCertDate: newValue,
-              }))
-            }
-          />
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <TextField
               label="Report Number"
               id="report-number"
               type="number"
+              disabled
               sx={{ width: "50%" }}
               value={diamondInfor.certificateId}
-              disabled={detailState.current !== "ASSESSING"}
-              onChange={(e) => {
-                setDiamondInfor((prevState) => ({
-                  ...prevState,
-                  certificateId: e.target.value,
-                }));
-              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">No.</InputAdornment>
                 ),
               }}
             />
+            <TextField
+              label="Certificate Date"
+              id="certificate-date"
+              type="text"
+              sx={{ width: "50%" }}
+              value={diamondInfor.certificateDate}
+              disabled
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <EventIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            {/*
+            <UIDatePicker
+              label="Certificate Date"
+              value={diamondInfor.giaCertDate}
+              disabled={detailState.current !== "ASSESSING"}
+              onChange={(newValue) =>
+                setDiamondInfor((prevState) => ({
+                  ...prevState,
+                  giaCertDate: newValue,
+                }))
+              }
+              sx={{ width: "50%" }}
+            />
+            */}
+          </Box>
+
+          <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <FormControl sx={{ width: "50%" }}>
               <FormLabel id="diamond-origin">Diamond Origin</FormLabel>
               <RadioGroup
@@ -209,6 +223,7 @@ const DiamondValuationAssessment = ({
                     diamondOrigin: e.target.value,
                   }));
                 }}
+                sx={{ gap: 2.5 }}
               >
                 <FormControlLabel
                   value="NATURAL"
@@ -224,6 +239,20 @@ const DiamondValuationAssessment = ({
                 />
               </RadioGroup>
             </FormControl>
+            <TextField
+              label="Cut Score"
+              id="cut-score"
+              type="number"
+              sx={{ width: "50%" }}
+              disabled={detailState.current !== "ASSESSING"}
+              value={diamondInfor.cutScore || ""}
+              onChange={(e) => {
+                setDiamondInfor((prevState) => ({
+                  ...prevState,
+                  cutScore: e.target.value,
+                }));
+              }}
+            />
           </Box>
         </DiamondValuationFieldGroup>
 

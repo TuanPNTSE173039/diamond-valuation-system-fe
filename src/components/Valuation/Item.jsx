@@ -14,7 +14,6 @@ import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import dayjs from "dayjs";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -25,6 +24,7 @@ import { storage } from "../../services/config/firebase.js";
 import { useDetail } from "../../services/details.js";
 import { useRequest } from "../../services/requests.js";
 import { useValuation } from "../../services/valuations.js";
+import { formattedDate } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
@@ -128,9 +128,10 @@ const DiamondValuationItem = () => {
   };
   const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({
-    giaCertDate: dayjs(new Date()),
+    certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
     certificateId: serverDiamondInfor?.certificateId,
     diamondOrigin: serverDiamondInfor?.diamondOrigin,
+    cutScore: serverDiamondInfor?.cutScore,
     caratWeight: serverDiamondInfor?.caratWeight,
     color: serverDiamondInfor?.color,
     clarity: serverDiamondInfor?.clarity,
@@ -146,6 +147,7 @@ const DiamondValuationItem = () => {
     rangePrice:
       serverDiamondInfor?.minPrice + " - " + serverDiamondInfor?.maxPrice,
   });
+  console.log(diamondInfor);
 
   //Clarity Characteristic List
   const [clarities, setClarities] = useState(
