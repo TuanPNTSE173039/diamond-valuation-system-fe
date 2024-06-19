@@ -82,6 +82,10 @@ const DetailItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["detail", { detailId: detailId }],
       });
+      if (body.data.status === "ASSESSING")
+        toast.success("Save assessment successfully");
+      else if (body.data.status === "ASSESSED")
+        toast.success("Confirm assessment successfully");
     },
   });
   const { mutate: mutateAssessment } = useMutation({
@@ -92,10 +96,6 @@ const DetailItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["detail", { detailId: detailId }],
       });
-      if (body.data.status === "ASSESSING")
-        toast.success("Save assessment successfully");
-      else if (body.data.status === "ASSESSED")
-        toast.success("Confirm assessment successfully");
     },
   });
 
