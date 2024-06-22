@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useRequest } from "../../services/requests.js";
 import DetailList from "../Detail/List.jsx";
-import RecordList from "../Record/RecordList.jsx";
+import RecordList from "../Record/List.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIRequestHeader from "../UI/UIRequestHeader.jsx";
@@ -23,7 +23,7 @@ const RequestItem = () => {
       <UIRequestHeader title={"Valuation Request"} />
 
       <RequestGeneral />
-      <RecordList valuationRequest={request} />
+      <RecordList />
       <DetailList />
     </>
   );

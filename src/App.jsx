@@ -6,7 +6,11 @@ import RoleBasedGuard from "./components/Auth/RoleBasedGuard.jsx";
 import AuthSignIn from "./components/Auth/SignIn.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
-import ScreenResult from "./components/Record/ScreenResult.jsx";
+import RecordScreenCommitment from "./components/Record/Screen/Commitment.jsx";
+import RecordScreenReceipt from "./components/Record/Screen/Receipt.jsx";
+import RecordScreenResult from "./components/Record/Screen/Result.jsx";
+import RecordScreenReturn from "./components/Record/Screen/Return.jsx";
+import RecordScreenSealing from "./components/Record/Screen/Sealing.jsx";
 import RequestItem from "./components/Request/Item.jsx";
 import RequestList from "./components/Request/List.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
@@ -67,7 +71,23 @@ const router = createBrowserRouter([
               },
               {
                 path: "results",
-                element: <ScreenResult />,
+                element: <RecordScreenResult />,
+              },
+              {
+                path: "receipt",
+                element: <RecordScreenReceipt />,
+              },
+              {
+                path: "return",
+                element: <RecordScreenReturn />,
+              },
+              {
+                path: "commitment",
+                element: <RecordScreenCommitment />,
+              },
+              {
+                path: "sealing",
+                element: <RecordScreenSealing />,
               },
             ],
           },

@@ -3,18 +3,17 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { postPayment, updateValuationRequest } from "../../services/api.js";
 import { useRequest } from "../../services/requests.js";
 
 const RecordReceipt = () => {
+  const navigate = useNavigate();
+
   const { requestId } = useParams();
   const queryClient = useQueryClient();
-  const {
-    data: valuationRequest,
-  } = useRequest(requestId);
-
+  const { data: valuationRequest } = useRequest(requestId);
   const { mutate: updateReceiptLink } = useMutation({
     mutationFn: (body) => {
       return updateValuationRequest(requestId, body);
@@ -43,6 +42,7 @@ const RecordReceipt = () => {
       });
     },
   });
+
   return (
     <Paper elevation={3} sx={{ mb: 0.5, minWidth: "275px" }}>
       <Card variant="outlined">
@@ -64,12 +64,12 @@ const RecordReceipt = () => {
           <Button
             size="small"
             onClick={() => {
-              const reqsBody = {
-                ...valuationRequest,
-                receiptLink: "ahihi.pdf",
-              };
-
-              updateReceiptLink(reqsBody);
+              // const reqsBody = {
+              //   ...valuationRequest,
+              //   receiptLink: "ahihi.pdf",
+              // };
+              // updateReceiptLink(reqsBody);
+              navigate(`/request/${requestId}/receipt`);
             }}
           >
             Create
