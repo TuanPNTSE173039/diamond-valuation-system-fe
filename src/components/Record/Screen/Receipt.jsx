@@ -372,11 +372,20 @@ const RecordScreenReceipt = () => {
   const handleDownload = () => {
     pdfGenerator.download("receipt.pdf");
   };
-  console.log();
+  const savePdf = () => {
+    pdfGenerator.getBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    });
+  };
   useEffect(() => {
     loadImageByPath("images/logo.png", setLogo);
-    pdfGenerator.getDataUrl((url) => setUrl(url));
-  }, []);
+    // pdfGenerator.getDataUrl((url) => setUrl(url));
+    pdfGenerator.getBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      setUrl(url);
+    });
+  }, [logo]);
 
   return (
     <div>
@@ -384,6 +393,10 @@ const RecordScreenReceipt = () => {
       <Button variant={"contained"} onClick={handleDownload}>
         Download
       </Button>
+      <Button variant={"contained"} onClick={savePdf}>
+        Save
+      </Button>
+      <br />
       <br />
 
       {url && (
