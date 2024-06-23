@@ -4,43 +4,6 @@ import pdfMake from "pdfmake/build/pdfmake";
 import { useEffect, useState } from "react";
 import { loadImageByPath } from "../../../utilities/imageLoader.js";
 
-pdfMake.tableLayouts = {
-  receiptLayout: {
-    hLineWidth: function (i, node) {
-      if (i === 0 || i === node.table.body.length) {
-        return 0;
-      }
-      return i === node.table.headerRows ? 1 : 0.8;
-    },
-    vLineWidth: function (i) {
-      return 0;
-    },
-    hLineColor: function (i) {
-      return i === 1 ? "black" : "#aaa";
-    },
-    paddingLeft: function (i) {
-      return i === 0 ? 0 : 8;
-    },
-    paddingRight: function (i, node) {
-      return i === node.table.widths.length - 1 ? 0 : 8;
-    },
-  },
-};
-
-const diamondInformation = [
-  {
-    number: "250",
-    size: 4.8,
-    servicePrice: "$25.00",
-    willBePaid: "$5.00",
-  },
-  {
-    number: "251",
-    size: 4.2,
-    servicePrice: "$20.00",
-    willBePaid: "$9.00",
-  },
-];
 const RecordScreenReceipt = () => {
   const [logo, setLogo] = useState(null);
   const [url, setUrl] = useState(null);
@@ -52,7 +15,6 @@ const RecordScreenReceipt = () => {
             image: "logo",
             width: 53,
             height: 40,
-            // margin: [30, 0],
           },
           {
             text: "H&T Diamond",
