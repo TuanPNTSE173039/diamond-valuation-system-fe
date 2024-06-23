@@ -2,7 +2,7 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import pdfMake from "pdfmake/build/pdfmake";
-import { pdfMake as pdfFonts } from "pdfmake/build/vfs_fonts";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
@@ -10,7 +10,17 @@ import App from "./App.jsx";
 import "./index.css";
 import { store } from "./redux/store.js";
 
-pdfMake.vfs = pdfFonts.vfs;
+pdfMake.fonts = {
+  Roboto: {
+    normal:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
+    bold: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
+    italics:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
+    bolditalics:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
+  },
+};
 pdfMake.tableLayouts = {
   receiptLayout: {
     hLineWidth: function (i, node) {
