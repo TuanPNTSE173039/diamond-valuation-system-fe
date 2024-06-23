@@ -8,6 +8,7 @@ const RecordScreenReceipt = () => {
   const [logo, setLogo] = useState(null);
   const [url, setUrl] = useState(null);
 
+  console.log(url)
   const docDefinition = {
     content: [
       {
