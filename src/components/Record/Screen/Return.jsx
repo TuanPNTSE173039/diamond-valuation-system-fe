@@ -64,7 +64,7 @@ const RecordScreenReceipt = () => {
                         width: "*",
                         text: [
                             {
-                                text: "Receipt #123\n",
+                                text: "Return #123\n",
                                 margin: [0, 20],
                                 style: "header",
                                 alignment: "right",
@@ -145,11 +145,11 @@ const RecordScreenReceipt = () => {
                     {
                         text: [
                             {
-                                text: "Estimated Return Date: \n",
+                                text: "Return Date: \n",
                                 style: "subheader",
                             },
                             {
-                                text: "2024/04/20 - 12:00:00",
+                                text: "2024/07/03 - 12:00:00",
                             },
                         ],
                         margin: [0, 20, 0, 0],
@@ -171,7 +171,7 @@ const RecordScreenReceipt = () => {
                 ],
             },
             {
-                text: "Diamond Information",
+                text: "Service Information",
                 style: "subheader",
                 margin: [0, 20, 0, 5],
             },
@@ -181,14 +181,15 @@ const RecordScreenReceipt = () => {
                     // headers are automatically repeated if the table spans over multiple pages
                     // you can declare how many rows should be treated as headers
                     headerRows: 1,
-                    widths: ["*", 80, 120, 120],
+                    widths: ["*", 80, 120, 100, 100],
 
                     body: [
                         [
                             { text: "Number", style: "thead" },
                             { text: "Size", style: ["thead", "number"] },
                             { text: "Service Price", style: ["thead", "number"] },
-                            { text: "Will be paid", style: ["thead", "number"] },
+                            { text: "First Payment", style: ["thead", "number"] },
+                            { text: "Second Payment", style: ["thead", "number"]},
                         ],
                         [
                             { text: "250", bold: true },
@@ -208,9 +209,15 @@ const RecordScreenReceipt = () => {
                                 style: "number",
                             },
                             {
-                                text: "$5.00",
+                                text: "$10.00",
                                 bold: true,
                                 style: "number",
+                            },
+                            {
+                                text: "$15.00",
+                                bold: true,
+                                style: "number",
+                                color: "#EE4E4E",
                             },
                         ],
                         [
@@ -231,22 +238,29 @@ const RecordScreenReceipt = () => {
                                 style: "number",
                             },
                             {
-                                text: "$4.00",
+                                text: "$8.00",
                                 bold: true,
                                 style: "number",
+                            },
+                            {
+                                text: "$12.00",
+                                bold: true,
+                                style: "number",
+                                color: "#EE4E4E",
                             },
                         ],
                     ],
                 },
             },
+
             {
-                text: "Total Service Price: $29.00",
+                text: "Total Service Price: $45.00",
                 style: "subheader",
                 alignment: "right",
                 margin: [0, 20, 0, 5],
             },
             {
-                text: "Total Price (First payment): $9.00",
+                text: "Total Price (Second payment): $27.00",
                 style: "subheader",
                 color: "#EE4E4E",
                 alignment: "right",
@@ -255,7 +269,7 @@ const RecordScreenReceipt = () => {
             {
                 text: [
                     {
-                        text: "I, Tuan Pham, confirm that I have handed over the above-mentioned quantity of diamonds to H&T Diamond Company for appraisal. I acknowledge that the information provided about the diamonds is accurate to the best of my knowledge and that I have read and understood the terms and conditions of the appraisal service.",
+                        text: "I, Tuan Pham, certify that I have delivered the aforementioned quantity of diamonds to H&T Diamond Company for evaluation. I confirm that the information provided regarding the diamonds is accurate to the best of my knowledge and that I have read and understood the terms and conditions of the appraisal service.",
                         alignment: "justify",
                     },
                 ],
@@ -264,14 +278,13 @@ const RecordScreenReceipt = () => {
             {
                 text: [
                     {
-                        text: "We, H&T Diamond Company, confirm that we have received the above-mentioned quantity of diamonds from Tuan Pham for the purpose of appraisal. We guarantee that the diamonds will be appraised by our certified gemologists and will be handled with the utmost care.",
+                        text: "We, H&T Diamond Company, certify that we have received the aforementioned quantity of diamonds from Tuan Pham for appraisal. We guarantee that the diamonds have been appraised by our certified gemologists and have been handled with the utmost care. The results of this appraisal are final and binding, as per our agreed terms and conditions.",
                         alignment: "justify",
                     },
                 ],
 
                 margin: [0, 15, 0, 0],
             },
-
             {
                 columns: [
                     {
