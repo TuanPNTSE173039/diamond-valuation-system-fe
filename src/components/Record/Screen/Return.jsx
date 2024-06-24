@@ -319,8 +319,6 @@ const RecordScreenReceipt = () => {
             },
             {
                 ul: [
-                    "The first payment is required to be paid before the appraisal process begins.",
-                    "Please keep this receipt to retrieve your diamonds.",
                     "For any inquiries, please contact 0367304351 or hntdiamond@gmai.com.",
                 ],
                 margin: [0, 0, 0, 20],
