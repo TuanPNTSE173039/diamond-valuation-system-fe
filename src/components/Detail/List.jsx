@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { StyledBadge } from "../../assets/styles/Badge.jsx";
 import { StyledTableCell, StyledTableRow } from "../../assets/styles/Table.jsx";
@@ -33,6 +33,7 @@ import {
 
 const DetailList = () => {
   const { requestId } = useParams();
+  const navigate = useNavigate();
   const { data: request } = useRequest(requestId);
   const queryClient = useQueryClient();
   const { mutate, isPending, isError } = useMutation({
@@ -132,6 +133,10 @@ const DetailList = () => {
     }));
   }
 
+  function handleGetResult() {
+    navigate("results", { replace: true });
+  }
+
   return (
     <>
       <Box
@@ -148,13 +153,22 @@ const DetailList = () => {
             DETAILS
           </Typography>
         </StyledBadge>
-        <Button
-          onClick={handleAddClick}
-          variant={"outlined"}
-          endIcon={<AddIcon />}
-        >
-          Add
-        </Button>
+        <Box>
+          <Button
+            variant={"contained"}
+            sx={{ mr: 1 }}
+            onClick={handleGetResult}
+          >
+            Get Results
+          </Button>
+          <Button
+            onClick={handleAddClick}
+            variant={"outlined"}
+            endIcon={<AddIcon />}
+          >
+            Add
+          </Button>
+        </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 0 }}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">

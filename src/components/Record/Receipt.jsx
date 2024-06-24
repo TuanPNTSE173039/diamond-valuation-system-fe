@@ -21,8 +21,6 @@ const RecordReceipt = () => {
     onSuccess: () => {
       const paymentBody = {
         valuationRequestID: requestId,
-        amount: "",
-        externalTransaction: "none",
         paymentMethod: { id: 1 },
       };
       newPayment(paymentBody);

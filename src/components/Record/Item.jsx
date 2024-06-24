@@ -3,8 +3,16 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import { useParams } from "react-router-dom";
+import { useRequest } from "../../services/requests.js";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
-const RecordItem = ({ title, mode, handleMode }) => {
+const RecordItem = ({ title, mode, handleMode, status, date }) => {
+  const { requestId } = useParams();
+  const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
+  if (isRequestLoading) {
+    return <UICircularIndeterminate />;
+  }
   return (
     <Paper elevation={3} sx={{ mb: 0.5, minWidth: "275px" }}>
       <Card variant="outlined">
@@ -25,25 +33,34 @@ const RecordItem = ({ title, mode, handleMode }) => {
             >
               {title}
             </Typography>
-            <Typography variant="p">status</Typography>
+            <Typography variant="p">{status}</Typography>
           </Box>
+        </CardContent>
+        <CardActions>
           <Typography
             variant="span"
             component="div"
-            sx={{ mt: 1, fontSize: 14 }}
+            sx={{ fontSize: 14, ml: 1, width: "40%" }}
           >
-            {/* Date from BE */}
-            10/10/2022
+            {date}
           </Typography>
-        </CardContent>
-        <CardActions>
-          <Button
-            size="small"
-            variant={mode ? "contained" : "text"}
-            onClick={handleMode}
+
+          <Box
+            sx={{
+              width: "60%",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
-            {mode ? "Create" : "View"}
-          </Button>
+            <Box sx={{ flex: 1 }}></Box>
+            <Button
+              size="small"
+              variant={!mode ? "contained" : "outlined"}
+              onClick={handleMode}
+            >
+              {!mode ? "Create" : "Detail"}
+            </Button>
+          </Box>
         </CardActions>
       </Card>
     </Paper>
