@@ -4,6 +4,9 @@ import AuthGuard from "./components/Auth/AuthGuard.jsx";
 import GuestGuard from "./components/Auth/GuestGuard.jsx";
 import RoleBasedGuard from "./components/Auth/RoleBasedGuard.jsx";
 import AuthSignIn from "./components/Auth/SignIn.jsx";
+import BlogDetail from "./components/Blog/Detail.jsx";
+import BlogForm from "./components/Blog/Form.jsx";
+import BlogList from "./components/Blog/List.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
 import RecordScreenCommitment from "./components/Record/Screen/Commitment.jsx";
@@ -113,6 +116,46 @@ const router = createBrowserRouter([
             ),
           },
         ],
+      },
+      {
+        path: "blogs",
+        children: [
+          {
+            index: true, // uri: /blogs
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.ADMIN]}>
+                <BlogList />
+              </RoleBasedGuard>
+            ),
+          },
+          {
+            path: ":blogId", // uri: /blogs/:blogId
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.ADMIN]}>
+                <BlogDetail />
+              </RoleBasedGuard>
+            ),
+          },
+          {
+            path: "new", // uri: /blogs/new
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.ADMIN]}>
+                <BlogForm />
+              </RoleBasedGuard>
+            ),
+          },
+          {
+            path: ":blogId/edit", // uri: /blogs/:blogId/edit
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.ADMIN]}>
+                <BlogForm />
+              </RoleBasedGuard>
+            ),
+          },
+        ],
+      },
+      {
+        path: "service",
       },
     ],
   },
