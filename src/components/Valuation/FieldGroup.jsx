@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
 export default function DiamondValuationFieldGroup({
@@ -11,9 +12,9 @@ export default function DiamondValuationFieldGroup({
       <Typography variant="h6" sx={{ fontWeight: "600", color: "#333", pb: 1 }}>
         {title}
       </Typography>
-      <Box boxShadow={4} sx={{ p: 1 }}>
+      <Paper elevation={3} sx={{ p: 2, borderRadius: 3 }}>
         {children}
-      </Box>
+      </Paper>
     </Box>
   );
 }

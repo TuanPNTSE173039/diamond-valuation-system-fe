@@ -1,6 +1,5 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EventIcon from "@mui/icons-material/Event";
 import {
   FormControl,
   FormLabel,
@@ -636,7 +635,7 @@ const DiamondValuationAssessment = ({
             <Grid container spacing={0.5} justifyContent="center">
               {clarityCharacteristicList.map((clarity, index) => {
                 return (
-                  <Grid key={clarity.code} item>
+                  <Grid key={clarity.code} item >
                     <ToggleButton
                       value={clarity.code}
                       aria-label={clarity.label}

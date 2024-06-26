@@ -8,7 +8,8 @@ import * as React from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useBriefRequests } from "../../services/requests.js";
-import { formatDateTime } from "../../utilities/formatter.js";
+import { formattedDateTime } from "../../utilities/formatter.js";
+import Role from "../../utilities/Role.js";
 import { valuationRequestStatus } from "../../utilities/Status.jsx";
 import { a11yProps, RequestHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
@@ -27,10 +28,12 @@ const RequestList = () => {
   const userRole = currentUser?.account.role;
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const { data: requests, isFetching: isRequestFetching } = useBriefRequests(
     page,
     rowsPerPage,
+    userRole,
+    currentUser?.id,
   );
 
   const [selectedRequests, setSelectedRequests] = useState([]);
@@ -39,24 +42,35 @@ const RequestList = () => {
   const [statusIndex, setStatusIndex] = useState(0);
   const handleChange = (event, newValue) => {
     setStatusIndex(newValue);
-    console.log(newValue);
-    queryClient.invalidateQueries({
-      queryKey: ["briefRequests", { page, rowsPerPage, newValue }],
-    });
   };
 
   //Showing
-  const requestRows = requests?.content.map((row) => {
-    return {
-      number: row.id,
-      status: row.status,
-      customerFirstName: row.customerFirstName,
-      customerLastName: row.customerLastName,
-      creationDate: formatDateTime(row.creationDate),
-      diamondAmount: row.diamondAmount,
-      service: row.serviceName,
-    };
-  });
+  const requestRows =
+    userRole === Role.MANAGER
+      ? requests?.content.map((row) => {
+          return {
+            number: row.id,
+            status: row.status,
+            customerFirstName: row.customerFirstName,
+            customerLastName: row.customerLastName,
+            creationDate: formattedDateTime(row.creationDate),
+            diamondAmount: row.diamondAmount,
+            service: row.serviceName,
+          };
+        })
+      : requests?.content
+          .filter((row) => row.status !== "PENDING")
+          .map((row) => {
+            return {
+              number: row.id,
+              status: row.status,
+              customerFirstName: row.customerFirstName,
+              customerLastName: row.customerLastName,
+              creationDate: formattedDateTime(row.creationDate),
+              diamondAmount: row.diamondAmount,
+              service: row.serviceName,
+            };
+          });
 
   if (isRequestFetching) {
     return <UICircularIndeterminate />;

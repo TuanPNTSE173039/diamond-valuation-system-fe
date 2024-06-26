@@ -158,28 +158,16 @@ export const diamondValuationStatus = [
     name: "All",
   },
   {
-    id: 1,
-    name: "PENDING",
-  },
-  {
     id: 2,
-    name: "ASSESSING",
-  },
-  {
-    id: 3,
-    name: "ASSESSED",
-  },
-  {
-    id: 4,
     name: "VALUATING",
   },
   {
-    id: 5,
+    id: 3,
     name: "VALUATED",
   },
   {
-    id: 6,
-    name: "APPROVED",
+    id: 4,
+    name: "MISSING",
   },
 ];
 export const clarityCharacteristicList = [
@@ -254,6 +242,12 @@ export const clarityCharacteristicList = [
     image: natural,
   },
 ];
+
+export const clarityCharacteristicConverter = (characteristic) => {
+  return characteristic.map((item) => {
+    return clarityCharacteristicList.find((clarity) => clarity.code === item);
+  });
+};
 
 export const statusConverter = (status) => {
   switch (status) {

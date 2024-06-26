@@ -1,8 +1,11 @@
+import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
+import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import EmailIcon from "@mui/icons-material/Email";
 import LabelIcon from "@mui/icons-material/Label";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import PersonIcon from "@mui/icons-material/Person";
+import StraightenIcon from "@mui/icons-material/Straighten";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import * as React from "react";
@@ -10,6 +13,10 @@ import { useParams } from "react-router-dom";
 import { useCustomer } from "../../services/customers.js";
 import { useDetail } from "../../services/details.js";
 import { useRequest } from "../../services/requests.js";
+import {
+  formattedDiamondSize,
+  formattedMoney,
+} from "../../utilities/formatter.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
@@ -21,20 +28,15 @@ const DiamondValuationUserInfor = ({ ...props }) => {
     request?.customerID,
   );
   const infor = {
-    phone: customer?.phone?.trim(),
-    email: customer?.email?.trim(),
+    phone: customer?.phone.trim(),
+    email: customer?.account.email.trim(),
     size: detail?.size,
     service: request?.service.name,
     servicePrice: detail?.servicePrice,
     status: detail?.status,
-    fairPriceEstimate:
-      detail?.diamondValuationNote?.fairPrice === undefined
-        ? "N/A"
-        : detail?.diamondValuationNote?.fairPrice,
-    estimateRange:
-      detail?.diamondValuationNote?.minPrice +
-      " - " +
-      detail?.diamondValuationNote?.maxPrice,
+    fairPriceEstimate: detail?.diamondValuationNote?.fairPrice || "N/A",
+    minPrice: detail?.diamondValuationNote?.minPrice || "N/A",
+    maxPrice: detail?.diamondValuationNote?.maxPrice || "N/A",
   };
 
   if (isDetailLoading || isRequestLoading || isCustomerLoading) {
@@ -52,14 +54,17 @@ const DiamondValuationUserInfor = ({ ...props }) => {
       <DiamondValuationInforItem icon={<EmailIcon />} title="Email">
         {infor.email}
       </DiamondValuationInforItem>
-      <DiamondValuationInforItem icon={<EmailIcon />} title="Size">
-        {infor.size}
+      <DiamondValuationInforItem icon={<StraightenIcon />} title="Size">
+        {formattedDiamondSize(infor.size)}
       </DiamondValuationInforItem>
-      <DiamondValuationInforItem icon={<EmailIcon />} title="Service">
+      <DiamondValuationInforItem icon={<ElectricBoltIcon />} title="Service">
         {infor.service}
       </DiamondValuationInforItem>
-      <DiamondValuationInforItem icon={<EmailIcon />} title="Service Price">
-        {infor.servicePrice}
+      <DiamondValuationInforItem
+        icon={<CurrencyYenIcon />}
+        title="Service Price"
+      >
+        {formattedMoney(infor.servicePrice)}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LabelIcon />} title="Status">
         {infor.status}
@@ -68,11 +73,11 @@ const DiamondValuationUserInfor = ({ ...props }) => {
         icon={<LocalAtmIcon />}
         title="Fair Price Estimate"
       >
-        {infor.fairPriceEstimate}
+        {formattedMoney(infor.fairPriceEstimate)}
       </DiamondValuationInforItem>
 
       <DiamondValuationInforItem icon={<LocalAtmIcon />} title="Estimate Range">
-        {infor.estimateRange}
+        {formattedMoney(infor.minPrice)} - {formattedMoney(infor.maxPrice)}
       </DiamondValuationInforItem>
     </Box>
   );

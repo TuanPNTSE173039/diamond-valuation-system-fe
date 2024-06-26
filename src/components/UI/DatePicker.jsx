@@ -4,13 +4,18 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import * as React from "react";
 
-export default function UIDatePicker({ label, value, onChange, disabled }) {
+export default function UIDatePicker({
+  label,
+  value,
+  onChange,
+  disabled,
+  ...others
+}) {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} {...others}>
       <DemoContainer components={["DatePicker"]}>
         <DatePicker
           label={label}
-          sx={{ width: "100%" }}
           value={value}
           onChange={(newValue) => onChange(newValue)}
           format="DD-MM-YYYY"

@@ -200,7 +200,7 @@ export default function UITable({
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 35]}
+          rowsPerPageOptions={[10, 25, 35]}
           component="div"
           count={count}
           rowsPerPage={rowsPerPage}

@@ -18,7 +18,6 @@ import Link from "@mui/material/Link";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import dayjs from "dayjs";
 import {
   getDownloadURL,
   listAll,
@@ -28,6 +27,7 @@ import {
 import * as React from "react";
 import { useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
+import { useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateDetail, updateDiamondNote } from "../../services/api.js";
@@ -35,8 +35,9 @@ import { storage } from "../../services/config/firebase.js";
 import { useDetail } from "../../services/details.js";
 import { useStaffs } from "../../services/staffs.js";
 import { getStaffById } from "../../utilities/filtering.js";
-import { formattedMoney } from "../../utilities/formatter.js";
+import { formattedDate, formattedMoney } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
+import Role from "../../utilities/Role.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
@@ -62,10 +63,12 @@ export const metadata = {
   contentType: "image/jpeg",
 };
 const DetailItem = () => {
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.account.role;
   const queryClient = useQueryClient();
-  const { requestId, detailId } = useParams();
+  const { detailId } = useParams();
   const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
-  const { data: staffs, isLoading: isStaffLoading } = useStaffs();
+  const { data: staffs, isLoading: isStaffLoading } = useStaffs(Role.VALUATION);
 
   const location = useLocation();
   const pathNames = location.pathname.split("/").filter((x) => x);
@@ -79,6 +82,10 @@ const DetailItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["detail", { detailId: detailId }],
       });
+      if (body.data.status === "ASSESSING")
+        toast.success("Save assessment successfully");
+      else if (body.data.status === "ASSESSED")
+        toast.success("Confirm assessment successfully");
     },
   });
   const { mutate: mutateAssessment } = useMutation({
@@ -89,47 +96,61 @@ const DetailItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["detail", { detailId: detailId }],
       });
-      if (body.data.status === "ASSESSING")
-        toast.success("Save assessment successfully");
-      else if (body.data.status === "ASSESSED")
-        toast.success("Confirm assessment successfully");
     },
   });
 
   //DiamondInfor
   const serverDiamondInfor = detail?.diamondValuationNote;
-  const [diamondInfor, setDiamondInfor] = useState({
-    giaCertDate: dayjs(new Date()), //xu ly sau
-    certificateId: serverDiamondInfor?.certificateId,
-    diamondOrigin: serverDiamondInfor?.diamondOrigin,
-    caratWeight: serverDiamondInfor?.caratWeight,
-    color: serverDiamondInfor?.color,
-    clarity: serverDiamondInfor?.clarity,
-    cut: serverDiamondInfor?.cut,
-    shape: serverDiamondInfor?.shape,
-    symmetry: serverDiamondInfor?.symmetry,
-    polish: serverDiamondInfor?.polish,
-    fluorescence: serverDiamondInfor?.fluorescence,
-    proportions: serverDiamondInfor?.proportions,
-    clarityCharacteristicLink: serverDiamondInfor?.clarityCharacteristicLink,
-    clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
-  });
+  const [diamondInfor, setDiamondInfor] = useState({});
+  useEffect(() => {
+    if (detail) {
+      setDiamondInfor((prev) => {
+        return {
+          ...prev,
+          certificateDate: formattedDate(serverDiamondInfor?.certificateDate),
+          certificateId: serverDiamondInfor?.certificateId,
+          diamondOrigin: serverDiamondInfor?.diamondOrigin,
+          cutScore: serverDiamondInfor?.cutScore,
+          caratWeight: serverDiamondInfor?.caratWeight,
+          color: serverDiamondInfor?.color,
+          clarity: serverDiamondInfor?.clarity,
+          cut: serverDiamondInfor?.cut,
+          shape: serverDiamondInfor?.shape,
+          symmetry: serverDiamondInfor?.symmetry,
+          polish: serverDiamondInfor?.polish,
+          fluorescence: serverDiamondInfor?.fluorescence,
+          proportions: serverDiamondInfor?.proportions,
+          clarityCharacteristicLink:
+            serverDiamondInfor?.clarityCharacteristicLink,
+          clarityCharacteristic: serverDiamondInfor?.clarityCharacteristic,
+          fairPrice: serverDiamondInfor?.fairPrice,
+          minPrice: serverDiamondInfor?.minPrice,
+          maxPrice: serverDiamondInfor?.maxPrice,
+        };
+      });
+      setClarities(serverDiamondInfor?.clarityCharacteristic);
+    }
+  }, [detail]);
 
-  //Clarity Characteristic List
-  const [clarities, setClarities] = useState(
-    diamondInfor.clarityCharacteristic === null
-      ? []
-      : () => diamondInfor.clarityCharacteristic,
-  );
+  const [clarities, setClarities] = useState([]);
   const handleClarities = (event, newClarity) => {
     setClarities(newClarity);
   };
 
   //Assessing State
   const [detailState, setDetailState] = useState({
-    previous: getPreviousStatus(detail?.status),
-    current: detail?.status,
+    previous: null,
+    current: null,
   });
+
+  useEffect(() => {
+    if (detail) {
+      setDetailState({
+        previous: getPreviousStatus(detail?.status),
+        current: detail?.status,
+      });
+    }
+  }, [detail]);
   function handleAssessing() {
     setDetailState((prevState) => {
       return {
@@ -176,6 +197,7 @@ const DetailItem = () => {
     const assessmentBody = {
       ...diamondInfor,
       clarityCharacteristic: clarities,
+      certificateDate: null,
     };
     mutateAssessment(assessmentBody);
   }
@@ -221,7 +243,7 @@ const DetailItem = () => {
     listAll(listRef)
       .then(async (res) => {
         res.prefixes.forEach((folderRef) => {
-          console.log("folderRef", folderRef);
+          // console.log("folderRef", folderRef);
         });
         const images = await Promise.all(
           res.items.map(async (itemRef) => {
@@ -237,19 +259,19 @@ const DetailItem = () => {
   };
   useEffect(() => {
     getListAllImages();
-    if (detail?.diamondValuationNote?.proportions !== null) {
+    if (detail?.diamondValuationNote?.proportions) {
       loadImageByPath(
         detail?.diamondValuationNote?.proportions,
         setProportionImage,
       );
     }
-    if (detail?.diamondValuationNote?.clarityCharacteristicLink !== null) {
+    if (detail?.diamondValuationNote?.clarityCharacteristicLink) {
       loadImageByPath(
         detail?.diamondValuationNote?.clarityCharacteristicLink,
         setClarityCharacteristicImage,
       );
     }
-  }, []);
+  }, [detail]);
   const handleUploadDiamondImage = () => {
     const storageRef = ref(storage, `${imageLinks}/${diamondImage.name}`);
     const uploadTask = uploadBytesResumable(storageRef, diamondImage, metadata);
@@ -258,13 +280,13 @@ const DetailItem = () => {
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("Upload is " + progress + "% done");
+        // console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
           case "paused":
-            console.log("Upload is paused");
+            // console.log("Upload is paused");
             break;
           case "running":
-            console.log("Upload is running");
+            // console.log("Upload is running");
             break;
         }
       },
@@ -608,23 +630,25 @@ const DetailItem = () => {
         </Box>
       )}
 
-      {detail.status !== "CANCEL" && detailState.current !== "PENDING" && (
-        <DiamondValuationAssessment
-          diamondInfor={diamondInfor}
-          setDiamondInfor={setDiamondInfor}
-          detailState={detailState}
-          proportionImage={proportionImage}
-          clarityCharacteristicImage={clarityCharacteristicImage}
-          clarities={clarities}
-          handleClarities={handleClarities}
-        />
-      )}
+      {detailState.current !== "CANCEL" &&
+        detailState.current !== "PENDING" && (
+          <DiamondValuationAssessment
+            diamondInfor={diamondInfor}
+            setDiamondInfor={setDiamondInfor}
+            detailState={detailState}
+            proportionImage={proportionImage}
+            clarityCharacteristicImage={clarityCharacteristicImage}
+            clarities={clarities}
+            handleClarities={handleClarities}
+          />
+        )}
 
-      {detail.status !== "CANCEL" &&
+      {detailState.current !== "CANCEL" &&
         (detailState.current === "ASSESSED" ||
           detailState.current === "VALUATING" ||
           detailState.current === "DRAFT_VALUATING" ||
-          detailState.current === "VALUATED") && (
+          detailState.current === "VALUATED") &&
+        role === Role.MANAGER && (
           <>
             <DiamondValuationAssignTable
               detailState={detailState}

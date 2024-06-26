@@ -24,7 +24,7 @@ const RecordResult = () => {
         </CardContent>
         <CardActions>
           <Button size="small">
-            <Link to={"result"}>Create</Link>
+            <Link to={"results"}>Create</Link>
           </Button>
         </CardActions>
       </Card>

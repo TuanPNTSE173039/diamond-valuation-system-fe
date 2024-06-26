@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./config/axiosInstance.js";
 
-export const useStaffs = () => {
+export const useStaffs = (role) => {
+  let url = "staffs";
+  if (role) {
+    url += `?role=${role}`;
+  }
   return useQuery({
-    queryKey: ["staffs"],
+    queryKey: ["staffs", { role: role }],
     queryFn: async () => {
-      const response = await axiosInstance.get("staffs");
+      const response = await axiosInstance.get(url);
       return response.data;
     },
   });
