@@ -221,6 +221,10 @@ const DiamondValuationItem = () => {
   }, []);
 
   function handleSaveValuation() {
+    if (comment.length > 200) {
+      toast.error("Brief Comment must be less than 200 characters");
+      return;
+    }
     setDetailState((prevState) => {
       return {
         ...prevState,
