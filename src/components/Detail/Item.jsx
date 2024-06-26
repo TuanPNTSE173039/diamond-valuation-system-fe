@@ -155,6 +155,12 @@ const DetailItem = () => {
     });
   }
   function handleSaveAssessing() {
+    // Check if cutScore is a number between 0 and 10
+    if (diamondInfor.cutScore < 0 || diamondInfor.cutScore > 10) {
+      // Display an error message
+      toast.error("Cut Score must be a number between 0 and 10");
+      return;
+    }
     setDetailState((prevState) => {
       return {
         ...prevState,

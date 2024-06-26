@@ -21,8 +21,8 @@ const DiamondValuationUserInfor = ({ ...props }) => {
     request?.customerID,
   );
   const infor = {
-    phone: customer?.phone.trim(),
-    email: customer?.email.trim(),
+    phone: customer?.phone?.trim(),
+    email: customer?.email?.trim(),
     size: detail?.size,
     service: request?.service.name,
     servicePrice: detail?.servicePrice,
@@ -47,7 +47,7 @@ const DiamondValuationUserInfor = ({ ...props }) => {
         {customer.firstName + " " + customer.lastName}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LocalPhoneIcon />} title="Phone">
-        {customer.phone.trim()}
+        {infor.phone}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<EmailIcon />} title="Email">
         {infor.email}

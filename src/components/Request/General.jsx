@@ -111,16 +111,16 @@ const RequestGeneral = () => {
             {customer?.firstName + " " + customer?.lastName}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<AssignmentIndIcon />} title="CCCD">
-            {customer?.identityDocument.trim()}
+            {customer?.identityDocument?.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LocalPhoneIcon />} title="Phone">
-            {customer?.phone.trim()}
+            {customer?.phone?.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<EmailIcon />} title="Email">
-            {customer?.email.trim()}
+            {customer?.email?.trim()}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LocationOnIcon />} title="Adress">
-            {customer?.address.trim()}
+            {customer?.address?.trim()}
           </ValuationRequestUserInfor>
         </Grid>
         <Grid item xs={4}>
