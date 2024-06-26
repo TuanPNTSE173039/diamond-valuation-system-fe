@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
@@ -55,6 +56,8 @@ const DiamondValuationItem = () => {
   const { isLoading: isRequestLoading, data: request } = useRequest(
     detail?.valuationRequestID,
   );
+
+  const [error, setError] = useState("");
 
   //Update Diamond Valuation
   const queryClient = useQueryClient();
@@ -169,7 +172,7 @@ const DiamondValuationItem = () => {
       setValuationPrice(
         valuation?.valuationPrice === 0 ? "" : valuation?.valuationPrice,
       );
-      setComment(valuation?.comment);
+      setComment(valuation?.comment || "");
     }
   }, [detail, valuation]);
 
@@ -371,30 +374,23 @@ const DiamondValuationItem = () => {
               </Box>
             </Stack>
             <Box>
-              <label
-                htmlFor={"brief-comment"}
-                style={{
-                  marginTop: 2,
-                  fontSize: 20,
-                  fontWeight: 600,
-                  color: "primary.main",
-                }}
-              >
-                Brief Comment
-              </label>
-              <textarea
+              <TextField
                 id={"brief-comment"}
-                style={{
+                label="Brief Comment"
+                rows={4}
+                multiline
+                sx={{
                   width: "100%",
-                  height: "110px",
-                  resize: "none",
-                  outline: "1px solid #333",
-                  borderRadius: 4,
-                  padding: "8px 16px",
                 }}
                 onChange={(e) => setComment(e.target.value)}
                 disabled={detailState.current !== "VALUATING"}
                 value={comment}
+                error={comment.length > 200}
+                helperText={
+                  comment.length > 200
+                    ? "Brief Comment must be less than 200 characters"
+                    : null
+                }
               />
             </Box>
           </Box>
