@@ -23,6 +23,7 @@ import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import Role from "./utilities/Role.js";
 import ServiceList from "./components/Service/List.jsx";
+import ServicePriceList from "./components/Service/ServicePriceList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -197,6 +198,14 @@ const router = createBrowserRouter([
                 </RoleBasedGuard>
             ),
           },
+          {
+            path: ":serviceId",
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                  <ServicePriceList />
+                </RoleBasedGuard>
+            ),
+          }
         ],
       },
     ],

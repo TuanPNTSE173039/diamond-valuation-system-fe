@@ -18,6 +18,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useState } from "react";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import {StyledBadge} from "../../assets/styles/Badge.jsx";
+import AddIcon from "@mui/icons-material/Add.js";
+import * as React from "react";
+import {useNavigate} from "react-router-dom";
 
 const ServiceList = () => {
     const [serviceList, setServiceList] = useState([
@@ -47,105 +51,6 @@ const ServiceList = () => {
         }
     ]);
 
-    const [servicePriceList, setServicePriceList] = useState([
-        {
-            id: 1,
-            initPrice:20.00,
-            unitPrice:0.00,
-            minSize:4.01,
-            maxSize:4.49,
-            serviceId:1
-        },
-        {
-            id: 2,
-            initPrice:25.00,
-            unitPrice:0.00,
-            minSize:4.50,
-            maxSize:4.99,
-            serviceId:1
-        },
-        {
-            id: 3,
-            initPrice:30.00,
-            unitPrice:0.00,
-            minSize:5.00,
-            maxSize:5.49,
-            serviceId:1
-        },
-        {
-            id: 4,
-            initPrice:36.00,
-            unitPrice:0.00,
-            minSize:4.01,
-            maxSize:4.49,
-            serviceId:2
-        },
-        {
-            id: 5,
-            initPrice:40.00,
-            unitPrice:0.00,
-            minSize: 4.50,
-            maxSize: 4.99,
-            serviceId: 2
-        },
-        {
-            id: 6,
-            initPrice: 45.00,
-            unitPrice: 0.00,
-            minSize: 5.00,
-            maxSize: 5.49,
-            serviceId: 2
-        },
-        {
-            id: 7,
-            initPrice: 50.00,
-            unitPrice: 0.00,
-            minSize: 4.01,
-            maxSize: 4.49,
-            serviceId: 3
-        },
-        {
-            id: 8,
-            initPrice: 55.00,
-            unitPrice: 0.00,
-            minSize: 4.50,
-            maxSize: 4.99,
-            serviceId: 3
-        },
-        {
-            id: 9,
-            initPrice: 60.00,
-            unitPrice: 0.00,
-            minSize: 5.00,
-            maxSize: 5.49,
-            serviceId: 3
-        },
-        {
-            id: 10,
-            initPrice: 70.00,
-            unitPrice: 0.00,
-            minSize: 4.01,
-            maxSize: 4.49,
-            serviceId: 4
-        },
-        {
-            id: 11,
-            initPrice: 75.00,
-            unitPrice: 0.00,
-            minSize: 4.50,
-            maxSize: 4.99,
-            serviceId: 4
-        },
-        {
-            id: 12,
-            initPrice: 80.00,
-            unitPrice: 0.00,
-            minSize: 5.00,
-            maxSize: 5.49,
-            serviceId: 4
-        }
-    ]);
-
     const [selectedDetail, setSelectedDetail] = useState({
         id: undefined,
         service_name: "",
@@ -154,6 +59,8 @@ const ServiceList = () => {
     });
 
     const [openEdit, setOpenEdit] = useState(false);
+    const [openAdd, setOpenAdd] = useState(false);
+    const navigate = useNavigate();
 
     const handleEditClick = (id) => {
         setOpenEdit(true);
@@ -211,23 +118,69 @@ const ServiceList = () => {
         console.log("Deleting service with id:", id);
         // For demonstration, just log the id to delete
     };
-    const [openPriceDialog, setOpenPriceDialog] = useState(false);
-    const [priceDetails, setPriceDetails] = useState([]);
 
-// Function to handle opening the price details popup
-    const handlePriceClick = (serviceId) => {
-        const prices = servicePriceList.filter(price => price.serviceId === serviceId);
-        setPriceDetails(prices);
-        setOpenPriceDialog(true);
+    const handlePriceClick = (id) => {
+        navigate(`/services/${id}`); // Navigate to the service price list page
     };
 
-    const handlePriceClose = () => {
-        setOpenPriceDialog(false);
-        setPriceDetails([]);
+
+    const handleAddClick = () => {
+        setOpenAdd(true);
+        setSelectedDetail({
+            id: serviceList.length + 1, // Assuming id is incremental
+            service_name: "",
+            description: "",
+            period: 0,
+        });
+    };
+
+    const handleAddClose = () => {
+        setOpenAdd(false);
+        setSelectedDetail({
+            id: undefined,
+            service_name: "",
+            description: "",
+            period: 0,
+        });
+    };
+
+    const handleAddSave = () => {
+        setServiceList([...serviceList, selectedDetail]);
+        setOpenAdd(false);
+        setSelectedDetail({
+            id: undefined,
+            service_name: "",
+            description: "",
+            period: 0,
+        });
     };
 
     return (
         <Box sx={{ width: "100%" }}>
+            <Box
+                sx={{
+                    mt: 2,
+                    py: 0.5,
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                }}
+            >
+                <StyledBadge color="secondary">
+                    <Typography variant="h6" sx={{ fontWeight: "600" }}>
+                        SERVICES
+                    </Typography>
+                </StyledBadge>
+                <Box>
+                    <Button
+                        onClick={handleAddClick}
+                        variant={"outlined"}
+                        endIcon={<AddIcon />}
+                    >
+                        Add
+                    </Button>
+                </Box>
+            </Box>
             <TableContainer component={Paper} sx={{ mt: 0 }}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
@@ -262,6 +215,52 @@ const ServiceList = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {/* Add Dialog */}
+            <Dialog open={openAdd} onClose={handleAddClose}>
+                <DialogTitle>Add Service</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="service_name"
+                        name="service_name"
+                        label="Service Name"
+                        type="text"
+                        fullWidth
+                        value={selectedDetail.service_name}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="description"
+                        name="description"
+                        label="Description"
+                        type="text"
+                        fullWidth
+                        value={selectedDetail.description}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="period"
+                        name="period"
+                        label="Period"
+                        type="number"
+                        fullWidth
+                        value={selectedDetail.period}
+                        onChange={handleInputChange}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleAddClose} variant="text">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleAddSave} variant="contained">
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             {/* Edit Dialog */}
             <Dialog open={openEdit} onClose={handleEditClose}>
@@ -305,40 +304,6 @@ const ServiceList = () => {
                     </Button>
                     <Button onClick={handleEditSave} variant="contained">
                         Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Price Details Dialog */}
-            <Dialog open={openPriceDialog} onClose={handlePriceClose}>
-                <DialogTitle>Service Prices</DialogTitle>
-                <DialogContent>
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Id</TableCell>
-                                    <TableCell>Min Size - Max Size</TableCell>
-                                    <TableCell>Init Price</TableCell>
-                                    <TableCell>Unit Price</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {priceDetails.map((price) => (
-                                    <TableRow key={price.id}>
-                                        <TableCell>{price.id}</TableCell>
-                                        <TableCell>{price.minSize} - {price.maxSize}</TableCell>
-                                        <TableCell>${price.initPrice.toFixed(2)}</TableCell>
-                                        <TableCell>${price.unitPrice.toFixed(2)}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handlePriceClose} variant="text">
-                        Close
                     </Button>
                 </DialogActions>
             </Dialog>
