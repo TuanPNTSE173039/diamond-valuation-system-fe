@@ -16,39 +16,51 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { useState } from "react";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import { useState, useEffect } from "react";
-import { StyledBadge } from "../../assets/styles/Badge.jsx";
+import {StyledBadge} from "../../assets/styles/Badge.jsx";
 import AddIcon from "@mui/icons-material/Add.js";
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
-import { getServices } from "../../services/api.js";
+import {useNavigate} from "react-router-dom";
 
 const ServiceList = () => {
-    const [serviceList, setServiceList] = useState([]);
+    const [serviceList, setServiceList] = useState([
+        {
+            id: 1,
+            description: "– Time to send for inspection depends on the time of sending.\n– Unlimited quantity. Service price list according to regulations.",
+            period: 72,
+            name: "Normal pricing"
+        },
+        {
+            id: 2,
+            description: "-Inspection time is 48 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
+            period: 48,
+            name: "Quick valuation in 48 hours"
+        },
+        {
+            id: 3,
+            description: "-Inspection time is 24 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
+            period: 24,
+            name: "Quick valuation in 24 hours"
+        },
+        {
+            id: 4,
+            description: "-Inspection time is 3 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
+            period: 3,
+            name: "Quick valuation in 3 hours"
+        }
+    ]);
+
     const [selectedDetail, setSelectedDetail] = useState({
         id: undefined,
         name: "",
         description: "",
         period: 0,
     });
+
     const [openEdit, setOpenEdit] = useState(false);
     const [openAdd, setOpenAdd] = useState(false);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchServices = async () => {
-            try {
-                const response = await getServices();
-                setServiceList(response);
-            } catch (error) {
-                console.error("Error fetching services:", error);
-            }
-        };
-
-        fetchServices();
-    }, []);
-
 
     const handleEditClick = (id) => {
         setOpenEdit(true);
@@ -71,31 +83,26 @@ const ServiceList = () => {
         });
     };
 
-    const handleEditSave = async () => {
-        try {
-            await updateService(selectedDetail.id, selectedDetail);
-            const updatedServiceList = serviceList.map(service => {
-                if (service.id === selectedDetail.id) {
-                    return {
-                        ...service,
-                        name: selectedDetail.name,
-                        description: selectedDetail.description,
-                        period: selectedDetail.period,
-                    };
-                }
-                return service;
-            });
-            setServiceList(updatedServiceList);
-            setOpenEdit(false);
-            setSelectedDetail({
-                id: undefined,
-                name: "",
-                description: "",
-                period: 0,
-            });
-        } catch (error) {
-            console.error("Error updating service:", error);
-        }
+    const handleEditSave = () => {
+        const updatedServiceList = serviceList.map(service => {
+            if (service.id === selectedDetail.id) {
+                return {
+                    ...service,
+                    name: selectedDetail.name,
+                    description: selectedDetail.description,
+                    period: selectedDetail.period,
+                };
+            }
+            return service;
+        });
+        setServiceList(updatedServiceList);
+        setOpenEdit(false);
+        setSelectedDetail({
+            id: undefined,
+            name: "",
+            description: "",
+            period: 0,
+        });
     };
 
     const handleInputChange = (e) => {
@@ -106,24 +113,19 @@ const ServiceList = () => {
         }));
     };
 
-    const handleDelete = async (id) => {
-        try {
-            await deleteService(id);
-            const updatedServiceList = serviceList.filter(service => service.id !== id);
-            setServiceList(updatedServiceList);
-        } catch (error) {
-            console.error("Error deleting service:", error);
-        }
+    const handleDelete = (id) => {
+        console.log("Deleting service with id:", id);
     };
 
     const handlePriceClick = (id) => {
-        navigate(`/services/${id}`); // Navigate to the service price list page
+        navigate(`/services/${id}`);
     };
+
 
     const handleAddClick = () => {
         setOpenAdd(true);
         setSelectedDetail({
-            id: serviceList.length + 1, // Assuming id is incremental
+            id: serviceList.length + 1,
             name: "",
             description: "",
             period: 0,
@@ -140,20 +142,15 @@ const ServiceList = () => {
         });
     };
 
-    const handleAddSave = async () => {
-        try {
-            const response = await addService(selectedDetail);
-            setServiceList([...serviceList, response]);
-            setOpenAdd(false);
-            setSelectedDetail({
-                id: undefined,
-                name: "",
-                description: "",
-                period: 0,
-            });
-        } catch (error) {
-            console.error("Error adding service:", error);
-        }
+    const handleAddSave = () => {
+        setServiceList([...serviceList, selectedDetail]);
+        setOpenAdd(false);
+        setSelectedDetail({
+            id: undefined,
+            name: "",
+            description: "",
+            period: 0,
+        });
     };
 
     return (
@@ -224,8 +221,8 @@ const ServiceList = () => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="name"
-                        name="name"
+                        id="service_name"
+                        name="service_name"
                         label="Service Name"
                         type="text"
                         fullWidth
@@ -270,8 +267,8 @@ const ServiceList = () => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="name"
-                        name="name"
+                        id="service_name"
+                        name="service_name"
                         label="Service Name"
                         type="text"
                         fullWidth
