@@ -17,6 +17,7 @@ import RecordScreenReturn from "./components/Record/Screen/Return.jsx";
 import RecordScreenSealing from "./components/Record/Screen/Sealing.jsx";
 import RequestItem from "./components/Request/Item.jsx";
 import RequestList from "./components/Request/List.jsx";
+import SupplierList from "./components/Supplier/List.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
@@ -163,6 +164,19 @@ const router = createBrowserRouter([
             element: (
               <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
                 <DiamondPriceList />
+              </RoleBasedGuard>
+            ),
+          },
+        ],
+      },
+      {
+        path: "suppliers",
+        children: [
+          {
+            index: true,
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                <SupplierList />
               </RoleBasedGuard>
             ),
           },

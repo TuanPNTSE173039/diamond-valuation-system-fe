@@ -1,3 +1,5 @@
+export const EDIT_MODE = 1;
+export const ADD_MODE = 0;
 export function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -212,6 +214,44 @@ export const DiamondHeadCells = [
     numeric: false,
     disablePadding: false,
     label: "Supplier",
+  },
+  {
+    id: "price",
+    numeric: false,
+    disablePadding: false,
+    label: "Price",
+  },
+  {
+    id: "action",
+    numeric: false,
+    disablePadding: false,
+    label: "Action",
+  },
+];
+export const SupplierHeadCells = [
+  {
+    id: "number",
+    numeric: false,
+    disablePadding: false,
+    label: "No.",
+  },
+  {
+    id: "name",
+    numeric: false,
+    disablePadding: false,
+    label: "Name",
+  },
+  {
+    id: "logo",
+    numeric: false,
+    disablePadding: false,
+    label: "Logo",
+  },
+  {
+    id: "action",
+    numeric: false,
+    disablePadding: false,
+    label: "Action",
   },
 ];
 export const DetailHeadCells = [

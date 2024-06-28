@@ -18,11 +18,9 @@ import MenuItem from "@mui/material/MenuItem";
 import * as React from "react";
 import { useState } from "react";
 import { diamondAttribute } from "../../utilities/Status.jsx";
-import { DiamondHeadCells } from "../../utilities/table.js";
+import { ADD_MODE, DiamondHeadCells } from "../../utilities/table.js";
 import UITable from "../UI/Table.jsx";
 
-const EDIT_MODE = 1;
-const ADD_MODE = 0;
 const { cut, clarity, color, shape, symmetry, polish, fluorescence } =
   diamondAttribute;
 
@@ -202,14 +200,32 @@ const DiamondPriceList = () => {
               ))}
             </TextField>
           </Box>
-          <Box width="100%" mt={3}>
-            <TextField id="supplier" select label="Supplier" fullWidth>
+
+          <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
+            <TextField
+              id="supplier"
+              select
+              label="Supplier"
+              fullWidth
+              sx={{ width: "50%" }}
+            >
               {supplier.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {option.name}
                 </MenuItem>
               ))}
             </TextField>
+            <TextField
+              label="Price"
+              id="price"
+              type="number"
+              sx={{ width: "50%" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">$</InputAdornment>
+                ),
+              }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
