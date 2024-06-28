@@ -16,58 +16,46 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { useState } from "react";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import {StyledBadge} from "../../assets/styles/Badge.jsx";
+import { useState, useEffect } from "react";
+import { StyledBadge } from "../../assets/styles/Badge.jsx";
 import AddIcon from "@mui/icons-material/Add.js";
 import * as React from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { getServices } from "../../services/api.js";
 
 const ServiceList = () => {
-    const [serviceList, setServiceList] = useState([
-        {
-            id: 1,
-            description: "– Time to send for inspection depends on the time of sending.\n– Unlimited quantity. Service price list according to regulations.",
-            period: 72,
-            service_name: "Normal pricing"
-        },
-        {
-            id: 2,
-            description: "-Inspection time is 48 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
-            period: 48,
-            service_name: "Quick valuation in 48 hours"
-        },
-        {
-            id: 3,
-            description: "-Inspection time is 24 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
-            period: 24,
-            service_name: "Quick valuation in 24 hours"
-        },
-        {
-            id: 4,
-            description: "-Inspection time is 3 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
-            period: 3,
-            service_name: "Quick valuation in 3 hours"
-        }
-    ]);
-
+    const [serviceList, setServiceList] = useState([]);
     const [selectedDetail, setSelectedDetail] = useState({
         id: undefined,
-        service_name: "",
+        name: "",
         description: "",
         period: 0,
     });
-
     const [openEdit, setOpenEdit] = useState(false);
     const [openAdd, setOpenAdd] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const response = await getServices();
+                setServiceList(response);
+            } catch (error) {
+                console.error("Error fetching services:", error);
+            }
+        };
+
+        fetchServices();
+    }, []);
+
 
     const handleEditClick = (id) => {
         setOpenEdit(true);
         const service = serviceList.find(service => service.id === id);
         setSelectedDetail({
             id: service.id,
-            service_name: service.service_name,
+            name: service.name,
             description: service.description,
             period: service.period,
         });
@@ -77,32 +65,37 @@ const ServiceList = () => {
         setOpenEdit(false);
         setSelectedDetail({
             id: undefined,
-            service_name: "",
+            name: "",
             description: "",
             period: 0,
         });
     };
 
-    const handleEditSave = () => {
-        const updatedServiceList = serviceList.map(service => {
-            if (service.id === selectedDetail.id) {
-                return {
-                    ...service,
-                    service_name: selectedDetail.service_name,
-                    description: selectedDetail.description,
-                    period: selectedDetail.period,
-                };
-            }
-            return service;
-        });
-        setServiceList(updatedServiceList);
-        setOpenEdit(false);
-        setSelectedDetail({
-            id: undefined,
-            service_name: "",
-            description: "",
-            period: 0,
-        });
+    const handleEditSave = async () => {
+        try {
+            await updateService(selectedDetail.id, selectedDetail);
+            const updatedServiceList = serviceList.map(service => {
+                if (service.id === selectedDetail.id) {
+                    return {
+                        ...service,
+                        name: selectedDetail.name,
+                        description: selectedDetail.description,
+                        period: selectedDetail.period,
+                    };
+                }
+                return service;
+            });
+            setServiceList(updatedServiceList);
+            setOpenEdit(false);
+            setSelectedDetail({
+                id: undefined,
+                name: "",
+                description: "",
+                period: 0,
+            });
+        } catch (error) {
+            console.error("Error updating service:", error);
+        }
     };
 
     const handleInputChange = (e) => {
@@ -113,22 +106,25 @@ const ServiceList = () => {
         }));
     };
 
-    const handleDelete = (id) => {
-        // Implement delete logic here
-        console.log("Deleting service with id:", id);
-        // For demonstration, just log the id to delete
+    const handleDelete = async (id) => {
+        try {
+            await deleteService(id);
+            const updatedServiceList = serviceList.filter(service => service.id !== id);
+            setServiceList(updatedServiceList);
+        } catch (error) {
+            console.error("Error deleting service:", error);
+        }
     };
 
     const handlePriceClick = (id) => {
         navigate(`/services/${id}`); // Navigate to the service price list page
     };
 
-
     const handleAddClick = () => {
         setOpenAdd(true);
         setSelectedDetail({
             id: serviceList.length + 1, // Assuming id is incremental
-            service_name: "",
+            name: "",
             description: "",
             period: 0,
         });
@@ -138,21 +134,26 @@ const ServiceList = () => {
         setOpenAdd(false);
         setSelectedDetail({
             id: undefined,
-            service_name: "",
+            name: "",
             description: "",
             period: 0,
         });
     };
 
-    const handleAddSave = () => {
-        setServiceList([...serviceList, selectedDetail]);
-        setOpenAdd(false);
-        setSelectedDetail({
-            id: undefined,
-            service_name: "",
-            description: "",
-            period: 0,
-        });
+    const handleAddSave = async () => {
+        try {
+            const response = await addService(selectedDetail);
+            setServiceList([...serviceList, response]);
+            setOpenAdd(false);
+            setSelectedDetail({
+                id: undefined,
+                name: "",
+                description: "",
+                period: 0,
+            });
+        } catch (error) {
+            console.error("Error adding service:", error);
+        }
     };
 
     return (
@@ -196,7 +197,7 @@ const ServiceList = () => {
                         {serviceList.map((service) => (
                             <TableRow key={service.id}>
                                 <TableCell align="left">{service.id}</TableCell>
-                                <TableCell align="left">{service.service_name}</TableCell>
+                                <TableCell align="left">{service.name}</TableCell>
                                 <TableCell align="left">{service.description}</TableCell>
                                 <TableCell align="center">{service.period}</TableCell>
                                 <TableCell align="center">
@@ -223,12 +224,12 @@ const ServiceList = () => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="service_name"
-                        name="service_name"
+                        id="name"
+                        name="name"
                         label="Service Name"
                         type="text"
                         fullWidth
-                        value={selectedDetail.service_name}
+                        value={selectedDetail.name}
                         onChange={handleInputChange}
                     />
                     <TextField
@@ -269,12 +270,12 @@ const ServiceList = () => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="service_name"
-                        name="service_name"
+                        id="name"
+                        name="name"
                         label="Service Name"
                         type="text"
                         fullWidth
-                        value={selectedDetail.service_name}
+                        value={selectedDetail.name}
                         onChange={handleInputChange}
                     />
                     <TextField

@@ -63,3 +63,10 @@ export const checkDiamond = (id, body) =>
   axiosInstance.put(`valuation-request-details/${id}`, body);
 export const updateDetail = (id, body) =>
   axiosInstance.put(`valuation-request-details/${id}`, body);
+
+// ---SERVICES---
+export const getServices = async () => {
+  const response = await axiosInstance.get("services");
+  return response.data;
+};
+
