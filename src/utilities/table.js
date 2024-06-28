@@ -356,4 +356,39 @@ export const StaffHeadCells = [
     disablePadding: false,
     label: "Current Valuations",
   },
+
 ];
+
+export const CustomerHeadCells = [
+  {
+    id: "id",
+    numeric: false,
+    disablePadding: false,
+    label: "ID",
+  },
+  {
+    id: "customerName",
+    numeric: false,
+    disablePadding: false,
+    label: "Customer Name",
+  },
+  {
+    id: "phone",
+    numeric: false,
+    disablePadding: false,
+    label: "Phone",
+  },
+  {
+    id: "address",
+    numeric: false,
+    disablePadding: false,
+    label: "Address",
+  },
+  {
+    id: "identityDocument",
+    numeric: false,
+    disablePadding: false,
+    label: "Identity Document",
+  },
+];
+
