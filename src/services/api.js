@@ -63,3 +63,5 @@ export const checkDiamond = (id, body) =>
   axiosInstance.put(`valuation-request-details/${id}`, body);
 export const updateDetail = (id, body) =>
   axiosInstance.put(`valuation-request-details/${id}`, body);
+
+

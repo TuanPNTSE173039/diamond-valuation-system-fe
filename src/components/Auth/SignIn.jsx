@@ -41,7 +41,13 @@ export default function AuthSignIn() {
     dispatch(clearMessage());
   }, [dispatch]);
 
-  //Formik
+  //1. chỗ lưu data
+  //2. validation
+  //3. lấy được data trong từng field
+  //4. POST/PUT lên thôi
+  //5. Sau khi đã nhận response về thì làm cái gì
+
+  //Formik & Yub validation
   const initialValues = {
     username: "",
     password: "",
