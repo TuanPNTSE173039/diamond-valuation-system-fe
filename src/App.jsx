@@ -9,7 +9,6 @@ import BlogForm from "./components/Blog/Form.jsx";
 import BlogList from "./components/Blog/List.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
-import DiamondPriceForm from "./components/DiamondPrice/Form.jsx";
 import DiamondPriceList from "./components/DiamondPrice/List.jsx";
 import RecordScreenCommitment from "./components/Record/Screen/Commitment.jsx";
 import RecordScreenReceipt from "./components/Record/Screen/Receipt.jsx";
@@ -164,22 +163,6 @@ const router = createBrowserRouter([
             element: (
               <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
                 <DiamondPriceList />
-              </RoleBasedGuard>
-            ),
-          },
-          {
-            path: "new",
-            element: (
-              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                <DiamondPriceForm />
-              </RoleBasedGuard>
-            ),
-          },
-          {
-            path: ":diamondId/edit",
-            element: (
-              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                <DiamondPriceForm />
               </RoleBasedGuard>
             ),
           },

@@ -432,7 +432,6 @@ const DiamondValuationAssessment = ({
           </Box>
         </DiamondValuationFieldGroup>
       </Box>
-
       <Box sx={{ width: "50%" }}>
         <DiamondValuationFieldGroup
           title="Proportions"

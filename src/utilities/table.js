@@ -133,6 +133,87 @@ export const RequestHeadCells = [
     label: "Service",
   },
 ];
+
+export const DiamondHeadCells = [
+  {
+    id: "number",
+    numeric: false,
+    disablePadding: false,
+    label: "No.",
+  },
+  {
+    id: "diamondOrigin",
+    numeric: false,
+    disablePadding: false,
+    label: "Origin",
+  },
+  {
+    id: "caratWeight",
+    numeric: false,
+    disablePadding: false,
+    label: "Carat",
+  },
+  {
+    id: "clarity",
+    numeric: false,
+    disablePadding: false,
+    label: "Clarity",
+  },
+  {
+    id: "color",
+    numeric: false,
+    disablePadding: false,
+    label: "Color",
+  },
+  {
+    id: "cut",
+    numeric: false,
+    disablePadding: false,
+    label: "Cut",
+  },
+  {
+    id: "cutScore",
+    numeric: false,
+    disablePadding: false,
+    label: "Score",
+  },
+  {
+    id: "shape",
+    numeric: false,
+    disablePadding: false,
+    label: "Shape",
+  },
+  {
+    id: "polish",
+    numeric: false,
+    disablePadding: false,
+    label: "Polish",
+  },
+  {
+    id: "symmetry",
+    numeric: false,
+    disablePadding: false,
+    label: "Symmetry",
+  },
+  {
+    id: "fluorescence",
+    numeric: false,
+    disablePadding: false,
+    label: "Fluorescence",
+  },
+  {
+    id: "creationDate",
+    numeric: false,
+    disablePadding: false,
+    label: "Date",
+  },
+  {
+    id: "supplier",
+    numeric: false,
+    disablePadding: false,
+    label: "Supplier",
+  },
+];
 export const DetailHeadCells = [
   {
     id: "number",
