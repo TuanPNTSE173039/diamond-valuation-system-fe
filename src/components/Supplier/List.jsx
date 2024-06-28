@@ -18,7 +18,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useState } from "react";
 import { StyledBadge } from "../../assets/styles/Badge.jsx";
-import AddIcon from "@mui/icons-material/Add.js";
+import AddIcon from "@mui/icons-material/Add";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import DiamondIcon from "@mui/icons-material/Diamond";
