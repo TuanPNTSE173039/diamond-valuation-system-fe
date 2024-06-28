@@ -24,6 +24,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Role from "./utilities/Role.js";
 import ServiceList from "./components/Service/List.jsx";
 import ServicePriceList from "./components/Service/ServicePriceList.jsx";
+import SupplierList from "./components/Supplier/List.jsx";
+import DiamondList from "./components/Supplier/DiamondList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -203,6 +205,27 @@ const router = createBrowserRouter([
             element: (
                 <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
                   <ServicePriceList />
+                </RoleBasedGuard>
+            ),
+          }
+        ],
+      },
+      {
+        path: "suppliers",
+        children: [
+          {
+            index: true,
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                  <SupplierList />
+                </RoleBasedGuard>
+            ),
+          },
+          {
+            path: ":supplierId",
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                  <DiamondList />
                 </RoleBasedGuard>
             ),
           }
