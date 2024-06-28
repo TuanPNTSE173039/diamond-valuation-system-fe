@@ -17,30 +17,45 @@ import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useState } from "react";
-import { StyledBadge } from "../../assets/styles/Badge.jsx";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import {StyledBadge} from "../../assets/styles/Badge.jsx";
 import AddIcon from "@mui/icons-material/Add.js";
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
-import DiamondIcon from "@mui/icons-material/Diamond";
+import {useNavigate} from "react-router-dom";
 
-const SupplierList = () => {
-    const [supplierList, setSupplierList] = useState([
+const ServiceList = () => {
+    const [serviceList, setServiceList] = useState([
         {
             id: 1,
-            link: "https://www.stonealgo.com/",
-            name: "StoneAlgo",
+            description: "– Time to send for inspection depends on the time of sending.\n– Unlimited quantity. Service price list according to regulations.",
+            period: 72,
+            name: "Normal pricing"
         },
         {
             id: 2,
-            link: "https://www.adiamor.com/",
-            name: "Adiamor",
+            description: "-Inspection time is 48 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
+            period: 48,
+            name: "Quick valuation in 48 hours"
         },
+        {
+            id: 3,
+            description: "-Inspection time is 24 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
+            period: 24,
+            name: "Quick valuation in 24 hours"
+        },
+        {
+            id: 4,
+            description: "-Inspection time is 3 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
+            period: 3,
+            name: "Quick valuation in 3 hours"
+        }
     ]);
 
     const [selectedDetail, setSelectedDetail] = useState({
         id: undefined,
         name: "",
-        link: "",
+        description: "",
+        period: 0,
     });
 
     const [openEdit, setOpenEdit] = useState(false);
@@ -49,11 +64,12 @@ const SupplierList = () => {
 
     const handleEditClick = (id) => {
         setOpenEdit(true);
-        const supplier = supplierList.find(supplier => supplier.id === id);
+        const service = serviceList.find(service => service.id === id);
         setSelectedDetail({
-            id: supplier.id,
-            name: supplier.name,
-            link: supplier.link,
+            id: service.id,
+            name: service.name,
+            description: service.description,
+            period: service.period,
         });
     };
 
@@ -62,27 +78,30 @@ const SupplierList = () => {
         setSelectedDetail({
             id: undefined,
             name: "",
-            link: "",
+            description: "",
+            period: 0,
         });
     };
 
     const handleEditSave = () => {
-        const updatedSupplierList = supplierList.map(supplier => {
-            if (supplier.id === selectedDetail.id) {
+        const updatedServiceList = serviceList.map(service => {
+            if (service.id === selectedDetail.id) {
                 return {
-                    ...supplier,
+                    ...service,
                     name: selectedDetail.name,
-                    link: selectedDetail.link,
+                    description: selectedDetail.description,
+                    period: selectedDetail.period,
                 };
             }
-            return supplier;
+            return service;
         });
-        setSupplierList(updatedSupplierList);
+        setServiceList(updatedServiceList);
         setOpenEdit(false);
         setSelectedDetail({
             id: undefined,
             name: "",
-            link: "",
+            description: "",
+            period: 0,
         });
     };
 
@@ -95,16 +114,21 @@ const SupplierList = () => {
     };
 
     const handleDelete = (id) => {
-        const updatedSupplierList = supplierList.filter(supplier => supplier.id !== id);
-        setSupplierList(updatedSupplierList);
+        console.log("Deleting service with id:", id);
     };
+
+    const handlePriceClick = (id) => {
+        navigate(`/services/${id}`);
+    };
+
 
     const handleAddClick = () => {
         setOpenAdd(true);
         setSelectedDetail({
-            id: supplierList.length + 1,
+            id: serviceList.length + 1,
             name: "",
-            link: "",
+            description: "",
+            period: 0,
         });
     };
 
@@ -113,17 +137,19 @@ const SupplierList = () => {
         setSelectedDetail({
             id: undefined,
             name: "",
-            link: "",
+            description: "",
+            period: 0,
         });
     };
 
     const handleAddSave = () => {
-        setSupplierList([...supplierList, selectedDetail]);
+        setServiceList([...serviceList, selectedDetail]);
         setOpenAdd(false);
         setSelectedDetail({
             id: undefined,
             name: "",
-            link: "",
+            description: "",
+            period: 0,
         });
     };
 
@@ -140,7 +166,7 @@ const SupplierList = () => {
             >
                 <StyledBadge color="secondary">
                     <Typography variant="h6" sx={{ fontWeight: "600" }}>
-                        SUPPLIERS
+                        SERVICES
                     </Typography>
                 </StyledBadge>
                 <Box>
@@ -158,30 +184,28 @@ const SupplierList = () => {
                     <TableHead>
                         <TableRow sx={{ backgroundColor: 'primary.main'}}>
                             <TableCell align="left" sx={{ color: 'white' }}>Id</TableCell>
-                            <TableCell align="center" sx={{ color: 'white' }}>Supplier Name</TableCell>
-                            <TableCell align="center" sx={{ color: 'white' }}>Link</TableCell>
+                            <TableCell align="center" sx={{ color: 'white' }}>Service Name</TableCell>
+                            <TableCell align="center" sx={{ color: 'white' }}>Description</TableCell>
+                            <TableCell align="center" sx={{ color: 'white' }}>Period</TableCell>
                             <TableCell align="center" sx={{ color: 'white' }}>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {supplierList.map((supplier) => (
-                            <TableRow key={supplier.id}>
-                                <TableCell align="left">{supplier.id}</TableCell>
-                                <TableCell align="center">{supplier.name}</TableCell>
+                        {serviceList.map((service) => (
+                            <TableRow key={service.id}>
+                                <TableCell align="left">{service.id}</TableCell>
+                                <TableCell align="left">{service.name}</TableCell>
+                                <TableCell align="left">{service.description}</TableCell>
+                                <TableCell align="center">{service.period}</TableCell>
                                 <TableCell align="center">
-                                    <a href={supplier.link} target="_blank" rel="noopener noreferrer">
-                                        {supplier.link}
-                                    </a>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <IconButton color="primary" onClick={() => handleEditClick(supplier.id)}>
+                                    <IconButton color="primary" onClick={() => handleEditClick(service.id)}>
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton color="secondary" onClick={() => handleDelete(supplier.id)}>
+                                    <IconButton color="secondary" onClick={() => handleDelete(service.id)}>
                                         <DeleteForeverIcon />
                                     </IconButton>
-                                    <IconButton color="primary" onClick={() => navigate(`/suppliers/${supplier.id}`)}>
-                                        <DiamondIcon />
+                                    <IconButton color="success" onClick={() => handlePriceClick(service.id)}>
+                                        <AttachMoneyIcon />
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -192,14 +216,14 @@ const SupplierList = () => {
 
             {/* Add Dialog */}
             <Dialog open={openAdd} onClose={handleAddClose}>
-                <DialogTitle>Add Supplier</DialogTitle>
+                <DialogTitle>Add Service</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="name"
-                        name="name"
-                        label="Supplier Name"
+                        id="service_name"
+                        name="service_name"
+                        label="Service Name"
                         type="text"
                         fullWidth
                         value={selectedDetail.name}
@@ -207,12 +231,22 @@ const SupplierList = () => {
                     />
                     <TextField
                         margin="dense"
-                        id="link"
-                        name="link"
-                        label="Link"
-                        type="url"
+                        id="description"
+                        name="description"
+                        label="Description"
+                        type="text"
                         fullWidth
-                        value={selectedDetail.link}
+                        value={selectedDetail.description}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="period"
+                        name="period"
+                        label="Period"
+                        type="number"
+                        fullWidth
+                        value={selectedDetail.period}
                         onChange={handleInputChange}
                     />
                 </DialogContent>
@@ -228,14 +262,14 @@ const SupplierList = () => {
 
             {/* Edit Dialog */}
             <Dialog open={openEdit} onClose={handleEditClose}>
-                <DialogTitle>Edit Supplier</DialogTitle>
+                <DialogTitle>Edit Service</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="name"
-                        name="name"
-                        label="Supplier Name"
+                        id="service_name"
+                        name="service_name"
+                        label="Service Name"
                         type="text"
                         fullWidth
                         value={selectedDetail.name}
@@ -243,12 +277,22 @@ const SupplierList = () => {
                     />
                     <TextField
                         margin="dense"
-                        id="link"
-                        name="link"
-                        label="Link"
-                        type="url"
+                        id="description"
+                        name="description"
+                        label="Description"
+                        type="text"
                         fullWidth
-                        value={selectedDetail.link}
+                        value={selectedDetail.description}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="period"
+                        name="period"
+                        label="Period"
+                        type="number"
+                        fullWidth
+                        value={selectedDetail.period}
                         onChange={handleInputChange}
                     />
                 </DialogContent>
@@ -265,4 +309,4 @@ const SupplierList = () => {
     );
 };
 
-export default SupplierList;
+export default ServiceList;

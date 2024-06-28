@@ -9,6 +9,7 @@ import BlogForm from "./components/Blog/Form.jsx";
 import BlogList from "./components/Blog/List.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
+import DiamondPriceForm from "./components/DiamondPrice/Form.jsx";
 import DiamondPriceList from "./components/DiamondPrice/List.jsx";
 import RecordScreenCommitment from "./components/Record/Screen/Commitment.jsx";
 import RecordScreenReceipt from "./components/Record/Screen/Receipt.jsx";
@@ -17,15 +18,14 @@ import RecordScreenReturn from "./components/Record/Screen/Return.jsx";
 import RecordScreenSealing from "./components/Record/Screen/Sealing.jsx";
 import RequestItem from "./components/Request/Item.jsx";
 import RequestList from "./components/Request/List.jsx";
-import SupplierList from "./components/Supplier/List.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import Role from "./utilities/Role.js";
-import StaffList from "./components/Staff/List.jsx";
-import StaffDetail from "./components/Staff/Detail.jsx";
-import CustomerList from "./components/Customer/List.jsx";
-import CustomerDetail from "./components/Customer/Detail.jsx";
+import ServiceList from "./components/Service/List.jsx";
+import ServicePriceList from "./components/Service/ServicePriceList.jsx";
+import SupplierList from "./components/Supplier/List.jsx";
+import DiamondList from "./components/Supplier/DiamondList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -171,6 +171,43 @@ const router = createBrowserRouter([
               </RoleBasedGuard>
             ),
           },
+          {
+            path: "new",
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                <DiamondPriceForm />
+              </RoleBasedGuard>
+            ),
+          },
+          {
+            path: ":diamondId/edit",
+            element: (
+              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                <DiamondPriceForm />
+              </RoleBasedGuard>
+            ),
+          },
+        ],
+      },
+      {
+        path: "services",
+        children: [
+          {
+            index: true,
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                  <ServiceList />
+                </RoleBasedGuard>
+            ),
+          },
+          {
+            path: ":serviceId",
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                  <ServicePriceList />
+                </RoleBasedGuard>
+            ),
+          }
         ],
       },
       {
@@ -179,58 +216,21 @@ const router = createBrowserRouter([
           {
             index: true,
             element: (
-              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                <SupplierList />
-              </RoleBasedGuard>
+                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                  <SupplierList />
+                </RoleBasedGuard>
             ),
           },
+          {
+            path: ":supplierId",
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                  <DiamondList />
+                </RoleBasedGuard>
+            ),
+          }
         ],
       },
-      {
-        path: "staffs",
-        children: [
-          {
-            index: true,
-            element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <StaffList />
-                </RoleBasedGuard>
-            ),
-          },
-          {
-            path: ":staffId",
-            element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <StaffDetail/>
-                </RoleBasedGuard>
-            ),
-          },
-
-        ],
-      },
-      {
-        path: "customers",
-        children: [
-          {
-            index: true,
-            element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <CustomerList />
-                </RoleBasedGuard>
-            ),
-          },
-          {
-            path: ":staffId",
-            element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <CustomerDetail/>
-                </RoleBasedGuard>
-            ),
-          },
-
-        ],
-      },
-
       {
         path: "service",
       },
