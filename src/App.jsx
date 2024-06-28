@@ -7,6 +7,8 @@ import AuthSignIn from "./components/Auth/SignIn.jsx";
 import BlogDetail from "./components/Blog/Detail.jsx";
 import BlogForm from "./components/Blog/Form.jsx";
 import BlogList from "./components/Blog/List.jsx";
+import CustomerDetail from "./components/Customer/Detail.jsx";
+import CustomerList from "./components/Customer/List.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
 import DiamondPriceList from "./components/DiamondPrice/List.jsx";
@@ -17,15 +19,12 @@ import RecordScreenReturn from "./components/Record/Screen/Return.jsx";
 import RecordScreenSealing from "./components/Record/Screen/Sealing.jsx";
 import RequestItem from "./components/Request/Item.jsx";
 import RequestList from "./components/Request/List.jsx";
-import SupplierList from "./components/Supplier/List.jsx";
+import StaffDetail from "./components/Staff/Detail.jsx";
+import StaffList from "./components/Staff/List.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import Role from "./utilities/Role.js";
-import StaffList from "./components/Staff/List.jsx";
-import StaffDetail from "./components/Staff/Detail.jsx";
-import CustomerList from "./components/Customer/List.jsx";
-import CustomerDetail from "./components/Customer/Detail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -174,38 +173,24 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "suppliers",
-        children: [
-          {
-            index: true,
-            element: (
-              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                <SupplierList />
-              </RoleBasedGuard>
-            ),
-          },
-        ],
-      },
-      {
         path: "staffs",
         children: [
           {
             index: true,
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <StaffList />
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                <StaffList />
+              </RoleBasedGuard>
             ),
           },
           {
             path: ":staffId",
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <StaffDetail/>
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                <StaffDetail />
+              </RoleBasedGuard>
             ),
           },
-
         ],
       },
       {
@@ -214,25 +199,20 @@ const router = createBrowserRouter([
           {
             index: true,
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <CustomerList />
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                <CustomerList />
+              </RoleBasedGuard>
             ),
           },
           {
             path: ":staffId",
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
-                  <CustomerDetail/>
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                <CustomerDetail />
+              </RoleBasedGuard>
             ),
           },
-
         ],
-      },
-
-      {
-        path: "service",
       },
     ],
   },
