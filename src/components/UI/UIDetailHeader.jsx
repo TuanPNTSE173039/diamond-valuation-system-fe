@@ -7,6 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
@@ -112,20 +113,28 @@ export default function UIDetailHeader({ title, detail }) {
         >
           <DialogTitle>Cancel Request</DialogTitle>
           <DialogContent>
-            <label
-              htmlFor="message"
-              className="block mb-2 text-md font-medium text-gray-900"
-            >
-              Your Reason
-            </label>
-            <textarea
-              id="message"
-              rows="4"
-              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:primary.main focus:border-blue-500"
-              placeholder="Write your reason here..."
+            <TextField
+              margin="normal"
+              multiline
+              rows={3}
+              fullWidth
+              id="cancelReason"
+              type="text"
+              name="cancelReason"
+              label="Your Reason"
+              InputProps={{ sx: { borderRadius: 2 } }}
               value={reason}
               onChange={(event) => setReason(event.target.value)}
-            ></textarea>
+              inputProps={{
+                min: 50,
+              }}
+              error={reason.length < 50}
+              helperText={
+                reason.length < 50
+                  ? "Reason must be greater than 50 characters"
+                  : null
+              }
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCancelDialogClose}>Cancel</Button>
