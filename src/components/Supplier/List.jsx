@@ -1,12 +1,16 @@
 import AddIcon from "@mui/icons-material/Add";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { TextField } from "@mui/material";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useState } from "react";
+import { VisuallyHiddenInput } from "../../assets/styles/Input.jsx";
 import { ADD_MODE, SupplierHeadCells } from "../../utilities/table.js";
 import UITable from "../UI/Table.jsx";
 
@@ -60,6 +64,25 @@ const SupplierList = () => {
             fullWidth
             sx={{ width: "100%", mt: 2 }}
           />
+          <Box mt={2}>
+            <Typography fontSize={16} fontWeight={500} mb={0.7}>
+              Logo
+            </Typography>
+            <Button
+              component="label"
+              role={undefined}
+              variant="outlined"
+              tabIndex={-1}
+              startIcon={<CloudUploadIcon />}
+              sx={{ height: 264, width: "100%", borderRadius: 2 }}
+            >
+              Upload supplier logo
+              <VisuallyHiddenInput
+                type="file"
+                // onChange={handleSelectDiamondImage}
+              />
+            </Button>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button variant="outlined" onClick={handleCloseDialog}>
