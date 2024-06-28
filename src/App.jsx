@@ -22,6 +22,10 @@ import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import Role from "./utilities/Role.js";
+import StaffList from "./components/Staff/List.jsx";
+import StaffDetail from "./components/Staff/Detail.jsx";
+import CustomerList from "./components/Customer/List.jsx";
+import CustomerDetail from "./components/Customer/Detail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -185,6 +189,51 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "staffs",
+        children: [
+          {
+            index: true,
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                  <StaffList />
+                </RoleBasedGuard>
+            ),
+          },
+          {
+            path: ":staffId",
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                  <StaffDetail/>
+                </RoleBasedGuard>
+            ),
+          },
+
+        ],
+      },
+      {
+        path: "customers",
+        children: [
+          {
+            index: true,
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                  <CustomerList />
+                </RoleBasedGuard>
+            ),
+          },
+          {
+            path: ":staffId",
+            element: (
+                <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
+                  <CustomerDetail/>
+                </RoleBasedGuard>
+            ),
+          },
+
+        ],
+      },
+
       {
         path: "service",
       },
