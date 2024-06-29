@@ -30,6 +30,7 @@ import {
   formattedDiamondSize,
   formattedMoney,
 } from "../../utilities/formatter.js";
+import { convertStatus } from "../../utilities/Status.jsx";
 
 const DetailList = () => {
   const { requestId } = useParams();
@@ -219,7 +220,9 @@ const DetailList = () => {
                 <StyledTableCell align="right">
                   {row.valuationPrice}
                 </StyledTableCell>
-                <StyledTableCell align="center">{row.status}</StyledTableCell>
+                <StyledTableCell align="center">
+                  {convertStatus(row.status)}
+                </StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton
                     color="primary"

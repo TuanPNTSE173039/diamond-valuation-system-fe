@@ -10,7 +10,10 @@ import { useSelector } from "react-redux";
 import { useBriefRequests } from "../../services/requests.js";
 import { formattedDateTime } from "../../utilities/formatter.js";
 import Role from "../../utilities/Role.js";
-import { valuationRequestStatus } from "../../utilities/Status.jsx";
+import {
+  convertStatus,
+  valuationRequestStatus,
+} from "../../utilities/Status.jsx";
 import { a11yProps, RequestHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
@@ -110,7 +113,7 @@ const RequestList = () => {
             .map((status, index) => (
               <Tab
                 key={status.id}
-                label={status.name}
+                label={convertStatus(status.name)}
                 {...a11yProps(index + 1)}
               />
             ))}

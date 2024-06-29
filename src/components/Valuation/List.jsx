@@ -11,7 +11,10 @@ import {
   formattedMoney,
 } from "../../utilities/formatter.js";
 
-import { diamondValuationStatus } from "../../utilities/Status.jsx";
+import {
+  convertStatus,
+  diamondValuationStatus,
+} from "../../utilities/Status.jsx";
 import { ValuationHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UITable from "../UI/Table.jsx";
@@ -51,7 +54,7 @@ const DiamondValuationList = () => {
       diamondOrigin: valuation.diamondOrigin,
       caratWeight: formattedCaratWeight(valuation?.caratWeight),
       valuationPrice: formattedMoney(valuation.valuationPrice),
-      status: valuation.status ? "Valuated" : "Valuating",
+      status: valuation.status ? "VALUATED" : "VALUATING",
     };
   });
   const handleChange = (event, newValue) => {
@@ -85,7 +88,7 @@ const DiamondValuationList = () => {
               .map((status, index) => (
                 <Tab
                   key={index}
-                  label={status.name}
+                  label={convertStatus(status.name)}
                   {...a11yProps(index + 1)}
                 />
               ))}

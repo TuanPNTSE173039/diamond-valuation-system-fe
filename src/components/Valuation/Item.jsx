@@ -124,7 +124,7 @@ const DiamondValuationItem = () => {
   const valuationInfor = {
     service: request?.service?.name,
     deadline: request?.returnDate,
-    status: !valuation?.status ? "Valuating" : "Valuated",
+    status: !valuation?.status ? "VALUATING" : "VALUATED",
   };
   const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({});

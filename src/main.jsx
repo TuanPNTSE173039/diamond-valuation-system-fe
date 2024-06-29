@@ -51,6 +51,18 @@ const theme = createTheme({
     secondary: {
       main: "#f50057",
     },
+    status: {
+      color: "#eff3f5",
+      pending: "#33595e",
+      processing: "#30cb83",
+      received: "#2133a1",
+      cancelled: "#e74c3c",
+      sealing: "#f39c12",
+      completed: "#9b59b6",
+      finished: "#f1c40f",
+      valuating: "#54a0ff",
+      valuated: "#b33771",
+    },
     highlight: { white: "#ffffff" },
   },
   typography: {
