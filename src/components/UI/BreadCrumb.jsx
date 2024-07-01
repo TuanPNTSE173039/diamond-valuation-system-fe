@@ -28,7 +28,7 @@ export default function UIBreadCrumb({ pathNames }) {
         separator={<NavigateNextIcon fontSize="small" />}
         aria-label="breadcrumb"
       >
-        {pathNames.map((value, index) => {
+        {pathNames.map((_value, index) => {
           const last = index === pathNames.length - 1;
           const to = `/${pathNames.slice(0, index + 1).join("/")}`;
 

@@ -1,27 +1,18 @@
 import React from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { useRequest } from "../../services/requests.js";
+import { useLocation } from "react-router-dom";
 import DetailList from "../Detail/List.jsx";
 import RecordList from "../Record/List.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
-import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIRequestHeader from "../UI/UIRequestHeader.jsx";
 import RequestGeneral from "./General.jsx";
 
 const RequestItem = () => {
-  const { requestId } = useParams();
-  const { data: request, isLoading } = useRequest(requestId);
-
   const location = useLocation();
   const pathNames = location.pathname.split("/").filter((x) => x);
-  if (isLoading) {
-    return <UICircularIndeterminate />;
-  }
   return (
     <>
       <UIBreadCrumb pathNames={pathNames} />
       <UIRequestHeader title={"Valuation Request"} />
-
       <RequestGeneral />
       <RecordList />
       <DetailList />
