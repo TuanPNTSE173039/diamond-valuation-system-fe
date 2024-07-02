@@ -10,7 +10,7 @@ import {
   MenuSelectHeading,
   RichTextEditor,
 } from "mui-tiptap";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import {forwardRef, useImperativeHandle, useRef} from "react";
 
 const UIRichTextEditor = forwardRef(({ value, isDisabled }, ref) => {
   const rteRef = useRef(null);

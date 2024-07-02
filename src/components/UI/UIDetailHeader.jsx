@@ -8,12 +8,12 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import * as React from "react";
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { checkDiamond } from "../../services/api.js";
+import {useState} from "react";
+import {Link, useParams} from "react-router-dom";
+import {toast} from "react-toastify";
+import {checkDiamond} from "../../services/api.js";
 
 export default function UIDetailHeader({ title, detail }) {
   const { detailId, requestId } = useParams();
@@ -114,14 +114,14 @@ export default function UIDetailHeader({ title, detail }) {
           <DialogContent>
             <label
               htmlFor="message"
-              className="block mb-2 text-md font-medium text-gray-900"
+              className="mb-2 block font-medium text-gray-900 text-md"
             >
               Your Reason
             </label>
             <textarea
               id="message"
               rows="4"
-              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:primary.main focus:border-blue-500"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 p-2.5 focus:primary.main focus:border-blue-500"
               placeholder="Write your reason here..."
               value={reason}
               onChange={(event) => setReason(event.target.value)}

@@ -1,12 +1,7 @@
 /* eslint-disable default-case */
-import {
-  getDownloadURL,
-  listAll,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import React, { useEffect, useState } from "react";
-import { storage } from "../services/config/firebase.js";
+import {getDownloadURL, listAll, ref, uploadBytesResumable,} from "firebase/storage";
+import React, {useEffect, useState} from "react";
+import {storage} from "../services/config/firebase.js";
 
 const metadata = {
   contentType: "image/jpeg",
@@ -122,7 +117,7 @@ const ImageUpload = () => {
       <div className="py-10">
         {/* Other UI elements */}
         {loadedImageUrl && (
-          <div className="mt-4 container mx-auto">
+          <div className="container mx-auto mt-4">
             <img
               src={loadedImageUrl}
               alt="Loaded from Firebase"
@@ -132,7 +127,7 @@ const ImageUpload = () => {
         )}
       </div>
       <div className="py-10">
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <div className="mx-auto max-w-md rounded-lg bg-white p-6 shadow-lg">
           <div className="mb-4">
             <input
               type="file"
@@ -142,7 +137,7 @@ const ImageUpload = () => {
             />
             <label
               htmlFor="imageInput"
-              className="block bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
+              className="block cursor-pointer rounded-lg bg-blue-500 px-4 py-2 text-white"
             >
               Select Image
             </label>
@@ -162,18 +157,18 @@ const ImageUpload = () => {
           {image && (
             <button
               onClick={handleUpload}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg"
+              className="rounded-lg bg-green-500 px-4 py-2 text-white"
             >
               Upload
             </button>
           )}
         </div>
         {uploadedImages.length > 0 && (
-          <div className="mt-4 container mx-auto">
+          <div className="container mx-auto mt-4">
             <h2 className="text-lg font-semibold">Uploaded Images</h2>
             <div className="mt-2 masonry sm:masonry-sm md:masonry-md">
               {uploadedImages.map((url, index) => (
-                <div key={index} className="rounded-lg mb-6 break-inside">
+                <div key={index} className="mb-6 rounded-lg break-inside">
                   <img
                     src={url}
                     alt={`Uploaded ${index}`}

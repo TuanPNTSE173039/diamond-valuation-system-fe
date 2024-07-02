@@ -9,14 +9,11 @@ import StraightenIcon from "@mui/icons-material/Straighten";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import * as React from "react";
-import { useParams } from "react-router-dom";
-import { useCustomer } from "../../services/customers.js";
-import { useDetail } from "../../services/details.js";
-import { useRequest } from "../../services/requests.js";
-import {
-  formattedDiamondSize,
-  formattedMoney,
-} from "../../utilities/formatter.js";
+import {useParams} from "react-router-dom";
+import {useCustomer} from "../../services/customers.js";
+import {useDetail} from "../../services/details.js";
+import {useRequest} from "../../services/requests.js";
+import {formattedDiamondSize, formattedMoney,} from "../../utilities/formatter.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import DiamondValuationInforItem from "./InforItem.jsx";
 

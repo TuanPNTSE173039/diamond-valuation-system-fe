@@ -401,3 +401,43 @@ export const convertStatus = (status) => {
       );
   }
 };
+export const convertRecordStatus = (status) => {
+  switch (status) {
+    case "Not yet":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.pending" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Not yet
+        </Typography>
+      );
+    case "Processing":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.processing" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Processing
+        </Typography>
+      );
+    case "Done":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.received" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Done
+        </Typography>
+      );
+  }
+}

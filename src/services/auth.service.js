@@ -1,4 +1,4 @@
-import { axiosInstance } from "./config/axiosInstance.js";
+import {axiosInstance} from "./config/axiosInstance.js";
 
 const login = async (username, password) => {
   const response = await axiosInstance.post("/auth/login", {

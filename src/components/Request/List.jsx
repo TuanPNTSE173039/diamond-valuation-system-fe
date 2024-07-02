@@ -3,18 +3,15 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { useQueryClient } from "@tanstack/react-query";
+import {useQueryClient} from "@tanstack/react-query";
 import * as React from "react";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useBriefRequests } from "../../services/requests.js";
-import { formattedDateTime } from "../../utilities/formatter.js";
+import {useState} from "react";
+import {useSelector} from "react-redux";
+import {useBriefRequests} from "../../services/requests.js";
+import {formattedDateTime} from "../../utilities/formatter.js";
 import Role from "../../utilities/Role.js";
-import {
-  convertStatus,
-  valuationRequestStatus,
-} from "../../utilities/Status.jsx";
-import { a11yProps, RequestHeadCells } from "../../utilities/table.js";
+import {convertStatus, valuationRequestStatus,} from "../../utilities/Status.jsx";
+import {a11yProps, RequestHeadCells} from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDateRangePicker from "../UI/DateRangePicker.jsx";
 import UISearch from "../UI/Search.jsx";

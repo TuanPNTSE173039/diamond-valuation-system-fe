@@ -1,12 +1,12 @@
-import { Card, CardActions, CardContent } from "@mui/material";
+import {Card, CardActions, CardContent} from "@mui/material";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { postPayment, updateValuationRequest } from "../../services/api.js";
-import { useRequest } from "../../services/requests.js";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useNavigate, useParams} from "react-router-dom";
+import {toast} from "react-toastify";
+import {postPayment, updateValuationRequest} from "../../services/api.js";
+import {useRequest} from "../../services/requests.js";
 
 const RecordReceipt = () => {
   const navigate = useNavigate();

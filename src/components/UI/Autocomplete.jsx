@@ -1,4 +1,4 @@
-import { Avatar } from "@mui/material";
+import {Avatar} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";

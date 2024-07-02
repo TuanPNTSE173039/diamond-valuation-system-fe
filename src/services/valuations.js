@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import Role from "../utilities/Role.js";
-import { axiosInstance } from "./config/axiosInstance.js";
+import {axiosInstance} from "./config/axiosInstance.js";
 
 export const useValuations = (pageNo, pageSize, userRole, userId, status) => {
   let url;

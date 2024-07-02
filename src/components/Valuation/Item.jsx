@@ -1,32 +1,26 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  FormControl,
-  ImageList,
-  ImageListItem,
-  InputAdornment,
-  OutlinedInput,
-} from "@mui/material";
+import {FormControl, ImageList, ImageListItem, InputAdornment, OutlinedInput,} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import { styled } from "@mui/material/styles";
+import {styled} from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getDownloadURL, listAll, ref } from "firebase/storage";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {getDownloadURL, listAll, ref} from "firebase/storage";
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { updateDiamondValuation } from "../../services/api.js";
-import { storage } from "../../services/config/firebase.js";
-import { useDetail } from "../../services/details.js";
-import { useRequest } from "../../services/requests.js";
-import { useValuation } from "../../services/valuations.js";
-import { formattedDate } from "../../utilities/formatter.js";
-import { loadImageByPath } from "../../utilities/imageLoader.js";
-import { getPreviousStatus } from "../../utilities/Status.jsx";
+import {useEffect, useRef, useState} from "react";
+import {useLocation, useParams} from "react-router-dom";
+import {toast} from "react-toastify";
+import {updateDiamondValuation} from "../../services/api.js";
+import {storage} from "../../services/config/firebase.js";
+import {useDetail} from "../../services/details.js";
+import {useRequest} from "../../services/requests.js";
+import {useValuation} from "../../services/valuations.js";
+import {formattedDate} from "../../utilities/formatter.js";
+import {loadImageByPath} from "../../utilities/imageLoader.js";
+import {getPreviousStatus} from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIRichTextEditor from "../UI/RichTexEditor.jsx";
@@ -329,7 +323,7 @@ const DiamondValuationItem = () => {
             <Stack
               direction="row"
               spacing={4}
-              className="justify-between items-start"
+              className="items-start justify-between"
             >
               <DiamondValuationInfor
                 className="w-3/5"

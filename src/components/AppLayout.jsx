@@ -1,12 +1,12 @@
-import { Container } from "@mui/material";
+import {Container} from "@mui/material";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import { useTheme } from "@mui/material/styles";
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import {useTheme} from "@mui/material/styles";
+import {useState} from "react";
+import {Outlet} from "react-router-dom";
+import {ToastContainer} from "react-toastify";
 import UIAppBar from "./UI/AppBar.jsx";
-import UIDrawer, { DrawerHeader } from "./UI/Drawer.jsx";
+import UIDrawer, {DrawerHeader} from "./UI/Drawer.jsx";
 
 export default function AppLayout() {
   const theme = useTheme();

@@ -1,4 +1,4 @@
-import { axiosInstance } from "./config/axiosInstance.js";
+import {axiosInstance} from "./config/axiosInstance.js";
 
 // ---CUSTOMERS---
 export const getCustomers = async () => {

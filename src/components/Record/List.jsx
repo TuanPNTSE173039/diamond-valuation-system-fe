@@ -1,76 +1,55 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { updateValuationRequest } from "../../services/api.js";
-import { useRequest } from "../../services/requests.js";
-import { formattedDate } from "../../utilities/formatter.js";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
+import {useRecords} from "../../services/records.js";
+import {useRequest} from "../../services/requests.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import RecordItem from "./Item.jsx";
 
 export default function RecordList() {
-  const navigate = useNavigate();
   const { requestId } = useParams();
   const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
-  const queryClient = useQueryClient();
-  const { mutate: updateReceiptLink } = useMutation({
-    mutationFn: (body) => {
-      return updateValuationRequest(requestId, body);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["request", { requestId: requestId }],
-      });
-    },
-  });
-  const [mode, setMode] = useState({
-    receipt: false,
-    return: false,
-    commitment: false,
-    sealing: false,
+  const {data: records, isFetching: isRecordFetching} = useRecords(requestId);
+
+  const [recordInfo, setRecordInfo] = useState({
+    receiptRecord: null,
+    returnRecord: null,
+    commitmentRecord: null,
+    sealingRecord: null,
   });
 
-  const receiptStatus = !mode.receipt
-    ? "Not yet"
-    : request?.payment.length === 0
-      ? "Processing"
-      : "Done";
-  const returnStatus = !mode.return
-    ? "Not yet"
-    : request?.payment.length === 2
-      ? "Done"
-      : "Processing";
   useEffect(() => {
-    if (request) {
-      setMode((prev) => {
+    if (records) {
+      const receipt = records.find((record) => record.type === "RECEIPT");
+      const returned = records.find((record) => record.type === "RETURN");
+      const commitment = records.find((record) => record.type === "COMMITMENT");
+      const sealing = records.find((record) => record.type === "SEALING");
+      setRecordInfo((prev) => {
         return {
           ...prev,
-          receipt: request?.receiptLink !== null,
-          return: request?.returnLink !== null,
+          receiptRecord: {
+            status: receipt?.status,
+            date: receipt?.creationDate
+          },
+          returnRecord:{
+            status: returned?.status,
+            date: returned?.creationDate
+          },
+          commitmentRecord: {
+            status: commitment?.status,
+            date: commitment?.creationDate
+          },
+          sealingRecord: {
+            status: sealing?.status,
+            date: sealing?.creationDate
+          },
         };
       });
     }
-  }, [request]);
+  }, [records]);
 
-  const handleReceipt = () => {
-    navigate("receipt");
-  };
-
-  const handleReturn = () => {
-    navigate("return");
-  };
-
-  const handleCommitment = () => {
-    setMode((prev) => ({ ...prev, commitment: true }));
-    navigate("commitment");
-  };
-
-  const handleSealing = () => {
-    setMode((prev) => ({ ...prev, sealing: true }));
-    navigate("sealing");
-  };
-  if (isRequestLoading) {
+  if (isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;
   }
   return (
@@ -81,27 +60,23 @@ export default function RecordList() {
       <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
         <RecordItem
           title="Receipt"
-          mode={mode.receipt}
-          status={receiptStatus}
-          date={formattedDate(request?.receiptDate)}
-          handleMode={handleReceipt}
+          navLink="receipt"
+          status={recordInfo.receiptRecord?.status}
+          date={recordInfo.receiptRecord?.date}
         />
         <RecordItem
           title="Return"
-          mode={mode.return}
-          status={returnStatus}
-          date={formattedDate(request?.returnDate)}
-          handleMode={handleReturn}
+          navLink="return"
+          status={recordInfo.returnRecord?.status}
+          date={recordInfo.returnRecord?.date}
         />
         <RecordItem
           title="Commitment"
-          mode={mode.commitment}
-          handleMode={handleCommitment}
+          navLink="commitment"
         />
         <RecordItem
           title="Sealing"
-          mode={mode.sealing}
-          handleMode={handleSealing}
+          navLink="sealing"
         />
       </Box>
     </Box>

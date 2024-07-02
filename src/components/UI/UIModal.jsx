@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import {useEffect, useRef} from "react";
+import {createPortal} from "react-dom";
 
 export default function UIModal({ children, open, className = "", close }) {
   const dialog = useRef();

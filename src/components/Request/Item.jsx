@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import DetailList from "../Detail/List.jsx";
 import RecordList from "../Record/List.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";

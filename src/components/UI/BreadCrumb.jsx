@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 // import Link from "@mui/material/Link";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import {Link as RouterLink, useParams} from "react-router-dom";
 
 function LinkRouter(props) {
   return <Link {...props} component={RouterLink} />;
@@ -18,6 +18,10 @@ export default function UIBreadCrumb({ pathNames }) {
     "/requests": "Requests",
     [`/requests/${requestId}`]: requestId,
     [`/requests/${requestId}/${detailId}`]: detailId,
+    [`/requests/${requestId}/receipt`]: "Receipt",
+    [`/requests/${requestId}/return`]: "Return",
+    [`/requests/${requestId}/commitment`]: "Commitment",
+    [`/requests/${requestId}/sealing`]: "Sealing",
     "/valuations": "Valuations",
     [`/valuations/${valuationId}`]: valuationId,
   };

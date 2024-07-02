@@ -1,11 +1,6 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  AvatarGroup,
-  DialogContentText,
-  ImageList,
-  ImageListItem,
-} from "@mui/material";
+import {AvatarGroup, DialogContentText, ImageList, ImageListItem,} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -15,30 +10,25 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
-import { styled } from "@mui/material/styles";
+import {styled} from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  getDownloadURL,
-  listAll,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {getDownloadURL, listAll, ref, uploadBytesResumable,} from "firebase/storage";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import Carousel from "react-material-ui-carousel";
-import { useSelector } from "react-redux";
-import { useLocation, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { updateDetail, updateDiamondNote } from "../../services/api.js";
-import { storage } from "../../services/config/firebase.js";
-import { useDetail } from "../../services/details.js";
-import { useStaffs } from "../../services/staffs.js";
-import { getStaffById } from "../../utilities/filtering.js";
-import { formattedDate, formattedMoney } from "../../utilities/formatter.js";
-import { loadImageByPath } from "../../utilities/imageLoader.js";
+import {useSelector} from "react-redux";
+import {useLocation, useParams} from "react-router-dom";
+import {toast} from "react-toastify";
+import {updateDetail, updateDiamondNote} from "../../services/api.js";
+import {storage} from "../../services/config/firebase.js";
+import {useDetail} from "../../services/details.js";
+import {useStaffs} from "../../services/staffs.js";
+import {getStaffById} from "../../utilities/filtering.js";
+import {formattedDate, formattedMoney} from "../../utilities/formatter.js";
+import {loadImageByPath} from "../../utilities/imageLoader.js";
 import Role from "../../utilities/Role.js";
-import { getPreviousStatus } from "../../utilities/Status.jsx";
+import {getPreviousStatus} from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIDetailHeader from "../UI/UIDetailHeader.jsx";
@@ -427,7 +417,7 @@ const DetailItem = () => {
                 <Box>
                   {!detail.mode ? (
                     <Box sx={{ mt: 2 }}>
-                      <h2 className="text-xl mb-1/2 font-bold">
+                      <h2 className="text-xl font-bold mb-1/2">
                         {resultStaff.staff.firstName +
                           " " +
                           resultStaff.staff.lastName}
@@ -447,7 +437,7 @@ const DetailItem = () => {
                     <Carousel sx={{ mt: 5, height: "100%" }}>
                       {resultStaff.map((item, index) => (
                         <Box sx={{ mt: 2 }} key={index}>
-                          <h2 className="text-xl mb-1/2 font-bold">
+                          <h2 className="text-xl font-bold mb-1/2">
                             {item.staff.firstName + " " + item.staff.lastName}
                           </h2>
                           <p>{item.comment}</p>

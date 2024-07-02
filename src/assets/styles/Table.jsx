@@ -1,14 +1,14 @@
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
-import { alpha, styled } from "@mui/material/styles";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import {alpha, styled} from "@mui/material/styles";
+import TableCell, {tableCellClasses} from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { visuallyHidden } from "@mui/utils";
+import {visuallyHidden} from "@mui/utils";
 import PropTypes from "prop-types";
 import * as React from "react";
 

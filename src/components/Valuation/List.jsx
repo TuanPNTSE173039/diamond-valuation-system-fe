@@ -2,20 +2,13 @@ import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useValuations } from "../../services/valuations.js";
-import {
-  formattedCaratWeight,
-  formattedDateTime,
-  formattedMoney,
-} from "../../utilities/formatter.js";
+import {useState} from "react";
+import {useSelector} from "react-redux";
+import {useValuations} from "../../services/valuations.js";
+import {formattedCaratWeight, formattedDateTime, formattedMoney,} from "../../utilities/formatter.js";
 
-import {
-  convertStatus,
-  diamondValuationStatus,
-} from "../../utilities/Status.jsx";
-import { ValuationHeadCells } from "../../utilities/table.js";
+import {convertStatus, diamondValuationStatus,} from "../../utilities/Status.jsx";
+import {ValuationHeadCells} from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";

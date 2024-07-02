@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import {format} from "date-fns";
 
 export function formattedDateTime(date) {
   return format(new Date(date), "yyyy/MM/dd - HH:mm:ss");

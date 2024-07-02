@@ -1,36 +1,38 @@
+import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
-import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import pdfMake from "pdfmake/build/pdfmake";
-import {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {toast} from "react-toastify";
 import {postPayment} from "../../../services/api.js";
 import {useCustomer} from "../../../services/customers.js";
-import {createRecord, useRecord} from "../../../services/records.js";
+import {createRecord, useRecords} from "../../../services/records.js";
 import {useRequest} from "../../../services/requests.js";
 import {formattedDate, formattedDateTime, formattedMoney,} from "../../../utilities/formatter.js";
 import {loadImageByPath} from "../../../utilities/imageLoader.js";
 import {getDetailInformation} from "../../../utilities/record.js";
+import UIBreadCrumb from "../../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
 const RecordScreenReceipt = () => {
   const { requestId } = useParams();
   const navigate = useNavigate();
-  const { data: receipt, isLoading: isReceiptLoading } = useRecord(
-    requestId,
-    "RECEIPT",
-  );
+  const location = useLocation();
+  const pathNames = location.pathname.split("/").filter((x) => x);
+  const {data: records, isFetching: isRecordFetching}  = useRecords(requestId);
   const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
   const { data: customer, isLoading: isCustomerLoading } = useCustomer(
     request?.customerID,
   );
+
+  const queryClient = useQueryClient();
   const { mutate: firstPayment } = useMutation({
     mutationFn: (body) => {
       return postPayment(body);
@@ -43,7 +45,6 @@ const RecordScreenReceipt = () => {
       });
     },
   });
-
   const { mutate: createReceipt } = useMutation({
     mutationFn: (body) => {
       return createRecord(body);
@@ -51,7 +52,7 @@ const RecordScreenReceipt = () => {
     onSuccess: () => {
       toast.success("Create receipt successfully");
       queryClient.invalidateQueries({
-        queryKey: ["record", { requestId: requestId, recordType: "RECEIPT" }],
+        queryKey: ["records", { requestId: requestId }],
       });
     },
   });
@@ -60,7 +61,59 @@ const RecordScreenReceipt = () => {
   const [logo, setLogo] = useState(null);
   const [url, setUrl] = useState(null);
 
-  const getReceiptContent = () => {
+  const getReceiptContent = (payment = null) => {
+    const returnDate = request.returnDate || new Date();
+    let payStatus = {
+
+    }
+    let signature = {
+        text: "",
+        margin: [0, 50],
+      };
+
+    if (payment) {
+      payStatus = {
+        text: "Paid",
+        color: "#06D001",
+        style: "subheader",
+        alignment: "right",
+        margin: [0, 5, 0, 5],
+      };
+      signature = {
+        columns: [
+          {
+            text: [
+              {
+                text: `Signed by: ${customer.firstName} ${customer.lastName}\n`,
+              },
+              {
+                text: `Sign date: ${formattedDateTime(payment.paytime)}\n`,
+              },
+              {
+                text: `Payment: ${payment.paymentMethod.name}\n`,
+              },
+            ],
+            color: "#EE4E4E",
+            width: "50%",
+            alignment: "left",
+          },
+          {
+            text: [
+              {
+                text: `Signed by: H&T Diamond Representative\n`,
+              },
+              {
+                text: `Sign date: ${formattedDateTime(payment.paytime)}\n`,
+              },
+            ],
+            color: "#EE4E4E",
+            width: "50%",
+            alignment: "left",
+          },
+        ],
+        margin: [0, 20, 0, 0],
+      };
+    }
     return {
       content: [
         {
@@ -90,6 +143,8 @@ const RecordScreenReceipt = () => {
                   fontSize: 12,
                   alignment: "right",
                 },
+                payStatus
+
               ],
             },
           ],
@@ -125,7 +180,7 @@ const RecordScreenReceipt = () => {
                   style: "para",
                 },
                 {
-                  text: `Email: ${customer.email}\n`,
+                  text: `Email: ${customer.account.email}\n`,
                   style: "para",
                 },
                 {
@@ -165,7 +220,7 @@ const RecordScreenReceipt = () => {
                   style: "subheader",
                 },
                 {
-                  text: `${formattedDateTime(request.returnDate)}`,
+                  text: `${formattedDateTime(returnDate)}`,
                 },
               ],
               margin: [0, 20, 0, 0],
@@ -231,10 +286,8 @@ const RecordScreenReceipt = () => {
               alignment: "justify",
             },
           ],
-
           margin: [0, 15, 0, 0],
         },
-
         {
           columns: [
             {
@@ -258,10 +311,7 @@ const RecordScreenReceipt = () => {
           ],
           margin: [0, 20, 0, 0],
         },
-        {
-          text: "",
-          margin: [0, 50],
-        },
+        signature,
         {
           text: "Note: ",
           style: "subheader",
@@ -340,10 +390,13 @@ const RecordScreenReceipt = () => {
   };
 
   useEffect(() => {
+    const receipt = records?.find(
+      (record) => record.type === "RECEIPT"
+    );
     if (receipt) {
       setUrl(receipt.link);
     }
-  }, [receipt]);
+  }, [records]);
 
   let pdfGenerator = null;
 
@@ -352,7 +405,8 @@ const RecordScreenReceipt = () => {
   }
 
   const handleDownload = () => {
-    pdfGenerator.download(`receipt-${requestId}.pdf`);
+    const doc = getReceiptContent();
+    pdfMake.createPdf(doc).download(`receipt-${requestId}.pdf`);
   };
   const handleCreateReceipt = () => {
     const doc = getReceiptContent();
@@ -368,7 +422,19 @@ const RecordScreenReceipt = () => {
   };
 
   const handleView = () => {
-    pdfGenerator?.getBlob((blob) => {
+    const payment = {
+            "id": 38,
+            "paytime": "2024-06-03T03:00:27.367+00:00",
+            "amount": 100000.0,
+            "externalTransaction": "none",
+            "paymentMethod": {
+                "id": 1,
+                "name": "MOMO"
+            },
+            "valuationRequestID": 84
+        };
+    const doc = getReceiptContent(payment);
+    pdfMake.createPdf(doc)?.getBlob((blob) => {
       const url = URL.createObjectURL(blob);
       setUrl(url);
     });
@@ -385,7 +451,7 @@ const RecordScreenReceipt = () => {
     firstPayment(paymentBody);
   };
 
-  if (isCustomerLoading || isRequestLoading || isReceiptLoading) {
+  if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;
   }
 
@@ -396,8 +462,10 @@ const RecordScreenReceipt = () => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
+        <UIBreadCrumb pathNames={pathNames} />
         <Typography variant="h4">Receipt Record</Typography>
         <Button variant={"contained"} onClick={handleFirstPayment}>
           Create Payment
@@ -416,10 +484,10 @@ const RecordScreenReceipt = () => {
         </IconButton>
         <IconButton
           aria-label="Save"
-          color="primary"
+          color="secondary"
           onClick={handleCreateReceipt}
         >
-          <SaveAltIcon />
+          <AddIcon />
         </IconButton>
       </Stack>
       <br />
@@ -433,7 +501,7 @@ const RecordScreenReceipt = () => {
           />
         </Box>
       )}
-      {!url && <UICircularIndeterminate />}
+      {!url && isRecordFetching && <UICircularIndeterminate />}
     </Box>
   );
 };

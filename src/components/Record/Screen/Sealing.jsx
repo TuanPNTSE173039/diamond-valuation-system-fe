@@ -1,8 +1,8 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import pdfMake from "pdfmake/build/pdfmake";
-import { useEffect, useState } from "react";
-import { loadImageByPath } from "../../../utilities/imageLoader.js";
+import {useEffect, useState} from "react";
+import {loadImageByPath} from "../../../utilities/imageLoader.js";
 
 const RecordScreenSealing = () => {
   const [logo, setLogo] = useState(null);
