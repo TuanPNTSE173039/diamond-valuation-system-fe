@@ -17,7 +17,6 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as React from "react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -38,11 +37,11 @@ const DetailList = () => {
   const navigate = useNavigate();
   const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
   const queryClient = useQueryClient();
-  const { mutate, isPending, isError } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: (body) => {
       return checkDiamond(body.id, body);
     },
-    onSuccess: (body) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["request", { requestId: requestId }],
       });

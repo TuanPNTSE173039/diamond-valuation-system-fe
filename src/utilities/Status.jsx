@@ -375,5 +375,29 @@ export const convertStatus = (status) => {
           Valuated
         </Typography>
       );
+    case "ASSESSING":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.assessing" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Assessing
+        </Typography>
+      );
+    case "ASSESSED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.assessed" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Assessed
+        </Typography>
+      );
   }
 };

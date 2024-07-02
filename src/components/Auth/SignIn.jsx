@@ -11,7 +11,6 @@ import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useFormik } from "formik";
-import * as React from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +33,6 @@ export default function AuthSignIn() {
   let navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const { isLoggedIn, user } = useSelector((state) => state.auth);
   const { message } = useSelector((state) => state.message);
   const dispatch = useDispatch();
   useEffect(() => {
