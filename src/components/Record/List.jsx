@@ -54,11 +54,7 @@ export default function RecordList() {
   }, [request]);
 
   const handleReceipt = () => {
-    if (!mode.receipt) {
-      updateReceiptLink({ ...request, receiptLink: "receipt.pdf" });
-    } else {
-      navigate("receipt");
-    }
+    navigate("receipt");
   };
 
   const handleReturn = () => {
