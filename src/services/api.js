@@ -9,6 +9,11 @@ export const getCustomer = async (customerID) => {
   const response = await axiosInstance.get(`customers/${customerID}`);
   return response.data;
 };
+export const banCustomer = async (customerID) => {
+  const response = await axiosInstance.delete(`/customers/${customerID}`);
+  return response.data;
+};
+
 
 // ---DIAMOND VALUATION---
 export const updateDiamondNote = (id, body) =>
@@ -64,4 +69,12 @@ export const checkDiamond = (id, body) =>
 export const updateDetail = (id, body) =>
   axiosInstance.put(`valuation-request-details/${id}`, body);
 
-
+// ---STAFF---
+export const registerStaff = async (staffData) => {
+  const response = await axiosInstance.post('auth/register-staff', staffData);
+  return response.data;
+};
+export const deleteStaff = async (staffId) => {
+  const response = await axiosInstance.delete(`/staffs/${staffId}`);
+  return response.data;
+};

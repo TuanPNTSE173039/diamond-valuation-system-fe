@@ -209,7 +209,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: ":staffId",
+            path: ":customerId",
             element: (
               <RoleBasedGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}>
                 <CustomerDetail />

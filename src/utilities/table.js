@@ -356,6 +356,13 @@ export const StaffHeadCells = [
     disablePadding: false,
     label: "Current Valuations",
   },
+  {
+    id: "role",
+    numeric: true,
+    disablePadding: false,
+    label: "Role",
+  },
+
 
 ];
 

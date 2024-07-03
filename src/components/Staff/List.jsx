@@ -1,57 +1,44 @@
+import React, { useState } from "react";
+import {
+    Box,
+    Button,
+    Tab,
+    Tabs,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Typography,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import * as React from "react";
-import { useState } from "react";
 import { a11yProps, StaffHeadCells } from "../../utilities/table.js";
 import UISearch from "../UI/Search.jsx";
 import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 import RegisterStaff from "./Form.jsx";
-
-// Sample data
-const initialStaff = [
-    {
-        id: "1",
-        staffName: "John",
-        staffPhone: "1234567890",
-        yearExperience: 5,
-        totalProjects: 10,
-        currentProjects: 2,
-        status: "VALUATION STAFF",
-    },
-    {
-        id: "2",
-        staffName: "Jane",
-        staffPhone: "0987654321",
-        yearExperience: 3,
-        totalProjects: 5,
-        currentProjects: 1,
-        status: "CONSULTANT STAFF",
-    },
-];
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
+import { useStaffList } from "../../services/staffs";
+import Role from "../../utilities/Role.js";
+import {useSelector} from "react-redux";
 
 const staffStatus = [
-    { id: 0, name: "VALUATION STAFF", roles: ["MANAGER"] },
-    { id: 1, name: "CONSULTANT STAFF", roles: ["MANAGER"] },
+    { id: 0, name: "All", roles: [Role.MANAGER, Role.ADMIN] },
+    { id: 1, name: "Consultant Staff", roles: [Role.MANAGER, Role.ADMIN] },
+    { id: 2, name: "Valuation Staff", roles: [Role.MANAGER, Role.ADMIN] },
+    { id: 3, name: "Former Staff", roles: [Role.MANAGER, Role.ADMIN] },
 ];
 
 const StaffList = () => {
-    const userRole = "MANAGER"; // Example role, replace with actual user role
+    const { user: currentUser } = useSelector((state) => state.auth);
+    const userRole = currentUser?.account.role;
 
-    const [staff] = useState(initialStaff);
+    const [statusIndex, setStatusIndex] = useState(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [selectedStaff, setSelectedStaff] = useState([]);
-    const [statusIndex, setStatusIndex] = useState(0);
-
     const [open, setOpen] = useState(false);
+
+    const { data: staffResponse = {}, isFetching, error } = useStaffList(rowsPerPage, page);
 
     const handleChange = (event, newValue) => {
         setStatusIndex(newValue);
@@ -65,20 +52,37 @@ const StaffList = () => {
         setOpen(false);
     };
 
-    const filteredStaff =
-        statusIndex === 0
-            ? staff
-            : staff.filter((s) => s.status === staffStatus[statusIndex].name);
+    const filterStaff = (staff) => {
+        switch (statusIndex) {
+            case 1:
+                return staff.account.role === Role.CONSULTANT && staff.account.is_active;
+            case 2:
+                return staff.account.role === Role.VALUATION && staff.account.is_active;
+            case 3:
+                return !staff.account.is_active;
+            default:
+                return true;
+        }
+    };
 
-    const staffRows = filteredStaff.map((row) => ({
+    const staffRows = (staffResponse.content || []).filter(filterStaff).map((row) => ({
         id: row.id,
-        staffName: row.staffName,
-        staffPhone: row.staffPhone,
-        yearExperience: row.yearExperience,
-        totalProjects: row.totalProjects,
-        currentProjects: row.currentProjects,
-        status: row.status,
+        number: row.id,
+        staffName: `${row.firstName} ${row.lastName}`,
+        staffPhone: row.phone.trim(),
+        yearExperience: row.experience,
+        totalProjects: row.countProject,
+        currentProjects: row.currentTotalProject,
+        role: row.account.role === Role.CONSULTANT ? "Consultant Staff" : "Valuation Staff",
     }));
+
+    if (isFetching) {
+        return <UICircularIndeterminate />;
+    }
+
+    if (error) {
+        return <Typography variant="h6" color="error">Error loading staff data.</Typography>;
+    }
 
     return (
         <Box sx={{ width: "100%" }}>
@@ -119,12 +123,12 @@ const StaffList = () => {
                         <UITable
                             heading={status.name}
                             headCells={StaffHeadCells}
-                            rows={statusIndex === index ? staffRows : []}
+                            rows={staffRows}
                             selected={selectedStaff}
                             setSelected={setSelectedStaff}
                             page={page}
                             setPage={setPage}
-                            count={filteredStaff.length}
+                            count={staffResponse.totalElement}
                             rowsPerPage={rowsPerPage}
                             setRowsPerPage={setRowsPerPage}
                         >

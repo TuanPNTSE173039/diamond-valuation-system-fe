@@ -21,3 +21,17 @@ export const useCustomer = (id) => {
     enabled: id !== undefined && id !== null,
   });
 };
+
+export const useValuationRequests = (customerId, pageSize = 5, page = 0) => {
+  return useQuery({
+    queryKey: ["valuationRequests", { customerId, pageSize, page }],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`valuation-requests/customer/${customerId}`, {
+        params: { pageSize, page }
+      });
+      return response.data;
+    },
+    enabled: customerId !== undefined && customerId !== null,
+  });
+};
+
