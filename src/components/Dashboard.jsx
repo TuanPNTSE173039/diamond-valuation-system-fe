@@ -1,4 +1,4 @@
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Dashboard = () => {
   const count = useSelector((state) => state.counter.value);

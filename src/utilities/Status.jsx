@@ -440,4 +440,4 @@ export const convertRecordStatus = (status) => {
         </Typography>
       );
   }
-}
+};

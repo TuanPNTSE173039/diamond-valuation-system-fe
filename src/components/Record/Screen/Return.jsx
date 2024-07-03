@@ -6,17 +6,21 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import pdfMake from "pdfmake/build/pdfmake";
-import {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {toast} from "react-toastify";
-import {postPayment, updateValuationRequest} from "../../../services/api.js";
-import {useCustomer} from "../../../services/customers.js";
-import {useRequest} from "../../../services/requests.js";
-import {formattedDate, formattedDateTime, formattedMoney,} from "../../../utilities/formatter.js";
-import {loadImageByPath} from "../../../utilities/imageLoader.js";
-import {gerServiceInformation} from "../../../utilities/record.js";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { postPayment, updateValuationRequest } from "../../../services/api.js";
+import { useCustomer } from "../../../services/customers.js";
+import { useRequest } from "../../../services/requests.js";
+import {
+  formattedDate,
+  formattedDateTime,
+  formattedMoney,
+} from "../../../utilities/formatter.js";
+import { loadImageByPath } from "../../../utilities/imageLoader.js";
+import { gerServiceInformation } from "../../../utilities/record.js";
 import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
 const RecordScreenReturn = () => {

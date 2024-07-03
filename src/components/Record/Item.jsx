@@ -1,11 +1,11 @@
-import {Card, CardActions, CardContent} from "@mui/material";
+import { Card, CardActions, CardContent } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import {useNavigate, useParams} from "react-router-dom";
-import {formattedDate} from "../../utilities/formatter.js";
-import {convertRecordStatus} from "../../utilities/Status.jsx";
+import { useNavigate, useParams } from "react-router-dom";
+import { formattedDate } from "../../utilities/formatter.js";
+import { convertRecordStatus } from "../../utilities/Status.jsx";
 
 const RecordItem = ({ title, navLink, status, date }) => {
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ const RecordItem = ({ title, navLink, status, date }) => {
   function handleNavigateToDetail() {
     navigate(navLink);
   }
-
 
   return (
     <Paper elevation={3} sx={{ mb: 0.5, minWidth: "275px" }}>
@@ -36,7 +35,13 @@ const RecordItem = ({ title, navLink, status, date }) => {
             >
               {title}
             </Typography>
-            {convertRecordStatus(status === null || status === undefined ? "Not yet" : (status === true ? "Done" : "Processing"))}
+            {convertRecordStatus(
+              status === null || status === undefined
+                ? "Not yet"
+                : status === true
+                  ? "Done"
+                  : "Processing",
+            )}
           </Box>
         </CardContent>
         <CardActions>

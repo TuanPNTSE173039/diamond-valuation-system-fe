@@ -5,17 +5,17 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import {useQuery} from "@tanstack/react-query";
-import {getDownloadURL, ref as loadImageRef} from "firebase/storage";
-import React, {useEffect, useRef, useState} from "react";
-import {useParams} from "react-router-dom";
-import {Margin, Resolution, usePDF} from "react-to-pdf";
+import { useQuery } from "@tanstack/react-query";
+import { getDownloadURL, ref as loadImageRef } from "firebase/storage";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Margin, Resolution, usePDF } from "react-to-pdf";
 import logo from "../../../assets/images/logo.png";
-import {getValuationRequest} from "../../../services/api.js";
-import {storage} from "../../../services/config/firebase.js";
+import { getValuationRequest } from "../../../services/api.js";
+import { storage } from "../../../services/config/firebase.js";
 
-import {formattedMoney} from "../../../utilities/formatter.js";
-import {clarityCharacteristicConverter} from "../../../utilities/Status.jsx";
+import { formattedMoney } from "../../../utilities/formatter.js";
+import { clarityCharacteristicConverter } from "../../../utilities/Status.jsx";
 import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
 const RecordScreenResult = () => {

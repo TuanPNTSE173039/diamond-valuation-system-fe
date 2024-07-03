@@ -1,23 +1,41 @@
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import LoopIcon from "@mui/icons-material/Loop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { format } from "date-fns";
+import { sha512 } from "js-sha512";
 import pdfMake from "pdfmake/build/pdfmake";
-import React, {useEffect, useState} from "react";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {toast} from "react-toastify";
-import {postPayment} from "../../../services/api.js";
-import {useCustomer} from "../../../services/customers.js";
-import {createRecord, useRecords} from "../../../services/records.js";
-import {useRequest} from "../../../services/requests.js";
-import {formattedDate, formattedDateTime, formattedMoney,} from "../../../utilities/formatter.js";
-import {loadImageByPath} from "../../../utilities/imageLoader.js";
-import {getDetailInformation} from "../../../utilities/record.js";
+import qs from "qs";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { frontendUrl } from "../../../services/config/axiosInstance.js";
+import { useCustomer } from "../../../services/customers.js";
+import {
+  createRecord,
+  updateRecord,
+  useRecords,
+} from "../../../services/records.js";
+import { useRequest } from "../../../services/requests.js";
+import {
+  formattedDate,
+  formattedDateTime,
+  formattedMoney,
+} from "../../../utilities/formatter.js";
+import { loadImageByPath } from "../../../utilities/imageLoader.js";
+import { getDetailInformation } from "../../../utilities/record.js";
 import UIBreadCrumb from "../../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
@@ -26,25 +44,15 @@ const RecordScreenReceipt = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const pathNames = location.pathname.split("/").filter((x) => x);
-  const {data: records, isFetching: isRecordFetching}  = useRecords(requestId);
+  const [isPaid, setIsPaid] = useState(false);
+
+  const { data: records, isFetching: isRecordFetching } = useRecords(requestId);
   const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
   const { data: customer, isLoading: isCustomerLoading } = useCustomer(
     request?.customerID,
   );
 
   const queryClient = useQueryClient();
-  const { mutate: firstPayment } = useMutation({
-    mutationFn: (body) => {
-      return postPayment(body);
-    },
-    onSuccess: () => {
-      navigate(`/requests/${requestId}`, { replace: true });
-      toast.success("First payment created successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["request", { requestId: requestId }],
-      });
-    },
-  });
   const { mutate: createReceipt } = useMutation({
     mutationFn: (body) => {
       return createRecord(body);
@@ -56,20 +64,122 @@ const RecordScreenReceipt = () => {
       });
     },
   });
+  const { mutate: updateReceipt } = useMutation({
+    mutationFn: (body) => {
+      return updateRecord(body);
+    },
+    onSuccess: () => {
+      toast.success("Update record successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["records", { requestId: requestId }],
+      });
+    },
+  });
 
-  const [docContent, setDocContent] = useState(null);
   const [logo, setLogo] = useState(null);
   const [url, setUrl] = useState(null);
 
+  const [paymentMethod, setPaymentMethod] = useState("Cash"); //Cash or VNPay
+  const handleChangePaymentMethod = (event, newPaymentMethod) => {
+    setPaymentMethod(newPaymentMethod);
+  };
+
+  const [vnPayParam, setVnPayParam] = useState({
+    vnp_Amount: "",
+    vnp_Command: "pay",
+    vnp_CreateDate: "",
+    vnp_CurrCode: "VND",
+    vnp_IpAddr: "",
+    vnp_Locale: "vn",
+    vnp_OrderInfo: "",
+    vnp_OrderType: "other",
+    vnp_TmnCode: "BRNTYI8B",
+    vnp_TxnRef: "",
+    vnp_Version: "2.1.0",
+  });
+  const getVNPayURL = (vnPayParam) => {
+    const secretKey = "NT5SF8B7NJGGX5FILVUWHSARUC8P1TK9"; // Replace with your actual secret key
+    const updatedParams = { ...vnPayParam };
+    const sortedParams = Object.keys(updatedParams)
+      .sort()
+      .reduce((result, key) => {
+        result[key] = updatedParams[key];
+        return result;
+      }, {});
+    const queryString = qs.stringify(sortedParams, { encode: false });
+    sortedParams["vnp_SecureHash"] = sha512.hmac(secretKey, queryString);
+    return `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?${qs.stringify(sortedParams, { encode: false })}`;
+  };
+  useEffect(() => {
+    const fetchIpAddress = async () => {
+      try {
+        const response = await axios.get("https://api.ipify.org?format=json");
+        setVnPayParam((prev) => ({
+          ...prev,
+          vnp_IpAddr: response.data.ip,
+        }));
+      } catch (error) {
+        console.error("Error fetching the IP address:", error);
+      }
+    };
+    const convertCurrency = async (amount) => {
+      try {
+        const response = await axios.get(
+          `https://v6.exchangerate-api.com/v6/071dafb7c790a0973e0feee3/latest/USD`,
+        );
+        const exchangeRate = response.data.conversion_rates["VND"];
+        setVnPayParam((prev) => ({
+          ...prev,
+          vnp_Amount: Math.floor(amount * exchangeRate * 100),
+        }));
+      } catch (error) {
+        console.error("Error fetching the exchange rate:", error);
+        return null;
+      }
+    };
+    fetchIpAddress();
+    setVnPayParam((prev) => ({
+      ...prev,
+      vnp_CreateDate: format(date, "yyyyMMddHHmmss").toString(),
+      vnp_TxnRef: format(date, "HHmm").toString(),
+      vnp_OrderInfo: `Payment+for+request+${requestId}`,
+      vnp_ReturnUrl: encodeURIComponent(
+        frontendUrl + `requests/${requestId}/payment`,
+      ),
+    }));
+
+    const date = new Date();
+    if (request) {
+      convertCurrency(request.totalServicePrice * 0.4);
+    }
+  }, [request]);
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
+  };
+  const handleVNPayPayment = () => {
+    const vnPayURL = getVNPayURL(vnPayParam);
+    window.location.href = vnPayURL;
+    handleDialogClose();
+  };
+  const handleCashPayment = () => {
+    navigate(`/requests/${requestId}/payment?transaction_status=00`, {
+      replace: true,
+    });
+    handleDialogClose();
+  };
+
   const getReceiptContent = (payment = null) => {
     const returnDate = request.returnDate || new Date();
-    let payStatus = {
-
-    }
+    let payStatus = {};
     let signature = {
-        text: "",
-        margin: [0, 50],
-      };
+      text: "",
+      margin: [0, 50],
+    };
 
     if (payment) {
       payStatus = {
@@ -143,8 +253,7 @@ const RecordScreenReceipt = () => {
                   fontSize: 12,
                   alignment: "right",
                 },
-                payStatus
-
+                payStatus,
               ],
             },
           ],
@@ -390,19 +499,11 @@ const RecordScreenReceipt = () => {
   };
 
   useEffect(() => {
-    const receipt = records?.find(
-      (record) => record.type === "RECEIPT"
-    );
+    const receipt = records?.find((record) => record.type === "RECEIPT");
     if (receipt) {
       setUrl(receipt.link);
     }
   }, [records]);
-
-  let pdfGenerator = null;
-
-  if (docContent) {
-    pdfGenerator = pdfMake.createPdf(docContent);
-  }
 
   const handleDownload = () => {
     const doc = getReceiptContent();
@@ -421,38 +522,42 @@ const RecordScreenReceipt = () => {
     });
   };
 
-  const handleView = () => {
-    const payment = {
-            "id": 38,
-            "paytime": "2024-06-03T03:00:27.367+00:00",
-            "amount": 100000.0,
-            "externalTransaction": "none",
-            "paymentMethod": {
-                "id": 1,
-                "name": "MOMO"
-            },
-            "valuationRequestID": 84
-        };
-    const doc = getReceiptContent(payment);
-    pdfMake.createPdf(doc)?.getBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      setUrl(url);
-    });
-  };
   useEffect(() => {
     loadImageByPath("images/logo.png", setLogo);
   }, [logo]);
 
-  const handleFirstPayment = () => {
-    const paymentBody = {
-      valuationRequestID: requestId,
-      paymentMethod: { id: 1 },
-    };
-    firstPayment(paymentBody);
-  };
+  useEffect(() => {
+    const receipt = records?.find((record) => record.type === "RECEIPT");
+    if (request?.payment.length === 2 && receipt) {
+      setIsPaid(true);
+      const doc = getReceiptContent(request.payment[0]);
+      pdfMake.createPdf(doc).getDataUrl((url) => {
+        const body = {
+          ...receipt,
+          link: url,
+          status: true,
+        };
+        updateReceipt(body);
+      });
+    }
+  }, [request.payment[0]]);
 
   if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;
+  }
+
+  function handleRefreshReceipt() {
+    const receipt = records?.find((record) => record.type === "RECEIPT");
+    if (receipt) {
+      const doc = getReceiptContent();
+      pdfMake.createPdf(doc).getDataUrl((url) => {
+        const body = {
+          ...receipt,
+          link: url,
+        };
+        updateReceipt(body);
+      });
+    }
   }
 
   return (
@@ -467,9 +572,12 @@ const RecordScreenReceipt = () => {
       >
         <UIBreadCrumb pathNames={pathNames} />
         <Typography variant="h4">Receipt Record</Typography>
-        <Button variant={"contained"} onClick={handleFirstPayment}>
-          Create Payment
-        </Button>
+
+        {!isPaid && (
+          <Button variant={"contained"} onClick={handleDialogOpen}>
+            Create Payment
+          </Button>
+        )}
       </Box>
       <Stack direction={"row"} spacing={1}>
         <IconButton
@@ -479,29 +587,62 @@ const RecordScreenReceipt = () => {
         >
           <DownloadIcon />
         </IconButton>
-        <IconButton aria-label="View" color="secondary" onClick={handleView}>
-          <VisibilityIcon />
-        </IconButton>
-        <IconButton
-          aria-label="Save"
-          color="secondary"
-          onClick={handleCreateReceipt}
-        >
-          <AddIcon />
-        </IconButton>
+        {!isPaid && (
+          <>
+            <IconButton
+              aria-label="Save"
+              color="secondary"
+              onClick={handleCreateReceipt}
+            >
+              <AddIcon />
+            </IconButton>
+            <IconButton
+              aria-label="Save"
+              color="status.processing"
+              onClick={handleRefreshReceipt}
+            >
+              <LoopIcon />
+            </IconButton>
+          </>
+        )}
       </Stack>
       <br />
       {url && (
         <Box sx={{ w: "90%", margin: "0 auto" }}>
-          <iframe
-            src={
-              url
-            }
-            style={{ width: "100%", height: "90vh" }}
-          />
+          <iframe src={url} style={{ width: "100%", height: "90vh" }} />
         </Box>
       )}
       {!url && isRecordFetching && <UICircularIndeterminate />}
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>Payment Information</DialogTitle>
+        <DialogContent>
+          <Box>
+            <ToggleButtonGroup
+              color="primary"
+              value={paymentMethod}
+              exclusive
+              onChange={handleChangePaymentMethod}
+              aria-label="Payment"
+            >
+              <ToggleButton value="Cash">Cash</ToggleButton>
+              <ToggleButton value="VNPay">VNPay</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} variant="outlined">
+            Close
+          </Button>
+          <Button
+            onClick={
+              paymentMethod === "Cash" ? handleCashPayment : handleVNPayPayment
+            }
+            variant="contained"
+          >
+            {paymentMethod === "Cash" ? "Confirm" : "Pay now"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -8,12 +8,12 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
-import {useState} from "react";
-import {Link, useParams} from "react-router-dom";
-import {toast} from "react-toastify";
-import {checkDiamond} from "../../services/api.js";
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { checkDiamond } from "../../services/api.js";
 
 export default function UIDetailHeader({ title, detail }) {
   const { detailId, requestId } = useParams();

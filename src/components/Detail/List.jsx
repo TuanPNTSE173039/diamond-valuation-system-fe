@@ -16,16 +16,20 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {useState} from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {toast} from "react-toastify";
-import {StyledBadge} from "../../assets/styles/Badge.jsx";
-import {StyledTableCell, StyledTableRow} from "../../assets/styles/Table.jsx";
-import {checkDiamond} from "../../services/api.js";
-import {useRequest} from "../../services/requests.js";
-import {formattedDateTime, formattedDiamondSize, formattedMoney,} from "../../utilities/formatter.js";
-import {convertStatus} from "../../utilities/Status.jsx";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { StyledBadge } from "../../assets/styles/Badge.jsx";
+import { StyledTableCell, StyledTableRow } from "../../assets/styles/Table.jsx";
+import { checkDiamond } from "../../services/api.js";
+import { useRequest } from "../../services/requests.js";
+import {
+  formattedDateTime,
+  formattedDiamondSize,
+  formattedMoney,
+} from "../../utilities/formatter.js";
+import { convertStatus } from "../../utilities/Status.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
 const DetailList = () => {

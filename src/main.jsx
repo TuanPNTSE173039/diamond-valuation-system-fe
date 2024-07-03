@@ -1,14 +1,14 @@
-import {createTheme, ThemeProvider} from "@mui/material";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
+import { createTheme, ThemeProvider } from "@mui/material";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import pdfMake from "pdfmake/build/pdfmake";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {Provider} from "react-redux";
+import { Provider } from "react-redux";
 import App from "./App.jsx";
 import "./index.css";
-import {store} from "./redux/store.js";
+import { store } from "./redux/store.js";
 
 pdfMake.fonts = {
   Roboto: {

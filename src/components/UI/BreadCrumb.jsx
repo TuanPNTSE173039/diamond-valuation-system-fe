@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 // import Link from "@mui/material/Link";
-import {Link as RouterLink, useParams} from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 
 function LinkRouter(props) {
   return <Link {...props} component={RouterLink} />;

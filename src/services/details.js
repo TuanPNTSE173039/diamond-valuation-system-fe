@@ -1,5 +1,5 @@
-import {useQuery} from "@tanstack/react-query";
-import {axiosInstance} from "./config/axiosInstance.js";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "./config/axiosInstance.js";
 
 export const useDetail = (id) => {
   return useQuery({
@@ -22,4 +22,4 @@ export const useDetails = () => {
       return response.data;
     },
   });
-}
+};

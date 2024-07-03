@@ -1,4 +1,4 @@
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AppLayout from "./components/AppLayout.jsx";
 import AuthGuard from "./components/Auth/AuthGuard.jsx";
 import GuestGuard from "./components/Auth/GuestGuard.jsx";
@@ -13,6 +13,7 @@ import RecordScreenReturn from "./components/Record/Screen/Return.jsx";
 import RecordScreenSealing from "./components/Record/Screen/Sealing.jsx";
 import RequestItem from "./components/Request/Item.jsx";
 import RequestList from "./components/Request/List.jsx";
+import RequestResultPayment from "./components/Request/PaymentResult.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
               {
                 path: "sealing",
                 element: <RecordScreenSealing />,
+              },
+              {
+                path: "payment",
+                element: <RequestResultPayment />,
               },
             ],
           },

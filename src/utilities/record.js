@@ -1,4 +1,4 @@
-import {formattedMoney} from "./formatter.js";
+import { formattedMoney } from "./formatter.js";
 
 export const getDetailInformation = (details) => {
   const result = [

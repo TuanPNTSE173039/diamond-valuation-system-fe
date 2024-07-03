@@ -1,5 +1,5 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import {TablePagination} from "@mui/material";
+import { TablePagination } from "@mui/material";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -12,10 +12,13 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import * as React from "react";
-import {Link} from "react-router-dom";
-import {EnhancedTableHead, EnhancedTableToolbar,} from "../../assets/styles/Table.jsx";
-import {convertStatus} from "../../utilities/Status.jsx";
-import {getComparator, stableSort} from "../../utilities/table.js";
+import { Link } from "react-router-dom";
+import {
+  EnhancedTableHead,
+  EnhancedTableToolbar,
+} from "../../assets/styles/Table.jsx";
+import { convertStatus } from "../../utilities/Status.jsx";
+import { getComparator, stableSort } from "../../utilities/table.js";
 
 export default function UITable({
   heading,

@@ -1,16 +1,16 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {useRecords} from "../../services/records.js";
-import {useRequest} from "../../services/requests.js";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useRecords } from "../../services/records.js";
+import { useRequest } from "../../services/requests.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import RecordItem from "./Item.jsx";
 
 export default function RecordList() {
   const { requestId } = useParams();
   const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
-  const {data: records, isFetching: isRecordFetching} = useRecords(requestId);
+  const { data: records, isFetching: isRecordFetching } = useRecords(requestId);
 
   const [recordInfo, setRecordInfo] = useState({
     receiptRecord: null,
@@ -30,19 +30,19 @@ export default function RecordList() {
           ...prev,
           receiptRecord: {
             status: receipt?.status,
-            date: receipt?.creationDate
+            date: receipt?.creationDate,
           },
-          returnRecord:{
+          returnRecord: {
             status: returned?.status,
-            date: returned?.creationDate
+            date: returned?.creationDate,
           },
           commitmentRecord: {
             status: commitment?.status,
-            date: commitment?.creationDate
+            date: commitment?.creationDate,
           },
           sealingRecord: {
             status: sealing?.status,
-            date: sealing?.creationDate
+            date: sealing?.creationDate,
           },
         };
       });
@@ -70,14 +70,8 @@ export default function RecordList() {
           status={recordInfo.returnRecord?.status}
           date={recordInfo.returnRecord?.date}
         />
-        <RecordItem
-          title="Commitment"
-          navLink="commitment"
-        />
-        <RecordItem
-          title="Sealing"
-          navLink="sealing"
-        />
+        <RecordItem title="Commitment" navLink="commitment" />
+        <RecordItem title="Sealing" navLink="sealing" />
       </Box>
     </Box>
   );

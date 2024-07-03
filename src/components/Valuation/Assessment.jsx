@@ -1,7 +1,14 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EventIcon from "@mui/icons-material/Event";
-import {FormControl, FormLabel, InputAdornment, Radio, RadioGroup, TextField,} from "@mui/material";
+import {
+  FormControl,
+  FormLabel,
+  InputAdornment,
+  Radio,
+  RadioGroup,
+  TextField,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -15,15 +22,18 @@ import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import {ref, uploadBytesResumable} from "firebase/storage";
+import { ref, uploadBytesResumable } from "firebase/storage";
 import * as React from "react";
-import {useState} from "react";
-import {useParams} from "react-router-dom";
-import {toast} from "react-toastify";
-import {VisuallyHiddenInput} from "../../assets/styles/Input.jsx";
-import {storage} from "../../services/config/firebase.js";
-import {clarityCharacteristicList, diamondAttribute,} from "../../utilities/Status.jsx";
-import {metadata} from "../Detail/Item.jsx";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { VisuallyHiddenInput } from "../../assets/styles/Input.jsx";
+import { storage } from "../../services/config/firebase.js";
+import {
+  clarityCharacteristicList,
+  diamondAttribute,
+} from "../../utilities/Status.jsx";
+import { metadata } from "../Detail/Item.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
 const { cut, clarity, color, shape, symmetry, polish, fluorescence } =

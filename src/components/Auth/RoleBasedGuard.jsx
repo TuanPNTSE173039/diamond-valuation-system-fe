@@ -1,4 +1,4 @@
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 
 const RoleBasedGuard = ({ children, allowedRoles }) => {
   const { user } = useSelector((state) => state.auth);
