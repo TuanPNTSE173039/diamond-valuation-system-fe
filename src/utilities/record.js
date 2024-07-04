@@ -81,3 +81,33 @@ export const gerServiceInformation = (details) => {
   }
   return result;
 };
+
+export const getDiamondRows = (request) => {
+  let result = [
+    [
+      { text: "No.", style: "tableHeader" },
+      { text: "Certificate", style: "tableHeader" },
+      { text: "Carat", style: "tableHeader" },
+      { text: "Color", style: "tableHeader" },
+      { text: "Clarity", style: "tableHeader" },
+      { text: "Cut", style: "tableHeader" },
+      { text: "Origin", style: "tableHeader" },
+      { text: "Note", style: "tableHeader" },
+    ],
+  ];
+  for (let i = 0; i < request.valuationRequestDetails.length; i++) {
+    const detail = request.valuationRequestDetails[i].diamondValuationNote;
+    const item = [
+      i,
+      detail?.certificateId || "-",
+      detail?.caratWeight || "-",
+      detail?.color || "-",
+      detail?.clarity || "-",
+      detail?.cut || "-",
+      detail?.diamondOrigin || "-",
+      request.valuationRequestDetails[i].diamond ? "-" : "Fake diamond",
+    ];
+    result.push(item);
+  }
+  return result;
+};

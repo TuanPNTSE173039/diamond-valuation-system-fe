@@ -70,8 +70,18 @@ export default function RecordList() {
           status={recordInfo.returnRecord?.status}
           date={recordInfo.returnRecord?.date}
         />
-        <RecordItem title="Commitment" navLink="commitment" />
-        <RecordItem title="Sealing" navLink="sealing" />
+        <RecordItem
+          title="Commitment"
+          navLink="commitment"
+          status={recordInfo.commitmentRecord?.status}
+          date={recordInfo.commitmentRecord?.date}
+        />
+        <RecordItem
+          title="Sealing"
+          navLink="sealing"
+          status={recordInfo.sealingRecord?.status}
+          date={recordInfo.sealingRecord?.date}
+        />
       </Box>
     </Box>
   );

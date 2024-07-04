@@ -281,19 +281,19 @@ const RecordScreenReturn = () => {
             {
               text: [
                 {
-                  text: `Name: ${customer.firstName} ${customer.lastName}\n`,
+                  text: `Name: ${customer?.firstName} ${customer?.lastName}\n`,
                   style: "para",
                 },
                 {
-                  text: `Phone: ${customer.phone}\n`,
+                  text: `Phone: ${customer?.phone}\n`,
                   style: "para",
                 },
                 {
-                  text: `Email: ${customer.email}\n`,
+                  text: `Email: ${customer?.email}\n`,
                   style: "para",
                 },
                 {
-                  text: `Address: ${customer.address}\n`,
+                  text: `Address: ${customer?.address}\n`,
                   style: "para",
                 },
               ],
