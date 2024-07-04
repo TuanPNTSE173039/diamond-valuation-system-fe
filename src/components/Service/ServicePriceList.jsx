@@ -1,3 +1,4 @@
+import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -16,129 +17,38 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { useState } from "react";
-import {StyledBadge} from "../../assets/styles/Badge.jsx";
-import AddIcon from "@mui/icons-material/Add.js";
-import * as React from "react";
-
+import AddIcon from "@mui/icons-material/Add";
+import { useFormik } from "formik";
+import { useParams } from "react-router-dom";
+import { useServiceList } from "../../services/services";
+import UICircularIndeterminate from "../UI/CircularIndeterminate";
+import {deleteServicePrice, postServicePrice, updateServicePrice} from "../../services/api";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 
 const ServicePriceList = () => {
-
-    const [servicePriceList, setServicePriceList] = useState([
-        {
-            id: 1,
-            initPrice:20.00,
-            unitPrice:0.00,
-            minSize:4.01,
-            maxSize:4.49,
-            serviceId:1
-        },
-        {
-            id: 2,
-            initPrice:25.00,
-            unitPrice:0.00,
-            minSize:4.50,
-            maxSize:4.99,
-            serviceId:1
-        },
-        {
-            id: 3,
-            initPrice:30.00,
-            unitPrice:0.00,
-            minSize:5.00,
-            maxSize:5.49,
-            serviceId:1
-        },
-        {
-            id: 4,
-            initPrice:36.00,
-            unitPrice:0.00,
-            minSize:4.01,
-            maxSize:4.49,
-            serviceId:2
-        },
-        {
-            id: 5,
-            initPrice:40.00,
-            unitPrice:0.00,
-            minSize: 4.50,
-            maxSize: 4.99,
-            serviceId: 2
-        },
-        {
-            id: 6,
-            initPrice: 45.00,
-            unitPrice: 0.00,
-            minSize: 5.00,
-            maxSize: 5.49,
-            serviceId: 2
-        },
-        {
-            id: 7,
-            initPrice: 50.00,
-            unitPrice: 0.00,
-            minSize: 4.01,
-            maxSize: 4.49,
-            serviceId: 3
-        },
-        {
-            id: 8,
-            initPrice: 55.00,
-            unitPrice: 0.00,
-            minSize: 4.50,
-            maxSize: 4.99,
-            serviceId: 3
-        },
-        {
-            id: 9,
-            initPrice: 60.00,
-            unitPrice: 0.00,
-            minSize: 5.00,
-            maxSize: 5.49,
-            serviceId: 3
-        },
-        {
-            id: 10,
-            initPrice: 70.00,
-            unitPrice: 0.00,
-            minSize: 4.01,
-            maxSize: 4.49,
-            serviceId: 4
-        },
-        {
-            id: 11,
-            initPrice: 75.00,
-            unitPrice: 0.00,
-            minSize: 4.50,
-            maxSize: 4.99,
-            serviceId: 4
-        },
-        {
-            id: 12,
-            initPrice: 80.00,
-            unitPrice: 0.00,
-            minSize: 5.00,
-            maxSize: 5.49,
-            serviceId: 4
-        }
-    ]);
-
-    const [selectedServiceId, setSelectedServiceId] = useState(2); // Set the default serviceId to 1 or any other
-
-    const [selectedDetail, setSelectedDetail] = useState({
+    const { serviceId } = useParams();
+    const { data: servicePriceList, isLoading, refetch } = useServiceList(serviceId);
+    const [localServicePriceList, setLocalServicePriceList] = React.useState([]);
+    const [selectedDetail, setSelectedDetail] = React.useState({
         id: undefined,
         min_size: 0.0,
         max_size: 0.0,
         init_price: 0.0,
-        unit_price: 0.0
+        unit_price: 0.0,
     });
+    const [openEdit, setOpenEdit] = React.useState(false);
+    const [openAdd, setOpenAdd] = React.useState(false);
 
-    const [openEdit, setOpenEdit] = useState(false);
-    const [openAdd, setOpenAdd] = useState(false);
+    React.useEffect(() => {
+        if (servicePriceList) {
+            setLocalServicePriceList(servicePriceList);
+        }
+    }, [servicePriceList]);
 
     const handleEditClick = (id) => {
         setOpenEdit(true);
-        const service = servicePriceList.find((service) => service.id === id);
+        const service = localServicePriceList.find((service) => service.id === id);
         setSelectedDetail({
             id: service.id,
             min_size: service.minSize,
@@ -159,52 +69,50 @@ const ServicePriceList = () => {
         });
     };
 
-    const handleEditSave = () => {
-        const updatedServiceList = servicePriceList.map((service) => {
-            if (service.id === selectedDetail.id) {
-                return {
-                    ...service,
-                    minSize: selectedDetail.min_size,
-                    maxSize: selectedDetail.max_size,
-                    initPrice: selectedDetail.init_price,
-                    unitPrice: selectedDetail.unit_price,
-                };
-            }
-            return service;
-        });
-        setServicePriceList(updatedServiceList);
-        setOpenEdit(false);
+    const handleEditSave = async (values) => {
+        const updatedService = {
+            id: selectedDetail.id,
+            minSize: values.min_size,
+            maxSize: values.max_size,
+            initPrice: values.init_price,
+            unitPrice: values.unit_price,
+        };
+
+        try {
+            await updateServicePrice(selectedDetail.id, updatedService);
+            const updatedList = localServicePriceList.map((service) =>
+                service.id === selectedDetail.id ? updatedService : service
+            );
+            setLocalServicePriceList(updatedList);
+            toast.success("Service price updated successfully");
+            await refetch();
+        } catch (error) {
+            toast.error("Failed to update service price");
+        }
+
+        handleEditClose();
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await deleteServicePrice(id);
+            const updatedServiceList = localServicePriceList.filter((service) => service.id !== id);
+            setLocalServicePriceList(updatedServiceList);
+            toast.success("Service price deleted successfully");
+            await refetch();
+        } catch (error) {
+            toast.error("Failed to delete service price");
+        }
+    };
+
+    const handleAddClick = () => {
+        setOpenAdd(true);
         setSelectedDetail({
             id: undefined,
             min_size: 0.0,
             max_size: 0.0,
             init_price: 0.0,
             unit_price: 0.0,
-        });
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setSelectedDetail((prevState) => ({
-            ...prevState,
-            [name]: parseFloat(value),
-        }));
-    };
-
-    const handleDelete = (id) => {
-        const updatedServiceList = servicePriceList.filter((service) => service.id !== id);
-        setServicePriceList(updatedServiceList);
-    };
-
-    const handleAddClick = () => {
-        setOpenAdd(true);
-        setSelectedDetail({
-            id: servicePriceList.length + 1, // Assuming id is incremental
-            min_size: 0.0,
-            max_size: 0.0,
-            init_price: 0.0,
-            unit_price: 0.0,
-            serviceId: selectedServiceId // Assign selectedServiceId to the new service
         });
     };
 
@@ -219,28 +127,62 @@ const ServicePriceList = () => {
         });
     };
 
-    const handleAddSave = () => {
+    const handleAddSave = async (values) => {
         const newService = {
-            id: selectedDetail.id,
-            minSize: selectedDetail.min_size,
-            maxSize: selectedDetail.max_size,
-            initPrice: selectedDetail.init_price,
-            unitPrice: selectedDetail.unit_price,
-            serviceId: selectedServiceId // Make sure serviceId is included
+            minSize: values.min_size,
+            maxSize: values.max_size,
+            initPrice: values.init_price,
+            unitPrice: values.unit_price,
+            serviceId: serviceId,
         };
-        setServicePriceList([...servicePriceList, newService]);
-        setOpenAdd(false);
-        setSelectedDetail({
-            id: undefined,
+
+        try {
+            const response = await postServicePrice(newService);
+            const createdServicePrice = response.data;
+            setLocalServicePriceList([...localServicePriceList, createdServicePrice]);
+            toast.success("Service price added successfully");
+            await refetch();
+        } catch (error) {
+            toast.error("Failed to add service price");
+        }
+
+        handleAddClose();
+    };
+
+    const validationSchema = Yup.object().shape({
+        min_size: Yup.number().required("Min Size is required").positive("Min Size must be a positive number"),
+        max_size: Yup.number().required("Max Size is required").positive("Max Size must be a positive number").
+        moreThan(Yup.ref('min_size'), "Max Size must be greater than Min Size"),
+        init_price: Yup.number().required("Init Price is required").positive("Init Price must be a positive number"),
+        unit_price: Yup.number().required("Unit Price is required"),
+    });
+
+    const formikEdit = useFormik({
+        initialValues: {
+            min_size: selectedDetail.min_size,
+            max_size: selectedDetail.max_size,
+            init_price: selectedDetail.init_price,
+            unit_price: selectedDetail.unit_price,
+        },
+        enableReinitialize: true,
+        validationSchema: validationSchema,
+        onSubmit: handleEditSave,
+    });
+
+    const formikAdd = useFormik({
+        initialValues: {
             min_size: 0.0,
             max_size: 0.0,
             init_price: 0.0,
             unit_price: 0.0,
-        });
-    };
+        },
+        validationSchema: validationSchema,
+        onSubmit: handleAddSave,
+    });
 
-    // Filter the price list based on the selected serviceId
-    const filteredServicePriceList = servicePriceList.filter(service => service.serviceId === selectedServiceId);
+    if (isLoading) {
+        return <UICircularIndeterminate />;
+    }
 
     return (
         <Box sx={{ width: "100%" }}>
@@ -253,67 +195,37 @@ const ServicePriceList = () => {
                     justifyContent: "space-between",
                 }}
             >
-                <StyledBadge color="secondary">
-                    <Typography variant="h6" sx={{ fontWeight: "600" }}>
-                        SERVICE PRICES
-                    </Typography>
-                </StyledBadge>
-                <Box>
-                    <Button
-                        onClick={handleAddClick}
-                        variant={"outlined"}
-                        endIcon={<AddIcon />}
-                    >
-                        Add
-                    </Button>
-                </Box>
+                <Typography variant="h6" sx={{ fontWeight: "600" }}>Service Price List</Typography>
+                <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddClick}>
+                    Add
+                </Button>
             </Box>
-            <TableContainer component={Paper} sx={{ mt: 0 }}>
-                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableContainer component={Paper} sx={{ width: "100%", mt: 0 }}>
+                <Table>
                     <TableHead>
                         <TableRow sx={{ backgroundColor: "primary.main" }}>
-                            <TableCell align="left" sx={{ color: "white" }}>
-                                Id
-                            </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
-                                Min Size - Max Size
-                            </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
-                                Init Price
-                            </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
-                                Unit Price
-                            </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
-                                Action
-                            </TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>ID</TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>Min Size</TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>Max Size</TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>Init Price</TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>Unit Price</TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredServicePriceList.map((service) => (
+                        {localServicePriceList.map((service) => (
                             <TableRow key={service.id}>
-                                <TableCell align="left">{service.id}</TableCell>
+                                <TableCell align="center">{service.id}</TableCell>
+                                <TableCell align="center">{service.minSize}</TableCell>
+                                <TableCell align="center">{service.maxSize}</TableCell>
+                                <TableCell align="center">{service.initPrice}</TableCell>
+                                <TableCell align="center">{service.unitPrice}</TableCell>
                                 <TableCell align="center">
-                                    {service.minSize} - {service.maxSize}
-                                </TableCell>
-                                <TableCell align="center">
-                                    {service.initPrice}
-                                </TableCell>
-                                <TableCell align="center">
-                                    {service.unitPrice}
-                                </TableCell>
-                                <TableCell align="center">
-                                    <IconButton
-                                        color="primary"
-                                        onClick={() => handleEditClick(service.id)}
-                                    >
-                                        <EditIcon />
+                                    <IconButton aria-label="edit" onClick={() => handleEditClick(service.id)}>
+                                        <EditIcon color="primary" />
                                     </IconButton>
-                                    <IconButton
-                                        color="secondary"
-                                        onClick={() => handleDelete(service.id)}
-                                    >
-                                        <DeleteForeverIcon />
+                                    <IconButton aria-label="delete" onClick={() => handleDelete(service.id)}>
+                                        <DeleteForeverIcon color="secondary" />
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -322,127 +234,129 @@ const ServicePriceList = () => {
                 </Table>
             </TableContainer>
 
-        {/* Add Dialog */}
-        <Dialog open={openAdd} onClose={handleAddClose}>
-            <DialogTitle>Add Service</DialogTitle>
-            <DialogContent>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="min_size"
-                    name="min_size"
-                    label="Min Size"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.min_size}
-                    onChange={handleInputChange}
-                />
-                <TextField
-                    margin="dense"
-                    id="max_size"
-                    name="max_size"
-                    label="Max Size"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.max_size}
-                    onChange={handleInputChange}
-                />
-                <TextField
-                    margin="dense"
-                    id="init_price"
-                    name="init_price"
-                    label="Init Price"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.init_price}
-                    onChange={handleInputChange}
-                />
-                <TextField
-                    margin="dense"
-                    id="unit_price"
-                    name="unit_price"
-                    label="Unit Price"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.unit_price}
-                    onChange={handleInputChange}
-                />
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleAddClose} variant="text">
-                    Cancel
-                </Button>
-                <Button onClick={handleAddSave} variant="contained">
-                    Save
-                </Button>
-            </DialogActions>
-        </Dialog>
+            {/* Add Dialog */}
+            <Dialog open={openAdd} onClose={handleAddClose}>
+                <form onSubmit={formikAdd.handleSubmit}>
+                    <DialogTitle>Add Service Price</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            margin="dense"
+                            id="min_size"
+                            label="Min Size"
+                            type="number"
+                            inputProps={{ step: 0.01 }}
+                            fullWidth
+                            value={formikAdd.values.min_size}
+                            onChange={formikAdd.handleChange}
+                            error={formikAdd.touched.min_size && Boolean(formikAdd.errors.min_size)}
+                            helperText={formikAdd.touched.min_size && formikAdd.errors.min_size}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="max_size"
+                            label="Max Size"
+                            type="number"
+                            inputProps={{ step: 0.01 }}
+                            fullWidth
+                            value={formikAdd.values.max_size}
+                            onChange={formikAdd.handleChange}
+                            error={formikAdd.touched.max_size && Boolean(formikAdd.errors.max_size)}
+                            helperText={formikAdd.touched.max_size && formikAdd.errors.max_size}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="init_price"
+                            label="Init Price"
+                            type="number"
+                            inputProps={{ step: 0.1 }}
+                            fullWidth
+                            value={formikAdd.values.init_price}
+                            onChange={formikAdd.handleChange}
+                            error={formikAdd.touched.init_price && Boolean(formikAdd.errors.init_price)}
+                            helperText={formikAdd.touched.init_price && formikAdd.errors.init_price}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="unit_price"
+                            label="Unit Price"
+                            type="number"
+                            inputProps={{ step: 0.1 }}
+                            fullWidth
+                            value={formikAdd.values.unit_price}
+                            onChange={formikAdd.handleChange}
+                            error={formikAdd.touched.unit_price && Boolean(formikAdd.errors.unit_price)}
+                            helperText={formikAdd.touched.unit_price && formikAdd.errors.unit_price}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleAddClose}>Cancel</Button>
+                        <Button type="submit">Save</Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
 
-        {/* Edit Dialog */}
-        <Dialog open={openEdit} onClose={handleEditClose}>
-            <DialogTitle>Edit Service</DialogTitle>
-            <DialogContent>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="min_size"
-                    name="min_size"
-                    label="Min Size"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.min_size}
-                    onChange={handleInputChange}
-                />
-                <TextField
-                    margin="dense"
-                    id="max_size"
-                    name="max_size"
-                    label="Max Size"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.max_size}
-                    onChange={handleInputChange}
-                />
-                <TextField
-                    margin="dense"
-                    id="init_price"
-                    name="init_price"
-                    label="Init Price"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.init_price}
-                    onChange={handleInputChange}
-                />
-                <TextField
-                    margin="dense"
-                    id="unit_price"
-                    name="unit_price"
-                    label="Unit Price"
-                    type="number"
-                    inputProps={{ step: 0.01 }}
-                    fullWidth
-                    value={selectedDetail.unit_price}
-                    onChange={handleInputChange}
-                />
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleEditClose} variant="text">
-                    Cancel
-                </Button>
-                <Button onClick={handleEditSave} variant="contained">
-                    Save
-                </Button>
-            </DialogActions>
-        </Dialog>
-    </Box>
-);
+            {/* Edit Dialog */}
+            <Dialog open={openEdit} onClose={handleEditClose}>
+                <form onSubmit={formikEdit.handleSubmit}>
+                    <DialogTitle>Edit Service Price</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            margin="dense"
+                            id="min_size"
+                            label="Min Size"
+                            type="number"
+                            inputProps={{ step: 0.01 }}
+                            fullWidth
+                            value={formikEdit.values.min_size}
+                            onChange={formikEdit.handleChange}
+                            error={formikEdit.touched.min_size && Boolean(formikEdit.errors.min_size)}
+                            helperText={formikEdit.touched.min_size && formikEdit.errors.min_size}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="max_size"
+                            label="Max Size"
+                            type="number"
+                            inputProps={{ step: 0.01 }}
+                            fullWidth
+                            value={formikEdit.values.max_size}
+                            onChange={formikEdit.handleChange}
+                            error={formikEdit.touched.max_size && Boolean(formikEdit.errors.max_size)}
+                            helperText={formikEdit.touched.max_size && formikEdit.errors.max_size}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="init_price"
+                            label="Init Price"
+                            type="number"
+                            inputProps={{ step: 0.1 }}
+                            fullWidth
+                            value={formikEdit.values.init_price}
+                            onChange={formikEdit.handleChange}
+                            error={formikEdit.touched.init_price && Boolean(formikEdit.errors.init_price)}
+                            helperText={formikEdit.touched.init_price && formikEdit.errors.init_price}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="unit_price"
+                            label="Unit Price"
+                            type="number"
+                            inputProps={{ step: 0.1 }}
+                            fullWidth
+                            value={formikEdit.values.unit_price}
+                            onChange={formikEdit.handleChange}
+                            error={formikEdit.touched.unit_price && Boolean(formikEdit.errors.unit_price)}
+                            helperText={formikEdit.touched.unit_price && formikEdit.errors.unit_price}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleEditClose}>Cancel</Button>
+                        <Button type="submit">Save</Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
+        </Box>
+    );
 };
 
 export default ServicePriceList;

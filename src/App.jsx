@@ -230,7 +230,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: ":serviceId",
+            path: ":serviceId/service-price-lists",
             element: (
                 <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
                   <ServicePriceList />
@@ -251,7 +251,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: ":supplierId",
+            path: ":supplierId/diamond-market",
             element: (
                 <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
                   <DiamondList />

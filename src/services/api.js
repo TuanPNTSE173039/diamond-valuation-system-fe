@@ -64,4 +64,27 @@ export const checkDiamond = (id, body) =>
 export const updateDetail = (id, body) =>
   axiosInstance.put(`valuation-request-details/${id}`, body);
 
+// ---SERVICES---
+export const updateService = async (id, body) => axiosInstance.put(`services/${id}`, body);
+export const postService = async (body) => axiosInstance.post("services", body);
+export const deleteService = async (id) => axiosInstance.delete(`services/${id}`);
 
+// ---SERVICE PRICE---
+export const updateServicePrice = async (id, body) =>
+  axiosInstance.put(`service-price-lists/${id}`, body);
+export const postServicePrice = async (body) =>
+  axiosInstance.post("service-price-lists", body);
+export const deleteServicePrice = async (id) => axiosInstance.delete(`service-price-lists/${id}`);
+
+// ---SUPPLIERS---
+export const updateSupplier = async (id, body) => axiosInstance.put(`suppliers/${id}`, body);
+export const postSupplier = async (body) => axiosInstance.post("suppliers", body);
+export const deleteSupplier = async (id) => axiosInstance.delete(`suppliers/${id}`);
+
+// ---DIAMONDS---
+export const deleteDiamond = async (id) => axiosInstance.delete(`diamond-market/${id}`);
+
+// ---BLOG---
+export const postBlog = async (body) => axiosInstance.post("posts", body);
+export const updateBlog = async (id, body) => axiosInstance.put(`posts/${id}`, body);
+export const deleteBlog = async (id) => axiosInstance.delete(`posts/${id}`);

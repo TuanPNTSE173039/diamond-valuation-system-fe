@@ -29,7 +29,7 @@ import { loadImageByPath } from "../../utilities/imageLoader.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
-import UIRichTextEditor from "../UI/RichTexEditor.jsx";
+import UIRichTextEditor from "../UI/RichTextEditor.jsx";
 import DiamondValuationAssessment from "./Assessment.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 import DiamondValuationInfor from "./ValuationInfor.jsx";

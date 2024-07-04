@@ -1,3 +1,7 @@
+import * as React from "react";
+import { useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -16,55 +20,36 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { useState } from "react";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import {StyledBadge} from "../../assets/styles/Badge.jsx";
-import AddIcon from "@mui/icons-material/Add.js";
-import * as React from "react";
-import {useNavigate} from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import UICircularIndeterminate from "../UI/CircularIndeterminate";
+import { StyledBadge } from "../../assets/styles/Badge";
+import { useServices } from "../../services/services";
+import { updateService, postService, deleteService } from "../../services/api"; // Import hàm xóa service từ API
+import * as Yup from "yup";
 
 const ServiceList = () => {
-    const [serviceList, setServiceList] = useState([
-        {
-            id: 1,
-            description: "– Time to send for inspection depends on the time of sending.\n– Unlimited quantity. Service price list according to regulations.",
-            period: 72,
-            name: "Normal pricing"
-        },
-        {
-            id: 2,
-            description: "-Inspection time is 48 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
-            period: 48,
-            name: "Quick valuation in 48 hours"
-        },
-        {
-            id: 3,
-            description: "-Inspection time is 24 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
-            period: 24,
-            name: "Quick valuation in 24 hours"
-        },
-        {
-            id: 4,
-            description: "-Inspection time is 3 working hours from the time the product is received.\n– Quantity sent depends on time. Service price list according to regulations.",
-            period: 3,
-            name: "Quick valuation in 3 hours"
-        }
-    ]);
-
-    const [selectedDetail, setSelectedDetail] = useState({
+    const { data: serviceList, isLoading, refetch } = useServices();
+    const [localServiceList, setLocalServiceList] = React.useState([]);
+    const [selectedDetail, setSelectedDetail] = React.useState({
         id: undefined,
         name: "",
         description: "",
         period: 0,
     });
-
-    const [openEdit, setOpenEdit] = useState(false);
-    const [openAdd, setOpenAdd] = useState(false);
+    const [openEdit, setOpenEdit] = React.useState(false);
+    const [openAdd, setOpenAdd] = React.useState(false);
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if (serviceList) {
+            setLocalServiceList(serviceList);
+        }
+    }, [serviceList]);
 
     const handleEditClick = (id) => {
         setOpenEdit(true);
-        const service = serviceList.find(service => service.id === id);
+        const service = localServiceList.find((service) => service.id === id);
         setSelectedDetail({
             id: service.id,
             name: service.name,
@@ -83,49 +68,49 @@ const ServiceList = () => {
         });
     };
 
-    const handleEditSave = () => {
-        const updatedServiceList = serviceList.map(service => {
-            if (service.id === selectedDetail.id) {
-                return {
-                    ...service,
-                    name: selectedDetail.name,
-                    description: selectedDetail.description,
-                    period: selectedDetail.period,
-                };
-            }
-            return service;
-        });
-        setServiceList(updatedServiceList);
-        setOpenEdit(false);
-        setSelectedDetail({
-            id: undefined,
-            name: "",
-            description: "",
-            period: 0,
-        });
+    const handleEditSave = async (values) => {
+        const updatedService = {
+            id: selectedDetail.id,
+            name: values.name,
+            description: values.description,
+            period: values.period,
+        };
+
+        try {
+            await updateService(selectedDetail.id, updatedService);
+            const updatedList = localServiceList.map((service) =>
+                service.id === selectedDetail.id ? updatedService : service
+            );
+            setLocalServiceList(updatedList);
+            toast.success("Service updated successfully");
+            await refetch();
+        } catch (error) {
+            toast.error("Failed to update service");
+        }
+
+        handleEditClose();
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setSelectedDetail(prevState => ({
-            ...prevState,
-            [name]: value,
-        }));
-    };
-
-    const handleDelete = (id) => {
-        console.log("Deleting service with id:", id);
+    const handleDelete = async (id) => {
+        try {
+            await deleteService(id);
+            const updatedServiceList = localServiceList.filter((service) => service.id !== id);
+            setLocalServiceList(updatedServiceList);
+            toast.success("Service deleted successfully");
+            await refetch();
+        } catch (error) {
+            toast.error("Failed to delete service");
+        }
     };
 
     const handlePriceClick = (id) => {
-        navigate(`/services/${id}`);
+        navigate(`/services/${id}/service-price-lists`);
     };
-
 
     const handleAddClick = () => {
         setOpenAdd(true);
         setSelectedDetail({
-            id: serviceList.length + 1,
+            id: undefined,
             name: "",
             description: "",
             period: 0,
@@ -142,16 +127,55 @@ const ServiceList = () => {
         });
     };
 
-    const handleAddSave = () => {
-        setServiceList([...serviceList, selectedDetail]);
-        setOpenAdd(false);
-        setSelectedDetail({
-            id: undefined,
+    const handleAddSave = async (values) => {
+        const newService = {
+            name: values.name,
+            description: values.description,
+            period: values.period,
+        };
+        try {
+            const response = await postService(newService);
+            const createdService = response.data;
+            setLocalServiceList([...localServiceList, createdService]);
+            toast.success("Service added successfully");
+            await refetch();
+        } catch (error) {
+            toast.error("Failed to add service");
+        }
+
+        handleAddClose();
+    };
+
+    const validationSchema = Yup.object().shape({
+        name: Yup.string().required("Service name is required"),
+        description: Yup.string().required("Description is required"),
+        period: Yup.number().required("Period is required").positive("Period must be a positive number"),
+    });
+
+    const formikEdit = useFormik({
+        initialValues: {
+            name: selectedDetail.name,
+            description: selectedDetail.description,
+            period: selectedDetail.period,
+        },
+        enableReinitialize: true,
+        validationSchema: validationSchema,
+        onSubmit: handleEditSave,
+    });
+
+    const formikAdd = useFormik({
+        initialValues: {
             name: "",
             description: "",
             period: 0,
-        });
-    };
+        },
+        validationSchema: validationSchema,
+        onSubmit: handleAddSave,
+    });
+
+    if (isLoading) {
+        return <UICircularIndeterminate />;
+    }
 
     return (
         <Box sx={{ width: "100%" }}>
@@ -170,11 +194,7 @@ const ServiceList = () => {
                     </Typography>
                 </StyledBadge>
                 <Box>
-                    <Button
-                        onClick={handleAddClick}
-                        variant={"outlined"}
-                        endIcon={<AddIcon />}
-                    >
+                    <Button onClick={handleAddClick} variant="outlined" endIcon={<AddIcon />}>
                         Add
                     </Button>
                 </Box>
@@ -182,30 +202,49 @@ const ServiceList = () => {
             <TableContainer component={Paper} sx={{ mt: 0 }}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
-                        <TableRow sx={{ backgroundColor: 'primary.main'}}>
-                            <TableCell align="left" sx={{ color: 'white' }}>Id</TableCell>
-                            <TableCell align="center" sx={{ color: 'white' }}>Service Name</TableCell>
-                            <TableCell align="center" sx={{ color: 'white' }}>Description</TableCell>
-                            <TableCell align="center" sx={{ color: 'white' }}>Period</TableCell>
-                            <TableCell align="center" sx={{ color: 'white' }}>Action</TableCell>
+                        <TableRow sx={{ backgroundColor: "primary.main" }}>
+                            <TableCell align="left" sx={{ color: "white" }}>
+                                Id
+                            </TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>
+                                Service Name
+                            </TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>
+                                Description
+                            </TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>
+                                Period
+                            </TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>
+                                Action
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {serviceList.map((service) => (
+                        {localServiceList.map((service) => (
                             <TableRow key={service.id}>
                                 <TableCell align="left">{service.id}</TableCell>
                                 <TableCell align="left">{service.name}</TableCell>
                                 <TableCell align="left">{service.description}</TableCell>
                                 <TableCell align="center">{service.period}</TableCell>
                                 <TableCell align="center">
-                                    <IconButton color="primary" onClick={() => handleEditClick(service.id)}>
+                                    <IconButton
+                                        color="success"
+                                        onClick={() => handlePriceClick(service.id)}
+                                    >
+                                        <AttachMoneyIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="primary"
+                                        onClick={() => handleEditClick(service.id)}
+                                    >
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton color="secondary" onClick={() => handleDelete(service.id)}>
+                                    <IconButton
+                                        color="secondary"
+                                        onClick={() => handleDelete(service.id)}
+                                    >
                                         <DeleteForeverIcon />
-                                    </IconButton>
-                                    <IconButton color="success" onClick={() => handlePriceClick(service.id)}>
-                                        <AttachMoneyIcon />
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -221,13 +260,15 @@ const ServiceList = () => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="service_name"
-                        name="service_name"
+                        id="name"
+                        name="name"
                         label="Service Name"
                         type="text"
                         fullWidth
-                        value={selectedDetail.name}
-                        onChange={handleInputChange}
+                        value={formikAdd.values.name}
+                        onChange={formikAdd.handleChange}
+                        error={formikAdd.touched.name && Boolean(formikAdd.errors.name)}
+                        helperText={formikAdd.touched.name && formikAdd.errors.name}
                     />
                     <TextField
                         margin="dense"
@@ -236,8 +277,10 @@ const ServiceList = () => {
                         label="Description"
                         type="text"
                         fullWidth
-                        value={selectedDetail.description}
-                        onChange={handleInputChange}
+                        value={formikAdd.values.description}
+                        onChange={formikAdd.handleChange}
+                        error={formikAdd.touched.description && Boolean(formikAdd.errors.description)}
+                        helperText={formikAdd.touched.description && formikAdd.errors.description}
                     />
                     <TextField
                         margin="dense"
@@ -246,15 +289,17 @@ const ServiceList = () => {
                         label="Period"
                         type="number"
                         fullWidth
-                        value={selectedDetail.period}
-                        onChange={handleInputChange}
+                        value={formikAdd.values.period}
+                        onChange={formikAdd.handleChange}
+                        error={formikAdd.touched.period && Boolean(formikAdd.errors.period)}
+                        helperText={formikAdd.touched.period && formikAdd.errors.period}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleAddClose} variant="text">
                         Cancel
                     </Button>
-                    <Button onClick={handleAddSave} variant="contained">
+                    <Button onClick={formikAdd.handleSubmit} variant="contained">
                         Save
                     </Button>
                 </DialogActions>
@@ -267,13 +312,15 @@ const ServiceList = () => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="service_name"
-                        name="service_name"
+                        id="name"
+                        name="name"
                         label="Service Name"
                         type="text"
                         fullWidth
-                        value={selectedDetail.name}
-                        onChange={handleInputChange}
+                        value={formikEdit.values.name}
+                        onChange={formikEdit.handleChange}
+                        error={formikEdit.touched.name && Boolean(formikEdit.errors.name)}
+                        helperText={formikEdit.touched.name && formikEdit.errors.name}
                     />
                     <TextField
                         margin="dense"
@@ -282,8 +329,10 @@ const ServiceList = () => {
                         label="Description"
                         type="text"
                         fullWidth
-                        value={selectedDetail.description}
-                        onChange={handleInputChange}
+                        value={formikEdit.values.description}
+                        onChange={formikEdit.handleChange}
+                        error={formikEdit.touched.description && Boolean(formikEdit.errors.description)}
+                        helperText={formikEdit.touched.description && formikEdit.errors.description}
                     />
                     <TextField
                         margin="dense"
@@ -292,15 +341,17 @@ const ServiceList = () => {
                         label="Period"
                         type="number"
                         fullWidth
-                        value={selectedDetail.period}
-                        onChange={handleInputChange}
+                        value={formikEdit.values.period}
+                        onChange={formikEdit.handleChange}
+                        error={formikEdit.touched.period && Boolean(formikEdit.errors.period)}
+                        helperText={formikEdit.touched.period && formikEdit.errors.period}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleEditClose} variant="text">
                         Cancel
                     </Button>
-                    <Button onClick={handleEditSave} variant="contained">
+                    <Button onClick={formikEdit.handleSubmit} variant="contained">
                         Save
                     </Button>
                 </DialogActions>
