@@ -34,14 +34,13 @@ const DiamondValuationList = () => {
 
   const [statusIndex, setStatusIndex] = useState(0);
   const [selectedValuations, setSelectedValuations] = useState([]);
-  const { isLoading: isValuationLoading, data: valuations } = useValuations(
-    page,
-    rowsPerPage,
-    userRole,
-    currentUser?.id,
-  );
+  const {
+    isLoading: isValuationLoading,
+    data: valuations,
+    isFetching: isValuationFetching,
+  } = useValuations(page, rowsPerPage, userRole, currentUser?.id);
 
-  if (isValuationLoading) {
+  if (isValuationLoading || isValuationFetching) {
     return <UICircularIndeterminate />;
   }
   const rows = valuations.content.map((valuation) => {

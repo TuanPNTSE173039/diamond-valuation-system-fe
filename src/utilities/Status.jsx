@@ -399,6 +399,18 @@ export const convertStatus = (status) => {
           Assessed
         </Typography>
       );
+    case "APPROVED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.approved" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Approved
+        </Typography>
+      );
   }
 };
 export const convertRecordStatus = (status) => {

@@ -59,6 +59,17 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
+const ValuationInforItem = ({ title, children }) => {
+  return (
+    <Box mb={3}>
+      <Typography fontSize={20} fontWeight={700} mb={1}>
+        {title}
+      </Typography>
+      {children}
+    </Box>
+  );
+};
+
 export const metadata = {
   contentType: "image/jpeg",
 };
@@ -321,7 +332,7 @@ const DetailItem = () => {
   const handleClickClose = () => {
     setMoreDetail(false);
   };
-
+  console.log(selectedValuationDetail);
   if (isStaffLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
   }
@@ -469,6 +480,7 @@ const DetailItem = () => {
                   open={moreDetail}
                   onClose={handleClickClose}
                   scroll={"body"}
+                  fullWidth
                   maxWidth={"md"}
                   aria-labelledby="scroll-dialog-title"
                   aria-describedby="scroll-dialog-description"
@@ -481,34 +493,40 @@ const DetailItem = () => {
                       id="scroll-dialog-description"
                       tabIndex={-1}
                     >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        sx={{ gap: 2 }}
-                      >
-                        <Avatar
-                          alt={selectedValuationDetail?.staff.id}
-                          src={""}
-                        />
-                        <Typography>
-                          {selectedValuationDetail?.staff.firstName +
-                            " " +
-                            selectedValuationDetail?.staff.lastName}
-                        </Typography>
-                        <Typography>
-                          {selectedValuationDetail?.comment}
-                        </Typography>
-                        <div
-                          className=""
+                      <ValuationInforItem title="General Infor">
+                        <Box
+                          display="flex"
+                          flexDirection="row"
+                          alignItems="center"
+                          sx={{ gap: 2 }}
+                        >
+                          <Typography>Created by: </Typography>
+                          <Avatar
+                            alt={selectedValuationDetail?.staff.id}
+                            src={""}
+                          />
+                          <Typography>
+                            {selectedValuationDetail?.staff.firstName +
+                              " " +
+                              selectedValuationDetail?.staff.lastName}
+                          </Typography>
+                        </Box>
+                      </ValuationInforItem>
+                      <ValuationInforItem title="Brief Comment">
+                        {selectedValuationDetail?.comment}
+                      </ValuationInforItem>
+                      <ValuationInforItem title="Detail Comment">
+                        <Box
+                          component="div"
                           dangerouslySetInnerHTML={{
                             __html: selectedValuationDetail?.commentDetail,
                           }}
-                        ></div>
-                      </Box>
+                        />
+                      </ValuationInforItem>
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={handleClickClose}>Cancel</Button>
+                    <Button onClick={handleClickClose}>Close</Button>
                   </DialogActions>
                 </Dialog>
               </Box>
@@ -618,9 +636,13 @@ const DetailItem = () => {
       </Box>
 
       {detail.status === "CANCEL" && (
-        <Box sx={{ mt: 2 }}>
-          <Typography variant={"h6"}>Request has been canceled</Typography>
-          <Typography>{detail.cancelReason}</Typography>
+        <Box mt={5} textAlign="center">
+          <Typography variant={"h4"} fontWeight={700} color="secondary.main">
+            This diamond has been canceled
+          </Typography>
+          <Typography fontSize={20} mt={2}>
+            {detail.cancelReason}
+          </Typography>
         </Box>
       )}
 

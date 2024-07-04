@@ -144,7 +144,7 @@ const RecordScreenReceipt = () => {
       vnp_TxnRef: format(date, "HHmm").toString(),
       vnp_OrderInfo: `Payment+for+request+${requestId}`,
       vnp_ReturnUrl: encodeURIComponent(
-        frontendUrl + `requests/${requestId}/payment`,
+        frontendUrl + `requests/${requestId}/receipt/payment`,
       ),
     }));
 
@@ -167,7 +167,7 @@ const RecordScreenReceipt = () => {
     handleDialogClose();
   };
   const handleCashPayment = () => {
-    navigate(`/requests/${requestId}/payment?transaction_status=00`, {
+    navigate(`/requests/${requestId}/receipt/payment?transaction_status=00`, {
       replace: true,
     });
     handleDialogClose();

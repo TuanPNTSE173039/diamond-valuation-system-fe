@@ -17,6 +17,7 @@ import {
   formattedDiamondSize,
   formattedMoney,
 } from "../../utilities/formatter.js";
+import { convertStatus } from "../../utilities/Status.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
@@ -67,7 +68,7 @@ const DiamondValuationUserInfor = ({ ...props }) => {
         {formattedMoney(infor.servicePrice)}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LabelIcon />} title="Status">
-        {infor.status}
+        {convertStatus(infor.status)}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem
         icon={<LocalAtmIcon />}

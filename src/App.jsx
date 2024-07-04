@@ -76,11 +76,29 @@ const router = createBrowserRouter([
               },
               {
                 path: "receipt",
-                element: <RecordScreenReceipt />,
+                children: [
+                  {
+                    index: true,
+                    element: <RecordScreenReceipt />,
+                  },
+                  {
+                    path: "payment",
+                    element: <RequestResultPayment />,
+                  },
+                ],
               },
               {
                 path: "return",
-                element: <RecordScreenReturn />,
+                children: [
+                  {
+                    index: true,
+                    element: <RecordScreenReturn />,
+                  },
+                  {
+                    path: "payment",
+                    element: <RequestResultPayment />,
+                  },
+                ],
               },
               {
                 path: "commitment",
@@ -89,10 +107,6 @@ const router = createBrowserRouter([
               {
                 path: "sealing",
                 element: <RecordScreenSealing />,
-              },
-              {
-                path: "payment",
-                element: <RequestResultPayment />,
               },
             ],
           },

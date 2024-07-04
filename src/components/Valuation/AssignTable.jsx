@@ -24,7 +24,12 @@ import { useDetail } from "../../services/details.js";
 import { useStaffs } from "../../services/staffs.js";
 
 import { getStaffById } from "../../utilities/filtering.js";
+import {
+  formattedDateTime,
+  formattedMoney,
+} from "../../utilities/formatter.js";
 import Role from "../../utilities/Role.js";
+import { convertStatus } from "../../utilities/Status.jsx";
 import { StaffHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UITable from "../UI/Table.jsx";
@@ -197,10 +202,12 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                   {row.id}
                 </TableCell>
                 <TableCell align="left">{row.valuationStaffName}</TableCell>
-                <TableCell align="left">{row.date}</TableCell>
-                <TableCell align="right">{row.price}</TableCell>
+                <TableCell align="left">
+                  {formattedDateTime(row.date)}
+                </TableCell>
+                <TableCell align="right">{formattedMoney(row.price)}</TableCell>
                 <TableCell align="left">{row.comment}</TableCell>
-                <TableCell align="left">{row.status}</TableCell>
+                <TableCell align="left">{convertStatus(row.status)}</TableCell>
                 <TableCell align="center">
                   <Switch
                     checked={switches[index]}

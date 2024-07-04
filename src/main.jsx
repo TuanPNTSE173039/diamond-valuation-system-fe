@@ -64,6 +64,7 @@ const theme = createTheme({
       valuated: "#b33771",
       assessing: "#30cb83",
       assessed: "#2133a1",
+      approved: "#3FA2F6",
     },
     highlight: { white: "#ffffff" },
   },

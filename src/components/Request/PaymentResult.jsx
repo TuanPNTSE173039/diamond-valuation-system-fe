@@ -3,14 +3,21 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { axiosInstance } from "../../services/config/axiosInstance.js";
 
 const RequestResultPayment = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { requestId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [recordMode, setRecordMode] = useState("");
 
   //Params
   const transactionStatus =
@@ -20,7 +27,7 @@ const RequestResultPayment = () => {
   const transactionNo = searchParams.get("vnp_TransactionNo");
 
   const handleBack = () => {
-    navigate(`/requests/${requestId}/receipt`, { replace: true });
+    navigate(`/requests/${requestId}/${recordMode}`, { replace: true });
   };
 
   //save to db if transaction successful
@@ -38,6 +45,11 @@ const RequestResultPayment = () => {
         },
         valuationRequestID: requestId,
       });
+    }
+    if (location.pathname.includes("/receipt/")) {
+      setRecordMode("receipt");
+    } else if (location.pathname.includes("/return/")) {
+      setRecordMode("return");
     }
   }, []);
 
@@ -60,7 +72,7 @@ const RequestResultPayment = () => {
       </Typography>
       <Button variant="contained" onClick={handleBack}>
         <ArrowBackIcon />
-        Back to Receipt
+        Back to {recordMode === "receipt" ? "Receipt" : "Return"}
       </Button>
     </Box>
   );
