@@ -35,3 +35,10 @@ export const formattedCaratWeight = (weight) => {
   }
   return `${weight} .ct`;
 };
+
+export const formattedHour = (number) => {
+  if (!number) {
+    return "N/A";
+  }
+  return `${number} hrs`
+};

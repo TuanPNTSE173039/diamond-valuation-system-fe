@@ -11,6 +11,18 @@ export const useServices = () => {
     });
 };
 
+export const useService = (id) => {
+    return useQuery({
+        queryKey: ["service", { serviceId: id }],
+        queryFn: async () => {
+            const response = await axiosInstance.get(`services/${id}`);
+            return response.data;
+        },
+        enabled: id !== undefined && id !== null,
+    });
+
+}
+
 export const useServiceList = (id) => {
     return useQuery({
         queryKey: ["service", { serviceId: id }],

@@ -19,54 +19,50 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
 import { useFormik } from "formik";
-import { useParams } from "react-router-dom";
-import { useServiceList } from "../../services/services";
+import {useParams,  useLocation} from "react-router-dom";
+import { useService } from "../../services/services";
 import UICircularIndeterminate from "../UI/CircularIndeterminate";
-import {deleteServicePrice, postServicePrice, updateServicePrice} from "../../services/api";
+import { deleteServicePrice, postServicePrice, updateServicePrice } from "../../services/api";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import { formattedDiamondSize, formattedMoney } from "../../utilities/formatter.js";
+import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 
 const ServicePriceList = () => {
     const { serviceId } = useParams();
-    const { data: servicePriceList, isLoading, refetch } = useServiceList(serviceId);
-    const [localServicePriceList, setLocalServicePriceList] = React.useState([]);
-    const [selectedDetail, setSelectedDetail] = React.useState({
-        id: undefined,
-        min_size: 0.0,
-        max_size: 0.0,
-        init_price: 0.0,
-        unit_price: 0.0,
-    });
+    const { data: serviceData, isLoading, refetch } = useService(serviceId);
+
+    const [localServicePriceList, setLocalServicePriceList] = React.useState(null);
+    const [selectedDetail, setSelectedDetail] = React.useState(null);
     const [openEdit, setOpenEdit] = React.useState(false);
     const [openAdd, setOpenAdd] = React.useState(false);
+    const location = useLocation();
+    const pathNames = location.pathname.split("/").filter((x) => x);
 
     React.useEffect(() => {
-        if (servicePriceList) {
-            setLocalServicePriceList(servicePriceList);
+        if (serviceData) {
+            const updatedServicePriceList = {
+                id: serviceData.id,
+                name: serviceData.name,
+                description: serviceData.description,
+                period: serviceData.period,
+                servicePriceLists: serviceData.servicePriceLists,
+            };
+            // Sort servicePriceLists by minSize ascending
+            updatedServicePriceList.servicePriceLists.sort((a, b) => a.minSize - b.minSize);
+            setLocalServicePriceList(updatedServicePriceList);
         }
-    }, [servicePriceList]);
+    }, [serviceData]);
 
     const handleEditClick = (id) => {
         setOpenEdit(true);
-        const service = localServicePriceList.find((service) => service.id === id);
-        setSelectedDetail({
-            id: service.id,
-            min_size: service.minSize,
-            max_size: service.maxSize,
-            init_price: service.initPrice,
-            unit_price: service.unitPrice,
-        });
+        const service = localServicePriceList.servicePriceLists.find((service) => service.id === id);
+        setSelectedDetail(service);
     };
 
     const handleEditClose = () => {
         setOpenEdit(false);
-        setSelectedDetail({
-            id: undefined,
-            min_size: 0.0,
-            max_size: 0.0,
-            init_price: 0.0,
-            unit_price: 0.0,
-        });
+        setSelectedDetail(null);
     };
 
     const handleEditSave = async (values) => {
@@ -76,14 +72,18 @@ const ServicePriceList = () => {
             maxSize: values.max_size,
             initPrice: values.init_price,
             unitPrice: values.unit_price,
+            serviceId: serviceId,
         };
 
         try {
             await updateServicePrice(selectedDetail.id, updatedService);
-            const updatedList = localServicePriceList.map((service) =>
+            const updatedList = localServicePriceList.servicePriceLists.map((service) =>
                 service.id === selectedDetail.id ? updatedService : service
             );
-            setLocalServicePriceList(updatedList);
+            setLocalServicePriceList({
+                ...localServicePriceList,
+                servicePriceLists: updatedList,
+            });
             toast.success("Service price updated successfully");
             await refetch();
         } catch (error) {
@@ -96,8 +96,11 @@ const ServicePriceList = () => {
     const handleDelete = async (id) => {
         try {
             await deleteServicePrice(id);
-            const updatedServiceList = localServicePriceList.filter((service) => service.id !== id);
-            setLocalServicePriceList(updatedServiceList);
+            const updatedServiceList = localServicePriceList.servicePriceLists.filter((service) => service.id !== id);
+            setLocalServicePriceList({
+                ...localServicePriceList,
+                servicePriceLists: updatedServiceList,
+            });
             toast.success("Service price deleted successfully");
             await refetch();
         } catch (error) {
@@ -107,24 +110,12 @@ const ServicePriceList = () => {
 
     const handleAddClick = () => {
         setOpenAdd(true);
-        setSelectedDetail({
-            id: undefined,
-            min_size: 0.0,
-            max_size: 0.0,
-            init_price: 0.0,
-            unit_price: 0.0,
-        });
+        setSelectedDetail(null);
     };
 
     const handleAddClose = () => {
         setOpenAdd(false);
-        setSelectedDetail({
-            id: undefined,
-            min_size: 0.0,
-            max_size: 0.0,
-            init_price: 0.0,
-            unit_price: 0.0,
-        });
+        setSelectedDetail(null);
     };
 
     const handleAddSave = async (values) => {
@@ -139,7 +130,10 @@ const ServicePriceList = () => {
         try {
             const response = await postServicePrice(newService);
             const createdServicePrice = response.data;
-            setLocalServicePriceList([...localServicePriceList, createdServicePrice]);
+            setLocalServicePriceList({
+                ...localServicePriceList,
+                servicePriceLists: [...localServicePriceList.servicePriceLists, createdServicePrice],
+            });
             toast.success("Service price added successfully");
             await refetch();
         } catch (error) {
@@ -151,18 +145,20 @@ const ServicePriceList = () => {
 
     const validationSchema = Yup.object().shape({
         min_size: Yup.number().required("Min Size is required").positive("Min Size must be a positive number"),
-        max_size: Yup.number().required("Max Size is required").positive("Max Size must be a positive number").
-        moreThan(Yup.ref('min_size'), "Max Size must be greater than Min Size"),
+        max_size: Yup.number()
+            .required("Max Size is required")
+            .positive("Max Size must be a positive number")
+            .moreThan(Yup.ref("min_size"), "Max Size must be greater than Min Size"),
         init_price: Yup.number().required("Init Price is required").positive("Init Price must be a positive number"),
         unit_price: Yup.number().required("Unit Price is required"),
     });
 
     const formikEdit = useFormik({
         initialValues: {
-            min_size: selectedDetail.min_size,
-            max_size: selectedDetail.max_size,
-            init_price: selectedDetail.init_price,
-            unit_price: selectedDetail.unit_price,
+            min_size: selectedDetail ? selectedDetail.minSize : 0.0,
+            max_size: selectedDetail ? selectedDetail.maxSize : 0.0,
+            init_price: selectedDetail ? selectedDetail.initPrice : 0.0,
+            unit_price: selectedDetail ? selectedDetail.unitPrice : 0.0,
         },
         enableReinitialize: true,
         validationSchema: validationSchema,
@@ -185,6 +181,8 @@ const ServicePriceList = () => {
     }
 
     return (
+        <>
+            <UIBreadCrumb pathNames={pathNames} />
         <Box sx={{ width: "100%" }}>
             <Box
                 sx={{
@@ -193,6 +191,7 @@ const ServicePriceList = () => {
                     display: "flex",
                     flexDirection: "row",
                     justifyContent: "space-between",
+                    alignItems: "center",
                 }}
             >
                 <Typography variant="h6" sx={{ fontWeight: "600" }}>Service Price List</Typography>
@@ -204,28 +203,30 @@ const ServicePriceList = () => {
                 <Table>
                     <TableHead>
                         <TableRow sx={{ backgroundColor: "primary.main" }}>
-                            <TableCell align="center" sx={{ color: "white" }}>ID</TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>Min Size</TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>Max Size</TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>Init Price</TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>Unit Price</TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>No.</TableCell>
+                            <TableCell align="left" sx={{ color: "white" }}>Service Name</TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>Min Size</TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>Max Size</TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>Init Price</TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>Unit Price</TableCell>
                             <TableCell align="center" sx={{ color: "white" }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {localServicePriceList.map((service) => (
+                        {localServicePriceList && localServicePriceList.servicePriceLists.map((service, index) => (
                             <TableRow key={service.id}>
-                                <TableCell align="center">{service.id}</TableCell>
-                                <TableCell align="center">{service.minSize}</TableCell>
-                                <TableCell align="center">{service.maxSize}</TableCell>
-                                <TableCell align="center">{service.initPrice}</TableCell>
-                                <TableCell align="center">{service.unitPrice}</TableCell>
+                                <TableCell align="center">{index + 1}</TableCell>
+                                <TableCell align="left">{localServicePriceList.name}</TableCell>
+                                <TableCell align="right">{formattedDiamondSize(service.minSize)}</TableCell>
+                                <TableCell align="right">{formattedDiamondSize(service.maxSize)}</TableCell>
+                                <TableCell align="right">{formattedMoney(service.initPrice)}</TableCell>
+                                <TableCell align="right">{formattedMoney(service.unitPrice)}</TableCell>
                                 <TableCell align="center">
-                                    <IconButton aria-label="edit" onClick={() => handleEditClick(service.id)}>
-                                        <EditIcon color="primary" />
+                                    <IconButton aria-label="edit" color="primary" onClick={() => handleEditClick(service.id)}>
+                                        <EditIcon />
                                     </IconButton>
-                                    <IconButton aria-label="delete" onClick={() => handleDelete(service.id)}>
-                                        <DeleteForeverIcon color="secondary" />
+                                    <IconButton aria-label="delete" color="secondary" onClick={() => handleDelete(service.id)}>
+                                        <DeleteForeverIcon />
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -237,12 +238,12 @@ const ServicePriceList = () => {
             {/* Add Dialog */}
             <Dialog open={openAdd} onClose={handleAddClose}>
                 <form onSubmit={formikAdd.handleSubmit}>
-                    <DialogTitle>Add Service Price</DialogTitle>
+                    <DialogTitle>Add New Service Price</DialogTitle>
                     <DialogContent>
                         <TextField
                             margin="dense"
                             id="min_size"
-                            label="Min Size"
+                            label="Min Size (mm)"
                             type="number"
                             inputProps={{ step: 0.01 }}
                             fullWidth
@@ -254,7 +255,7 @@ const ServicePriceList = () => {
                         <TextField
                             margin="dense"
                             id="max_size"
-                            label="Max Size"
+                            label="Max Size (mm)"
                             type="number"
                             inputProps={{ step: 0.01 }}
                             fullWidth
@@ -266,7 +267,7 @@ const ServicePriceList = () => {
                         <TextField
                             margin="dense"
                             id="init_price"
-                            label="Init Price"
+                            label="Init Price ($00.00)"
                             type="number"
                             inputProps={{ step: 0.1 }}
                             fullWidth
@@ -278,7 +279,7 @@ const ServicePriceList = () => {
                         <TextField
                             margin="dense"
                             id="unit_price"
-                            label="Unit Price"
+                            label="Unit Price ($00.00)"
                             type="number"
                             inputProps={{ step: 0.1 }}
                             fullWidth
@@ -303,7 +304,7 @@ const ServicePriceList = () => {
                         <TextField
                             margin="dense"
                             id="min_size"
-                            label="Min Size"
+                            label="Min Size (mm)"
                             type="number"
                             inputProps={{ step: 0.01 }}
                             fullWidth
@@ -315,7 +316,7 @@ const ServicePriceList = () => {
                         <TextField
                             margin="dense"
                             id="max_size"
-                            label="Max Size"
+                            label="Max Size (mm)"
                             type="number"
                             inputProps={{ step: 0.01 }}
                             fullWidth
@@ -327,7 +328,7 @@ const ServicePriceList = () => {
                         <TextField
                             margin="dense"
                             id="init_price"
-                            label="Init Price"
+                            label="Init Price ($00.00)"
                             type="number"
                             inputProps={{ step: 0.1 }}
                             fullWidth
@@ -339,7 +340,7 @@ const ServicePriceList = () => {
                         <TextField
                             margin="dense"
                             id="unit_price"
-                            label="Unit Price"
+                            label="Unit Price ($00.00)"
                             type="number"
                             inputProps={{ step: 0.1 }}
                             fullWidth
@@ -356,6 +357,7 @@ const ServicePriceList = () => {
                 </form>
             </Dialog>
         </Box>
+      </>
     );
 };
 

@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-npo-dom";
 import AppLayout from "./components/AppLayout.jsx";
 import AuthGuard from "./components/Auth/AuthGuard.jsx";
 import GuestGuard from "./components/Auth/GuestGuard.jsx";
@@ -230,7 +230,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: ":serviceId/service-price-lists",
+            path: ":serviceId",
             element: (
                 <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
                   <ServicePriceList />
@@ -251,7 +251,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: ":supplierId/diamond-market",
+            path: ":supplierId",
             element: (
                 <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
                   <DiamondList />

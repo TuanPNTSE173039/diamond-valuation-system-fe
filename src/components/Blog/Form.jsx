@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -12,6 +12,7 @@ import { postBlog, updateBlog } from "../../services/api.js";
 import { toast } from "react-toastify";
 import UIRichTextEditor from "../UI/RichTextEditor.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
+import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 
 const BlogForm = () => {
   const location = useLocation();
@@ -19,24 +20,31 @@ const BlogForm = () => {
   const blogDetail = location.state?.blog;
   const blogId = blogDetail?.id;
 
+  const [submittedBlogId, setSubmittedBlogId] = useState(null);
+
   const handleAddSave = async (values) => {
     const blogData = {
       title: values.title,
       author: values.author,
       reference: values.reference,
       content: values.content,
+      description: values.description,
       thumbnail: values.thumbnail,
     };
 
     try {
+      let response;
       if (blogId) {
-        await updateBlog(blogId, blogData);
+        response = await updateBlog(blogId, blogData);
         toast.success("Blog updated successfully");
       } else {
-        await postBlog(blogData);
+        response = await postBlog(blogData);
         toast.success("Blog added successfully");
       }
-      navigate("/blogs");
+
+      const submittedId = response.data.id; // Assuming your API response structure returns an 'id'
+      setSubmittedBlogId(submittedId);
+      navigate(`/blogs/${submittedId}`);
     } catch (error) {
       toast.error("Failed to save blog");
     }
@@ -53,6 +61,10 @@ const BlogForm = () => {
         .min(1, "Minimum 1 character")
         .max(5000, "Maximum 5000 characters")
         .required("Content is required"),
+    description: Yup.string()
+        .min(1, "Minimum 1 character")
+        .max(5000, "Maximum 5000 characters")
+        .required("Description is required"),
     thumbnail: Yup.string().required("Thumbnail is required"),
   });
 
@@ -62,6 +74,7 @@ const BlogForm = () => {
       author: blogDetail?.author || "",
       reference: blogDetail?.reference || "",
       content: blogDetail?.content || "",
+      description: blogDetail?.description || "",
       thumbnail: blogDetail?.thumbnail || "",
     },
     validationSchema: validationSchema,
@@ -72,9 +85,15 @@ const BlogForm = () => {
     formik.setFieldValue("content", content);
   };
 
+  const handleDescriptionChange = (description) => {
+    formik.setFieldValue("description", description);
+  };
+
+  const pathNames = location.pathname.split("/").filter((x) => x);
+
   return (
       <>
-        <Box>BreadCrumb</Box>
+        <UIBreadCrumb pathNames={pathNames} />
         <UIBasicHeader title={blogId ? "Edit a post" : "Create a new post"} />
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Paper
@@ -130,7 +149,9 @@ const BlogForm = () => {
                   value={formik.values.reference}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  error={formik.touched.reference && Boolean(formik.errors.reference)}
+                  error={
+                      formik.touched.reference && Boolean(formik.errors.reference)
+                  }
                   helperText={formik.touched.reference && formik.errors.reference}
               />
               <Box mt={2.5}>
@@ -144,6 +165,21 @@ const BlogForm = () => {
                 />
                 {formik.touched.content && formik.errors.content && (
                     <Typography color="error">{formik.errors.content}</Typography>
+                )}
+              </Box>
+              <Box mt={2.5}>
+                <Typography fontSize={16} fontWeight={700} mb={0.7}>
+                  Description
+                </Typography>
+                <UIRichTextEditor
+                    value={formik.values.description}
+                    onChange={handleDescriptionChange}
+                    isDisabled={false}
+                />
+                {formik.touched.description && formik.errors.description && (
+                    <Typography color="error">
+                      {formik.errors.description}
+                    </Typography>
                 )}
               </Box>
               <TextField

@@ -35,7 +35,6 @@ const BlogList = () => {
 
   return (
       <>
-        <Box>BreadCrumb</Box>
         <Stack
             direction="row"
             alignItems="center"

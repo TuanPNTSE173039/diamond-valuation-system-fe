@@ -17,10 +17,11 @@ const BlogGrid = ({ page, rowsPerPage, status }) => {
                     <BlogCard
                         blogId={blog.id}
                         title={blog.title}
-                        content={parse(DOMPurify.sanitize(blog.content))}
+                        description={parse(DOMPurify.sanitize(blog.description))}
                         image={blog.thumbnail}
                         creationDate={blog.creationDate}
                         refetch={refetch}
+                        status={blog.status}
                     />
                 </Grid>
             ))}

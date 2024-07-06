@@ -25,6 +25,7 @@ import { postSupplier, updateSupplier, deleteSupplier } from "../../services/api
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
 import DiamondIcon from "@mui/icons-material/Diamond";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
 const SupplierList = () => {
     const { data: supplierList, isLoading, refetch } = useSuppliers();
@@ -36,6 +37,8 @@ const SupplierList = () => {
     });
     const [openEdit, setOpenEdit] = React.useState(false);
     const [openAdd, setOpenAdd] = React.useState(false);
+    const [openDeleteConfirm, setOpenDeleteConfirm] = React.useState(false);
+    const [selectedDeleteId, setSelectedDeleteId] = React.useState(null);
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -85,15 +88,27 @@ const SupplierList = () => {
         handleEditClose();
     };
 
-    const handleDelete = async (id) => {
+    const handleDeleteClick = (id) => {
+        setSelectedDeleteId(id);
+        setOpenDeleteConfirm(true);
+    };
+
+    const handleDeleteConfirmClose = () => {
+        setOpenDeleteConfirm(false);
+        setSelectedDeleteId(null);
+    };
+
+    const handleDeleteConfirm = async () => {
         try {
-            await deleteSupplier(id);
-            const updatedSupplierList = localSupplierList.filter((supplier) => supplier.id !== id);
+            await deleteSupplier(selectedDeleteId);
+            const updatedSupplierList = localSupplierList.filter((supplier) => supplier.id !== selectedDeleteId);
             setLocalSupplierList(updatedSupplierList);
             toast.success("Supplier deleted successfully");
             await refetch();
         } catch (error) {
             toast.error("Failed to delete supplier");
+        } finally {
+            handleDeleteConfirmClose();
         }
     };
 
@@ -158,11 +173,11 @@ const SupplierList = () => {
         onSubmit: handleAddSave,
     });
     const handlePriceClick = (id) => {
-        navigate(`/suppliers/${id}/diamond-market`);
+        navigate(`/suppliers/${id}`);
     };
 
     if (isLoading) {
-        return <Typography>Loading...</Typography>;
+        return <UICircularIndeterminate />;
     }
 
     return (
@@ -187,13 +202,16 @@ const SupplierList = () => {
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
                         <TableRow sx={{ backgroundColor: "primary.main" }}>
-                            <TableCell align="left" sx={{ color: "white" }}>
-                                Id
+                            <TableCell align="center" sx={{ color: "white" }}>
+                                No.
                             </TableCell>
                             <TableCell align="center" sx={{ color: "white" }}>
+                                Supplier Image
+                            </TableCell>
+                            <TableCell align="left" sx={{ color: "white" }}>
                                 Supplier Name
                             </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
+                            <TableCell align="left" sx={{ color: "white" }}>
                                 Link
                             </TableCell>
                             <TableCell align="center" sx={{ color: "white" }}>
@@ -202,11 +220,12 @@ const SupplierList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {localSupplierList.map((supplier) => (
+                        {localSupplierList.map((supplier, index) => (
                             <TableRow key={supplier.id}>
-                                <TableCell align="left">{supplier.id}</TableCell>
-                                <TableCell align="center">{supplier.name}</TableCell>
-                                <TableCell align="center">
+                                <TableCell align="center">{index + 1}</TableCell>
+                                <TableCell align="center">{supplier.image}</TableCell>
+                                <TableCell align="left">{supplier.name}</TableCell>
+                                <TableCell align="left">
                                     <a href={supplier.link} target="_blank" rel="noopener noreferrer">
                                         {supplier.link}
                                     </a>
@@ -221,10 +240,11 @@ const SupplierList = () => {
                                     <IconButton color="primary" onClick={() => handleEditClick(supplier.id)}>
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton color="secondary" onClick={() => handleDelete(supplier.id)}>
+                                    <IconButton color="secondary" onClick={() => handleDeleteClick(supplier.id)}>
                                         <DeleteForeverIcon />
                                     </IconButton>
                                 </TableCell>
+                                <TableCell style={{ display: "none" }}>{supplier.id}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -307,6 +327,29 @@ const SupplierList = () => {
                     </Button>
                     <Button onClick={formikEdit.handleSubmit} variant="contained">
                         Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={openDeleteConfirm}
+                onClose={handleDeleteConfirmClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+                <DialogContent>
+                    <Typography id="alert-dialog-description">
+                        Are you sure you want to delete this supplier?
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteConfirmClose} variant="text">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDeleteConfirm} variant="contained" color="secondary">
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>

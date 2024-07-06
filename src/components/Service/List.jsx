@@ -25,8 +25,9 @@ import AddIcon from "@mui/icons-material/Add";
 import UICircularIndeterminate from "../UI/CircularIndeterminate";
 import { StyledBadge } from "../../assets/styles/Badge";
 import { useServices } from "../../services/services";
-import { updateService, postService, deleteService } from "../../services/api"; // Import hàm xóa service từ API
+import { updateService, postService, deleteService } from "../../services/api";
 import * as Yup from "yup";
+import {formattedHour} from "../../utilities/formatter.js";
 
 const ServiceList = () => {
     const { data: serviceList, isLoading, refetch } = useServices();
@@ -104,7 +105,7 @@ const ServiceList = () => {
     };
 
     const handlePriceClick = (id) => {
-        navigate(`/services/${id}/service-price-lists`);
+        navigate(`/services/${id}`);
     };
 
     const handleAddClick = () => {
@@ -203,16 +204,16 @@ const ServiceList = () => {
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
                         <TableRow sx={{ backgroundColor: "primary.main" }}>
-                            <TableCell align="left" sx={{ color: "white" }}>
-                                Id
-                            </TableCell>
                             <TableCell align="center" sx={{ color: "white" }}>
+                                No.
+                            </TableCell>
+                            <TableCell align="left" sx={{ color: "white" }}>
                                 Service Name
                             </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
+                            <TableCell align="left" sx={{ color: "white" }}>
                                 Description
                             </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
+                            <TableCell align="right" sx={{ color: "white" }}>
                                 Period
                             </TableCell>
                             <TableCell align="center" sx={{ color: "white" }}>
@@ -221,12 +222,12 @@ const ServiceList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {localServiceList.map((service) => (
+                        {localServiceList.map((service,index) => (
                             <TableRow key={service.id}>
-                                <TableCell align="left">{service.id}</TableCell>
+                                <TableCell align="center">{index + 1}</TableCell>
                                 <TableCell align="left">{service.name}</TableCell>
                                 <TableCell align="left">{service.description}</TableCell>
-                                <TableCell align="center">{service.period}</TableCell>
+                                <TableCell align="right">{formattedHour(service.period)}</TableCell>
                                 <TableCell align="center">
                                     <IconButton
                                         color="success"
@@ -286,7 +287,7 @@ const ServiceList = () => {
                         margin="dense"
                         id="period"
                         name="period"
-                        label="Period"
+                        label="Period (Hours)"
                         type="number"
                         fullWidth
                         value={formikAdd.values.period}
@@ -338,7 +339,7 @@ const ServiceList = () => {
                         margin="dense"
                         id="period"
                         name="period"
-                        label="Period"
+                        label="Period (Hours)"
                         type="number"
                         fullWidth
                         value={formikEdit.values.period}

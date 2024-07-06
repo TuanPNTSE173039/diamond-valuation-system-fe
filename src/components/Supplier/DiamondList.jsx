@@ -1,6 +1,4 @@
-import AddIcon from "@mui/icons-material/Add";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import EditIcon from "@mui/icons-material/Edit";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -16,98 +14,47 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { StyledBadge } from "../../assets/styles/Badge.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import { useDiamondsOfSupplier } from "../../services/suppliers.js";
-import { useParams } from "react-router-dom";
-import {deleteDiamond} from "../../services/api.js";
-import {toast} from "react-toastify";
+import {useLocation, useParams} from "react-router-dom";
+import { deleteDiamond } from "../../services/api.js";
+import { toast } from "react-toastify";
+import {formattedCaratWeight, formattedMoney} from "../../utilities/formatter.js";
+import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 
 const DiamondList = () => {
   const { supplierId } = useParams();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { data, isLoading, error, refetch } = useDiamondsOfSupplier(page, rowsPerPage, supplierId);
+  const { data, isLoading, refetch } = useDiamondsOfSupplier(page, rowsPerPage, supplierId);
   const diamondList = data?.diamonds || [];
   const totalCount = data?.totalCount || 0;
+  const [openDeleteConfirm, setOpenDeleteConfirm] = React.useState(false);
+  const [selectedDeleteId, setSelectedDeleteId] = React.useState(null);
 
-  const [selectedDetail, setSelectedDetail] = useState({
-    id: undefined,
-    diamondImage: "",
-    diamondOrigin: "",
-    caratWeight: 0,
-    color: "",
-    clarity: "",
-    cut: "",
-    polish: "",
-    symmetry: "",
-    shape: "",
-    fluorescence: "",
-    cutScore: 0,
-    price: 0,
-    supplierId: 1,
-  });
+  const handleDeleteClick = (id) => {
+    setSelectedDeleteId(id);
+    setOpenDeleteConfirm(true);
+  };
 
-  // const [openEdit, setOpenEdit] = useState(false);
-  //
-  // const handleEditClick = (id) => {
-  //   setOpenEdit(true);
-  //   const diamond = diamondList.find((diamond) => diamond.id === id);
-  //   setSelectedDetail({ ...diamond });
-  // };
-  //
-  // const handleEditClose = () => {
-  //   setOpenEdit(false);
-  //   setSelectedDetail({
-  //     id: undefined,
-  //     diamondImage: "",
-  //     diamondOrigin: "",
-  //     caratWeight: 0,
-  //     color: "",
-  //     clarity: "",
-  //     cut: "",
-  //     polish: "",
-  //     symmetry: "",
-  //     shape: "",
-  //     fluorescence: "",
-  //     cutScore: 0,
-  //     price: 0,
-  //     supplierId: 1,
-  //   });
-  // };
+  const handleDeleteConfirmClose = () => {
+    setOpenDeleteConfirm(false);
+    setSelectedDeleteId(null);
+  };
 
-  // const handleEditSave = () => {
-  //   const updatedDiamondList = diamondList.map((diamond) => {
-  //     if (diamond.id === selectedDetail.id) {
-  //       return { ...selectedDetail };
-  //     }
-  //     return diamond;
-  //   });
-  //   // Since diamondList is managed by useQuery, update it appropriately.
-  //   setOpenEdit(false);
-  //   handleEditClose();
-  // };
-  //
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setSelectedDetail((prevState) => ({
-  //     ...prevState,
-  //     [name]: name === "caratWeight" || name === "cutScore" || name === "price" ? parseFloat(value) : value,
-  //   }));
-  // };
-
-  const handleDelete = async (id) => {
+  const handleDeleteConfirm = async () => {
     try {
-      await deleteDiamond(id);
-      refetch({ page, rowsPerPage });
-      toast.success(`Successfully deleted diamond`);
+      await deleteDiamond(selectedDeleteId);
+      toast.success("Diamond deleted successfully");
+      await refetch();
     } catch (error) {
-      toast.error(`Failed to delete diamond`);
-      // Handle error, such as showing a message to the user
+      toast.error("Failed to delete diamond");
+    } finally {
+      handleDeleteConfirmClose();
     }
   };
 
@@ -127,12 +74,12 @@ const DiamondList = () => {
   if (isLoading) {
     return <UICircularIndeterminate />;
   }
-
-  if (error) {
-    return <Typography>Error: {error.message}</Typography>;
-  }
+  const location = useLocation();
+  const pathNames = location.pathname.split("/").filter((x) => x);
 
   return (
+      <>
+        <UIBreadCrumb pathNames={pathNames} />
       <Box sx={{ width: "100%" }}>
         <Box
             sx={{
@@ -153,8 +100,8 @@ const DiamondList = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow sx={{ backgroundColor: "primary.main" }}>
-                <TableCell align="left" sx={{ color: "white" }}>
-                  Id
+                <TableCell align="center" sx={{ color: "white" }}>
+                  No.
                 </TableCell>
                 <TableCell align="center" sx={{ color: "white" }}>
                   Image
@@ -198,12 +145,12 @@ const DiamondList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {diamondList.map((diamond) => (
+              {diamondList.map((diamond, index) => (
                   <TableRow key={diamond.id}>
-                    <TableCell align="left">{diamond.id}</TableCell>
+                    <TableCell align="center">{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell align="center">{diamond.diamondImage}</TableCell>
                     <TableCell align="center">{diamond.diamondOrigin}</TableCell>
-                    <TableCell align="center">{diamond.caratWeight}</TableCell>
+                    <TableCell align="center">{formattedCaratWeight(diamond.caratWeight)}</TableCell>
                     <TableCell align="center">{diamond.color}</TableCell>
                     <TableCell align="center">{diamond.clarity}</TableCell>
                     <TableCell align="center">{diamond.cut}</TableCell>
@@ -212,9 +159,9 @@ const DiamondList = () => {
                     <TableCell align="center">{diamond.shape}</TableCell>
                     <TableCell align="center">{diamond.fluorescence}</TableCell>
                     <TableCell align="center">{diamond.cutScore}</TableCell>
-                    <TableCell align="center">{diamond.price}</TableCell>
+                    <TableCell align="center">{formattedMoney(diamond.price)}</TableCell>
                     <TableCell align="center">
-                      <IconButton color="secondary" onClick={() => handleDelete(diamond.id)}>
+                      <IconButton color="secondary" onClick={() => handleDeleteClick(diamond.id)}>
                         <DeleteForeverIcon />
                       </IconButton>
                     </TableCell>
@@ -232,145 +179,30 @@ const DiamondList = () => {
               onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </TableContainer>
-        {/*/!* Edit Dialog *!/*/}
-        {/*<Dialog open={openEdit} onClose={handleEditClose}>*/}
-        {/*  <DialogTitle>Edit Diamond</DialogTitle>*/}
-        {/*  <DialogContent>*/}
-        {/*    <TextField*/}
-        {/*        autoFocus*/}
-        {/*        margin="dense"*/}
-        {/*        id="diamondImage"*/}
-        {/*        name="diamondImage"*/}
-        {/*        label="Diamond Image"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.diamondImage}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="diamondOrigin"*/}
-        {/*        name="diamondOrigin"*/}
-        {/*        label="Diamond Origin"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.diamondOrigin}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="caratWeight"*/}
-        {/*        name="caratWeight"*/}
-        {/*        label="Carat Weight"*/}
-        {/*        type="number"*/}
-        {/*        inputProps={{ step: 0.01 }}*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.caratWeight}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="color"*/}
-        {/*        name="color"*/}
-        {/*        label="Color"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.color}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="clarity"*/}
-        {/*        name="clarity"*/}
-        {/*        label="Clarity"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.clarity}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="cut"*/}
-        {/*        name="cut"*/}
-        {/*        label="Cut"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.cut}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="polish"*/}
-        {/*        name="polish"*/}
-        {/*        label="Polish"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.polish}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="symmetry"*/}
-        {/*        name="symmetry"*/}
-        {/*        label="Symmetry"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.symmetry}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="shape"*/}
-        {/*        name="shape"*/}
-        {/*        label="Shape"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.shape}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="fluorescence"*/}
-        {/*        name="fluorescence"*/}
-        {/*        label="Fluorescence"*/}
-        {/*        type="text"*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.fluorescence}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="cutScore"*/}
-        {/*        name="cutScore"*/}
-        {/*        label="Cut Score"*/}
-        {/*        type="number"*/}
-        {/*        inputProps={{ step: 0.1 }}*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.cutScore}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*    <TextField*/}
-        {/*        margin="dense"*/}
-        {/*        id="price"*/}
-        {/*        name="price"*/}
-        {/*        label="Price"*/}
-        {/*        type="number"*/}
-        {/*        inputProps={{ step: 0.01 }}*/}
-        {/*        fullWidth*/}
-        {/*        value={selectedDetail.price}*/}
-        {/*        onChange={handleInputChange}*/}
-        {/*    />*/}
-        {/*  </DialogContent>*/}
-        {/*  <DialogActions>*/}
-        {/*    <Button onClick={handleEditClose} variant="text">*/}
-        {/*      Cancel*/}
-        {/*    </Button>*/}
-        {/*    <Button onClick={handleEditSave} variant="contained">*/}
-        {/*      Save*/}
-        {/*    </Button>*/}
-        {/*  </DialogActions>*/}
-        {/*</Dialog>*/}
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+            open={openDeleteConfirm}
+            onClose={handleDeleteConfirmClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+          <DialogContent>
+            <Typography id="alert-dialog-description">
+              Are you sure you want to delete this diamond?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteConfirmClose} variant="text">
+              Cancel
+            </Button>
+            <Button onClick={handleDeleteConfirm} variant="contained" color="secondary">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
+        </>
   );
 };
 
