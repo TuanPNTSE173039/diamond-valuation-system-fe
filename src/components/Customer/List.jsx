@@ -25,7 +25,7 @@ const CustomerList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
-    const { data: customers, isLoading: isRequestFetching } = useCustomers();
+    const { data: customers, isFetching: isRequestFetching } = useCustomers();
 
     const handleChange = (event, newValue) => {
         setStatusIndex(newValue);

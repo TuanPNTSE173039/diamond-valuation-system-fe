@@ -12,8 +12,6 @@ import {
     DialogContent,
     DialogContentText,
     DialogActions,
-    Snackbar,
-    Alert
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
@@ -31,21 +29,25 @@ import UIDateRangePicker from "../UI/DateRangePicker";
 import UICircularIndeterminate from "../UI/CircularIndeterminate";
 import { formattedDateTime } from "../../utilities/formatter";
 import { banCustomer } from "../../services/api.js";
+import { toast } from "react-toastify";
+import {useQueryClient} from "@tanstack/react-query";
+import WorkIcon from "@mui/icons-material/Work.js";
 
 const defaultAvatar = "https://via.placeholder.com/56"; // Set your default avatar URL here
 
 const CustomerDetail = () => {
     const { customerId } = useParams();
-    const { data: customer, isFetching: isRequestFetching } = useCustomer(customerId);
+    const queryClient = useQueryClient();
+
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const { data: valuationRequests, isFetching: isValuationFetching } = useValuationRequests(customerId, rowsPerPage, page);
     const [selectedRequests, setSelectedRequests] = useState([]);
     const [statusIndex, setStatusIndex] = useState(0);
-    const [openDialog, setOpenDialog] = useState(false); // State for the dialog
-    const [snackbarOpen, setSnackbarOpen] = useState(false); // State for the snackbar
-    const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+    const [openDialog, setOpenDialog] = useState(false);
+    const [status, setStatus] = useState("idle");
+
+    const { data: customer, isFetching: isRequestFetching } = useCustomer(customerId);
+    const { data: valuationRequests, isFetching: isValuationFetching } = useValuationRequests(customerId, rowsPerPage, page);
 
     const handleChange = (event, newValue) => {
         setStatusIndex(newValue);
@@ -59,28 +61,22 @@ const CustomerDetail = () => {
         setOpenDialog(false);
     };
 
-    const handleSnackbarClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setSnackbarOpen(false);
-    };
-
     const handleDeleteConfirm = async () => {
+        setStatus("loading");
         try {
             await banCustomer(customerId);
-            if(customer.account.is_active) {
-                setSnackbarMessage("Customer banned successfully!");
+            queryClient.invalidateQueries(['customer', customerId]);
+            queryClient.invalidateQueries(['valuationRequests', customerId]);
+
+            if (customer.account.is_active) {
+                toast.success("Customer banned successfully!");
             } else {
-                setSnackbarMessage("Customer unbanned successfully!");
+                toast.success("Customer unbanned successfully!");
             }
-            setSnackbarSeverity("success");
-            setSnackbarOpen(true);
-            // Update customer state to reflect ban status
+            setStatus("success");
         } catch (error) {
-            setSnackbarMessage("Error banning customer");
-            setSnackbarSeverity("error");
-            setSnackbarOpen(true);
+            toast.error("Error banning customer");
+            setStatus("error");
         } finally {
             setOpenDialog(false);
         }
@@ -96,7 +92,7 @@ const CustomerDetail = () => {
         service: row.serviceName,
     })) : [];
 
-    if (isRequestFetching || isValuationFetching) {
+    if (isRequestFetching || isValuationFetching || status === "loading") {
         return <UICircularIndeterminate />;
     }
 
@@ -141,9 +137,15 @@ const CustomerDetail = () => {
                         <EmailIcon sx={{ marginRight: 1 }} />
                         <Typography variant="body1"><strong>Email:</strong> {customer?.account.email}</Typography>
                     </Grid>
-                    <Grid item xs={12} container alignItems="center">
+                    <Grid item xs={12} md={6} container alignItems="center">
                         <HomeIcon sx={{ marginRight: 1 }} />
                         <Typography variant="body1"><strong>Address:</strong> {customer.address}</Typography>
+                    </Grid>
+                    <Grid item xs={12} md={6} container alignItems="center">
+                        <WorkIcon sx={{ marginRight: 1 }} />
+                        <Typography variant="body1">
+                            <strong>Status:</strong> {customer.account.is_active ? "Active" : "Banned"}
+                        </Typography>
                     </Grid>
                 </Grid>
             </Box>
@@ -156,9 +158,6 @@ const CustomerDetail = () => {
                     justifyContent: "space-between",
                     alignItems: "center"
                 }}>
-                    <UISearch />
-                    <Box sx={{ flexGrow: 1 }} />
-                    <UIDateRangePicker />
                 </Box>
                 <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                     <Tabs value={statusIndex} onChange={handleChange} aria-label="valuation requests status">
@@ -177,7 +176,7 @@ const CustomerDetail = () => {
                         setSelected={setSelectedRequests}
                         page={page}
                         setPage={setPage}
-                        count={valuationRequests?.totalElements || 0}
+                        count={valuationRequests?.totalElement || 0}
                         rowsPerPage={rowsPerPage}
                         setRowsPerPage={setRowsPerPage}
                     >
@@ -229,17 +228,7 @@ const CustomerDetail = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Snackbar for success or error message */}
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
+
         </Box>
     );
 };

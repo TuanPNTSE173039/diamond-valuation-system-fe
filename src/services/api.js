@@ -74,7 +74,18 @@ export const registerStaff = async (staffData) => {
   const response = await axiosInstance.post('auth/register-staff', staffData);
   return response.data;
 };
+
 export const deleteStaff = async (staffId) => {
   const response = await axiosInstance.delete(`/staffs/${staffId}`);
+  return response.data;
+};
+
+export const updateStaff = async (staffId, staffData) => {
+  const response = await axiosInstance.put(`/staffs/${staffId}`, staffData);
+  return response.data;
+};
+
+export const updateStaffPassword = async (authID, body) => {
+  const response = await axiosInstance.put(`auth/${authID}`, body);
   return response.data;
 };

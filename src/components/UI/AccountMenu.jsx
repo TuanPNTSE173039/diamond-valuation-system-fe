@@ -28,6 +28,10 @@ export default function UIAccountMenu() {
     setAnchorEl(null);
   };
 
+  const handleProfile = () => {
+    navigate("/profile");
+  };
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/auth/login", { replace: true });
@@ -91,17 +95,11 @@ export default function UIAccountMenu() {
           <Avatar /> {currentUser?.firstName + " " + currentUser?.lastName}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <PersonAdd fontSize="small" />
-          </ListItemIcon>
-          Add another account
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleProfile}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
-          Settings
+          Profile
         </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>

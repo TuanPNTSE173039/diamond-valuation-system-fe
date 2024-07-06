@@ -29,6 +29,7 @@ import ServiceList from "./components/Service/List.jsx";
 import ServicePriceList from "./components/Service/ServicePriceList.jsx";
 import SupplierList from "./components/Supplier/List.jsx";
 import DiamondList from "./components/Supplier/DiamondList.jsx";
+import ProfilePage from "./components/Profile/Page.jsx";
 
 const router = createBrowserRouter([
   {
@@ -274,6 +275,10 @@ const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: "profile",
+    element: <ProfilePage />,
   },
 ]);
 
