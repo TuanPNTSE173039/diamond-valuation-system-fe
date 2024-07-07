@@ -65,6 +65,21 @@ const StaffList = () => {
         }
     };
 
+    const getRoleName = (role) => {
+        switch (role) {
+            case Role.CONSULTANT:
+                return "Consultant Staff";
+            case Role.VALUATION:
+                return "Valuation Staff";
+            case Role.ADMIN:
+                return "Admin Staff";
+            case Role.MANAGER:
+                return "Manager Staff";
+            default:
+                return "Unknown Role";
+        }
+    };
+
     const staffRows = (staffResponse.content || []).filter(filterStaff).map((row) => ({
         id: row.id,
         number: row.id,
@@ -73,7 +88,7 @@ const StaffList = () => {
         yearExperience: row.experience,
         totalProjects: row.countProject,
         currentProjects: row.currentTotalProject,
-        role: row.account.role === Role.CONSULTANT ? "Consultant Staff" : "Valuation Staff",
+        role: getRoleName(row.account.role),
     }));
 
     if (isFetching) {

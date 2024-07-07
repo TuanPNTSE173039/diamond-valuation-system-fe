@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { DialogTitle, Grid } from "@mui/material";
+import {DialogTitle, Grid} from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import CustomInput from "./CustomerInput.jsx";
@@ -13,11 +13,11 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import {ToastContainer, toast} from "react-toastify";
 import * as Yup from "yup";
-import { useFormik } from "formik";
-import { useDispatch } from "react-redux";
-import { setMessage } from "../../redux/messageSlide.js";
+import {useFormik} from "formik";
+import {useDispatch} from "react-redux";
+import {setMessage} from "../../redux/messageSlide.js";
 import {updateStaff, updateStaffPassword} from "../../services/api.js";
 
 const styles = {
@@ -90,6 +90,9 @@ export default function ProfileCard(props) {
                 },
             )
             .required("New password is required!"),
+        confirmPassword: Yup.string()
+            .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
+            .required('Confirm password is required!')
     });
 
     const [originalUser] = useState(user);
@@ -102,14 +105,14 @@ export default function ProfileCard(props) {
     const fullName = `${user.firstName} ${user.lastName}`;
 
     const changeField = (event) => {
-        const { name, value } = event.target;
-        setUser({ ...user, [name]: value });
+        const {name, value} = event.target;
+        setUser({...user, [name]: value});
         formik.setFieldValue(name, value);
         formik.setFieldTouched(name, true);
     };
 
     const changePasswordField = (event) => {
-        setPasswords({ ...passwords, [event.target.name]: event.target.value });
+        setPasswords({...passwords, [event.target.name]: event.target.value});
     };
 
     const [open, setOpen] = useState(false);
@@ -141,13 +144,14 @@ export default function ProfileCard(props) {
     console.log(user.staffID);
     const handleUpdate = async () => {
         const changedFields = getChangedFields();
-        console.log("Changed fields:", JSON.stringify(changedFields, null, 2));
-        try {
-            await updateStaff(user.staffID, user);
-            toast.success("Staff information updated successfully!");
-        } catch (error) {
-            toast.error("Failed to update staff information.");
-            console.error("Failed to update staff information", error);
+        if (Object.keys(changedFields).length > 0) {
+            try {
+                await updateStaff(user.staffID, user);
+                toast.success("Staff information updated successfully!");
+            } catch (error) {
+                toast.error("Failed to update staff information.");
+                console.error("Failed to update staff information", error);
+            }
         }
     };
 
@@ -161,9 +165,9 @@ export default function ProfileCard(props) {
             } else {
                 toast.success("Password updated successfully!");
                 handleClose();
-                setPasswords({ oldPassword: "", newPassword: "" });
+                setPasswords({oldPassword: "", newPassword: ""});
                 formik.resetForm({
-                    values: { ...formik.values, oldPassword: "", newPassword: "" },
+                    values: {...formik.values, oldPassword: "", newPassword: ""},
                 });
             }
         } catch (error) {
@@ -190,7 +194,7 @@ export default function ProfileCard(props) {
         }
         edit.disabled = !edit.disabled;
         edit.isEdit = !edit.isEdit;
-        update({ ...edit });
+        update({...edit});
     };
 
     const formik = useFormik({
@@ -212,12 +216,12 @@ export default function ProfileCard(props) {
 
     const handlePasswordChange = (event) => {
         formik.handleChange(event); // Đảm bảo formik cập nhật giá trị
-        setPasswords({ ...passwords, [event.target.name]: event.target.value });
+        setPasswords({...passwords, [event.target.name]: event.target.value});
     };
 
     return (
-        <Card variant="outlined" sx={{ height: "730px", width: "96%" }}>
-            <ToastContainer containerId="profile" />
+        <Card variant="outlined" sx={{height: "730px", width: "100%"}}>
+            <ToastContainer containerId="profile"/>
             {/* MAIN CONTENT CONTAINER */}
             <Grid
                 container
@@ -226,14 +230,14 @@ export default function ProfileCard(props) {
                 alignItems="center"
             >
                 {/* CARD HEADER START */}
-                <Grid item sx={{ p: "1.5rem 0rem", textAlign: "center" }}>
+                <Grid item sx={{p: "1.5rem 0rem", textAlign: "center"}}>
                     {/* PROFILE PHOTO */}
                     <Badge
                         overlap="circular"
-                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                        anchorOrigin={{vertical: "bottom", horizontal: "right"}}
                     >
                         <Avatar
-                            sx={{ width: 100, height: 100, mb: 1.5 }}
+                            sx={{width: 100, height: 100, mb: 1.5}}
                             src={props.avatar}
                         />
                     </Badge>
@@ -241,19 +245,19 @@ export default function ProfileCard(props) {
                     <Typography>{user.username}</Typography>
                 </Grid>
 
-                <Grid item style={styles.details} sx={{ width: "100%" }}></Grid>
+                <Grid item style={styles.details} sx={{width: "100%"}}></Grid>
             </Grid>
             <CardContent
                 sx={{
                     p: 3,
-                    maxHeight: { md: "40vh" },
-                    textAlign: { xs: "center", md: "start" },
+                    maxHeight: {md: "40vh"},
+                    textAlign: {xs: "center", md: "start"},
                 }}
             >
                 <FormControl fullWidth>
                     <Grid
                         container
-                        direction={{ xs: "column", md: "row" }}
+                        direction={{xs: "column", md: "row"}}
                         columnSpacing={5}
                         rowSpacing={3}
                     >
@@ -399,6 +403,21 @@ export default function ProfileCard(props) {
                                             formik.touched.newPassword && formik.errors.newPassword
                                         }
                                     />
+                                    <TextField
+                                        autoComplete="confirm-password"
+                                        margin="dense"
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        label="Confirm Password"
+                                        type="password"
+                                        fullWidth
+                                        onChange={handlePasswordChange}
+                                        value={formik.values.confirmPassword}
+                                        onBlur={formik.handleBlur}
+                                        error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                                        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                                    />
+
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleClose}>Cancel</Button>
@@ -410,12 +429,12 @@ export default function ProfileCard(props) {
 
                     <Grid
                         container
-                        justifyContent={{ xs: "center", md: "flex-end" }}
+                        justifyContent={{xs: "center", md: "flex-end"}}
                         item
                         xs={6}
                     >
                         <Button
-                            sx={{ p: "1rem 2rem", my: 2, height: "3rem" }}
+                            sx={{p: "1rem 2rem", my: 2, height: "3rem"}}
                             component="button"
                             size="large"
                             variant="contained"

@@ -7,10 +7,13 @@ import {createTheme, Drawer, ThemeProvider} from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid";
 import ProfileCard from "./ProfileCard.jsx";
+import {useLocation} from "react-router-dom";
 
 const theme = createTheme();
 
 export default function ProfilePage() {
+
+
     const { id } = useSelector((state) => state.auth.user);
     console.log(id)
 
@@ -48,18 +51,13 @@ export default function ProfilePage() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline>
-                {/* MAIN GRID */}
                 <Grid container direction="row">
-                    {/* DRAWER */}
                     <Grid item xs={2}>
                         <Drawer />
                     </Grid>
 
-                    {/* CONTENT */}
                     <Grid item xs={10} sx={{ marginTop: "80px" }}>
-                        {/* BACKGROUND */}
-                        <Grid container direction="column" sx={{ marginLeft: "65px" }}>
-                            {/* COMPONENTS */}
+                        <Grid container direction="column" sx={{ marginLeft: "0px" }}>
                             <Grid
                                 container
                                 direction={{ xs: "column", md: "row" }}

@@ -261,6 +261,10 @@ const router = createBrowserRouter([
           }
         ],
       },
+      {
+        path: "profile",
+        element: <ProfilePage />,
+      },
     ],
   },
   {
@@ -276,10 +280,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: "profile",
-    element: <ProfilePage />,
-  },
+
 ]);
 
 export default function App() {
