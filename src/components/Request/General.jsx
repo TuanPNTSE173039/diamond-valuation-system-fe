@@ -28,6 +28,7 @@ import { useRequest } from "../../services/requests.js";
 import { useStaff, useStaffs } from "../../services/staffs.js";
 import { formattedMoney } from "../../utilities/formatter.js";
 import Role from "../../utilities/Role.js";
+import { convertStatus } from "../../utilities/Status.jsx";
 import UIAutocomplete from "../UI/Autocomplete.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import ValuationRequestUserInfor from "./UserInfor.jsx";
@@ -177,7 +178,7 @@ const RequestGeneral = () => {
             {request?.service.name}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<LabelIcon />} title="Status">
-            {request?.status}
+            {convertStatus(request?.status)}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor
             icon={<CalendarMonthIcon />}

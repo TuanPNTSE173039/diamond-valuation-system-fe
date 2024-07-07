@@ -17,7 +17,6 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as React from "react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -30,17 +29,19 @@ import {
   formattedDiamondSize,
   formattedMoney,
 } from "../../utilities/formatter.js";
+import { convertStatus } from "../../utilities/Status.jsx";
+import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 
 const DetailList = () => {
   const { requestId } = useParams();
   const navigate = useNavigate();
-  const { data: request } = useRequest(requestId);
+  const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
   const queryClient = useQueryClient();
-  const { mutate, isPending, isError } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: (body) => {
       return checkDiamond(body.id, body);
     },
-    onSuccess: (body) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["request", { requestId: requestId }],
       });
@@ -67,20 +68,6 @@ const DetailList = () => {
       status: item.status,
     };
   });
-  // const { data: detailItems } = useQueries(
-  //   request?.valuationRequestDetails?.map((item) => {
-  //     return {
-  //       queryKey: ["detail", { detailId: item.number }],
-  //       queryFn: async () => {
-  //         const response = await axiosInstance.get(
-  //           `valuation-request-details/${item.number}`,
-  //         );
-  //         return response.data;
-  //       },
-  //       enabled: item.number !== null && item.number !== undefined,
-  //     };
-  //   }),
-  // );
 
   const [selectedDetail, setSelectedDetail] = useState({
     id: undefined,
@@ -98,7 +85,7 @@ const DetailList = () => {
     setOpenEdit(false);
   };
   const handleEditSave = () => {
-    const detail = request.valuationRequestDetails.find(
+    const detail = request?.valuationRequestDetails.find(
       (d) => d.id === selectedDetail.id,
     );
     const body = {
@@ -137,6 +124,10 @@ const DetailList = () => {
     navigate("results", { replace: true });
   }
 
+  if (isRequestLoading) {
+    return <UICircularIndeterminate />;
+  }
+
   return (
     <>
       <Box
@@ -148,7 +139,7 @@ const DetailList = () => {
           justifyContent: "space-between",
         }}
       >
-        <StyledBadge color="secondary" badgeContent={details.length}>
+        <StyledBadge color="secondary" badgeContent={details?.length}>
           <Typography variant="h6" sx={{ fontWeight: "600" }}>
             DETAILS
           </Typography>
@@ -219,7 +210,9 @@ const DetailList = () => {
                 <StyledTableCell align="right">
                   {row.valuationPrice}
                 </StyledTableCell>
-                <StyledTableCell align="center">{row.status}</StyledTableCell>
+                <StyledTableCell align="center">
+                  {convertStatus(row.status)}
+                </StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton
                     color="primary"

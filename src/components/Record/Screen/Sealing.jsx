@@ -1,349 +1,462 @@
+import AddIcon from "@mui/icons-material/Add";
+import DownloadIcon from "@mui/icons-material/Download";
+import LoopIcon from "@mui/icons-material/Loop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import pdfMake from "pdfmake/build/pdfmake";
 import { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useCustomer } from "../../../services/customers.js";
+import {
+  createRecord,
+  updateRecord,
+  useRecords,
+} from "../../../services/records.js";
+import { useRequest } from "../../../services/requests.js";
+import { formattedDateTime } from "../../../utilities/formatter.js";
 import { loadImageByPath } from "../../../utilities/imageLoader.js";
+import { getDiamondRows } from "../../../utilities/record.js";
+import UIBreadCrumb from "../../UI/BreadCrumb.jsx";
+import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
 const RecordScreenSealing = () => {
+  const { requestId } = useParams();
+  const location = useLocation();
+  const pathNames = location.pathname.split("/").filter((x) => x);
+  const [isSigned, setIsSigned] = useState(false);
+
+  const { data: records, isFetching: isRecordFetching } = useRecords(requestId);
+  const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
+  const { data: customer, isLoading: isCustomerLoading } = useCustomer(
+    request?.customerID,
+  );
+
+  const queryClient = useQueryClient();
+  const { mutate: createSealing } = useMutation({
+    mutationFn: (body) => {
+      return createRecord(body);
+    },
+    onSuccess: () => {
+      toast.success("Create sealing successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["records", { requestId: requestId }],
+      });
+    },
+  });
+  const { mutate: updateSealing } = useMutation({
+    mutationFn: (body) => {
+      return updateRecord(body);
+    },
+    onSuccess: () => {
+      toast.success("Update sealing successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["records", { requestId: requestId }],
+      });
+    },
+  });
+
   const [logo, setLogo] = useState(null);
   const [url, setUrl] = useState(null);
-  const docDefinition = {
-    content: [
-      {
-        columns: [
-          {
-            image: "logo",
-            width: 53,
-            height: 40,
-          },
-          {
-            text: "H&T Diamond",
-            margin: [0, 10],
-            fontSize: 18,
-            color: "#1474b1",
-          },
-          {
-            width: "*",
-            text: [
-              {
-                text: "Sealing Record\n",
-                margin: [0, 20],
-                style: "header",
-                alignment: "right",
-              },
-              {
-                text: "Appointment: #255\n",
-                fontSize: 12,
-                alignment: "right",
-              },
-              {
-                text: "Date: 2021-10-01\n",
-                fontSize: 12,
-                alignment: "right",
-              },
-            ],
-          },
-        ],
-        columnGap: 10,
-      },
-      {
-        columns: [
-          {
-            //customer infor
-            text: "Customer Information\n",
-            width: "50%",
-            style: "subheader",
-          },
-          {
-            //company infor
-            text: "Company Information",
-            width: "50%",
-            style: "subheader",
-          },
-        ],
-        margin: [0, 20, 0, 5],
-      },
-      {
-        columns: [
-          {
-            text: [
-              {
-                text: "Name: Tuan Pham\n",
-                style: "para",
-              },
-              {
-                text: "Phone: 0367304351\n",
-                style: "para",
-              },
-              {
-                text: "Email: tuanpnt17@gmail.com\n",
-                style: "para",
-              },
-              {
-                text: "Address: District 9, HCM City\n",
-                style: "para",
-              },
-            ],
-          },
-          {
-            text: [
-              {
-                text: "Representative: Dat Nguyen\n",
-                style: "para",
-              },
-              {
-                text: "Phone: 0367304353\n",
-                style: "para",
-              },
-              {
-                text: "Email: datnguyen123@gmail.com\n",
-                style: "para",
-              },
-              {
-                text: "Address: Binh Thanh, HCM City\n",
-                style: "para",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        text: "Diamond Information",
-        style: "subheader",
-        margin: [0, 20, 0, 5],
-      },
-      {
-        layout: "receiptLayout", // optional
-        table: {
-          headerRows: 1,
-          widths: [50, "*", 70, 50, 70, 60, 50],
 
-          body: [
-            [
-              { text: "Number", style: "thead" },
-              { text: "Certificate", style: ["thead", "number"] },
-              { text: "Origin", style: ["thead"] },
-              { text: "Carat", style: ["thead", "number"] },
-              { text: "Cut", style: ["thead"] },
-              { text: "Color", style: ["thead"] },
-              { text: "Clarity", style: ["thead"] },
-            ],
-            [
-              { text: "250", bold: true },
-              {
-                text: "0367304351",
-                style: "number",
-              },
-              {
-                text: "Natural",
-              },
-              {
-                text: [
-                  "1.01",
-                  {
-                    text: " .ct",
-                    italics: true,
-                  },
-                ],
-                style: "number",
-              },
-              {
-                text: "Excellence",
-              },
-              {
-                text: "D",
-              },
-              {
-                text: "VS1",
-              },
-            ],
-            [
-              { text: "251", bold: true },
-              {
-                text: "0781889890",
-                style: "number",
-              },
-              {
-                text: "Natural",
-              },
-              {
-                text: [
-                  "2.01",
-                  {
-                    text: " .ct",
-                    italics: true,
-                  },
-                ],
-                style: "number",
-              },
-              {
-                text: "Excellence",
-              },
-              {
-                text: "D",
-              },
-              {
-                text: "VS1",
-              },
-            ],
-          ],
-        },
-      },
-      {
-        text: "Confirmation Reason",
-        style: "subheader",
-        margin: [0, 20, 0, 0],
-      },
-      {
-        text: [
-          {
-            text: "The diamonds listed above have been sealed due to the customer not retrieving them within 24 hours after the scheduled return date. Efforts to contact the customer have been unsuccessful, and the diamonds are being securely stored until the customer reclaims them.",
-            alignment: "justify",
-          },
-        ],
-        margin: [0, 7, 0, 0],
-      },
-      {
-        text: "Company Confirmation",
-        style: "subheader",
-        margin: [0, 20, 0, 0],
-      },
-      {
-        text: [
-          {
-            text: "We, H&T Diamond Company, confirm that the above-listed diamonds have been securely sealed and stored due to the customer's failure to retrieve them within the specified time frame.",
-            alignment: "justify",
-          },
-        ],
-        margin: [0, 7, 0, 0],
-      },
-      {
+  const getSealingContent = (isSigned = false) => {
+    let signature = {
+      text: "",
+      margin: [0, 50],
+    };
+    if (isSigned) {
+      signature = {
         columns: [
           {
             text: "",
             width: "50%",
-            alignment: "center",
+            alignment: "left",
           },
           {
             text: [
               {
-                text: "Representative Signature\n",
+                text: `Signed by: H&T Diamond Representative\n`,
+              },
+              {
+                text: `Sign date: ${formattedDateTime(new Date())}\n`,
               },
             ],
+            color: "#EE4E4E",
             width: "50%",
-            alignment: "center",
+            alignment: "left",
           },
         ],
         margin: [0, 20, 0, 0],
-      },
-      {
-        text: "",
-        margin: [0, 50],
-      },
-      {
-        text: "Note: ",
-        style: "subheader",
-        margin: [0, 20, 0, 5],
-      },
-      {
-        ul: [
-          "The customer is advised to contact us at the earliest convenience to reclaim their diamonds.",
-          "For any inquiries, please contact 0367304351 or hntdiamond@gmai.com.",
-        ],
-        margin: [0, 0, 0, 20],
-      },
-    ],
-    header: function (currentPage, pageCount, pageSize) {
-      return [
+      };
+    }
+    return {
+      content: [
         {
-          text: currentPage.toString() + " of " + pageCount,
-          alignment: "right",
-          margin: [0, 10, 20, 0],
+          columns: [
+            {
+              image: "logo",
+              width: 53,
+              height: 40,
+            },
+            {
+              text: "H&T Diamond",
+              margin: [0, 10],
+              fontSize: 18,
+              color: "#1474b1",
+            },
+            {
+              width: "*",
+              text: [
+                {
+                  text: "Sealing Record\n",
+                  margin: [0, 20],
+                  style: "header",
+                  alignment: "right",
+                },
+                {
+                  text: `Appointment: #${requestId}\n`,
+                  fontSize: 12,
+                  alignment: "right",
+                },
+                {
+                  text: `Date: ${formattedDateTime(new Date())}\n`,
+                  fontSize: 12,
+                  alignment: "right",
+                },
+              ],
+            },
+          ],
+          columnGap: 10,
         },
         {
-          canvas: [
-            { type: "rect", x: 170, y: 32, w: pageSize.width - 170, h: 40 },
+          columns: [
+            {
+              //customer infor
+              text: "Customer Information\n",
+              width: "50%",
+              style: "subheader",
+            },
+            {
+              //company infor
+              text: "Company Information",
+              width: "50%",
+              style: "subheader",
+            },
+          ],
+          margin: [0, 20, 0, 5],
+        },
+        {
+          columns: [
+            {
+              text: [
+                {
+                  text: `Name: ${customer?.firstName} ${customer?.lastName}\n`,
+                  style: "para",
+                },
+                {
+                  text: `Phone: ${customer?.phone}\n`,
+                  style: "para",
+                },
+                {
+                  text: `Email: ${customer?.account?.email}\n`,
+                  style: "para",
+                },
+                {
+                  text: `Address: ${customer?.address}\n`,
+                  style: "para",
+                },
+              ],
+            },
+            {
+              text: [
+                {
+                  text: "Representative: Dat Nguyen\n",
+                  style: "para",
+                },
+                {
+                  text: "Phone: 0367304353\n",
+                  style: "para",
+                },
+                {
+                  text: "Email: datnguyen123@gmail.com\n",
+                  style: "para",
+                },
+                {
+                  text: "Address: Binh Thanh, HCM City\n",
+                  style: "para",
+                },
+              ],
+            },
           ],
         },
-      ];
-    },
-    footer: [
-      {
-        text: "Thank you for choosing H&T Diamond",
-        alignment: "center",
+        {
+          text: "Diamond Information",
+          style: "subheader",
+          margin: [0, 20, 0, 5],
+        },
+        {
+          layout: "receiptLayout", // optional
+          table: {
+            headerRows: 1,
+            widths: [20, "*", 30, 40, 40, 70, 70, "*"],
+            body: getDiamondRows(request),
+          },
+        },
+        {
+          text: "Confirmation Reason",
+          style: "subheader",
+          margin: [0, 20, 0, 0],
+        },
+        {
+          text: [
+            {
+              text: "The diamonds listed above have been sealed due to the customer not retrieving them within 24 hours after the scheduled return date. Efforts to contact the customer have been unsuccessful, and the diamonds are being securely stored until the customer reclaims them.",
+              alignment: "justify",
+            },
+          ],
+          margin: [0, 7, 0, 0],
+        },
+        {
+          text: "Company Confirmation",
+          style: "subheader",
+          margin: [0, 20, 0, 0],
+        },
+        {
+          text: [
+            {
+              text: "We, H&T Diamond Company, confirm that the above-listed diamonds have been securely sealed and stored due to the customer's failure to retrieve them within the specified time frame.",
+              alignment: "justify",
+            },
+          ],
+          margin: [0, 7, 0, 0],
+        },
+        {
+          columns: [
+            {
+              text: "",
+              width: "50%",
+              alignment: "center",
+            },
+            {
+              text: [
+                {
+                  text: "Representative Signature\n",
+                },
+              ],
+              width: "50%",
+              alignment: "center",
+            },
+          ],
+          margin: [0, 20, 0, 0],
+        },
+        signature,
+        {
+          text: "Note: ",
+          style: "subheader",
+          margin: [0, 20, 0, 5],
+        },
+        {
+          ul: [
+            "The customer is advised to contact us at the earliest convenience to reclaim their diamonds.",
+            "For any inquiries, please contact 0367304351 or hntdiamond@gmai.com.",
+          ],
+          margin: [0, 0, 0, 20],
+        },
+      ],
+      header: function (currentPage, pageCount, pageSize) {
+        return [
+          {
+            text: currentPage.toString() + " of " + pageCount,
+            alignment: "right",
+            margin: [0, 10, 20, 0],
+          },
+          {
+            canvas: [
+              { type: "rect", x: 170, y: 32, w: pageSize.width - 170, h: 40 },
+            ],
+          },
+        ];
       },
-    ],
-    images: {
-      logo: `${logo}`,
-    },
-    defaultStyle: {
-      fontSize: 12,
-      bold: false,
-    },
-    styles: {
-      thead: {
-        fontSize: 13,
-        bold: true,
+      footer: [
+        {
+          text: "Thank you for choosing H&T Diamond",
+          alignment: "center",
+        },
+      ],
+      images: {
+        logo: `${logo}`,
       },
-      header: {
-        fontSize: 20,
-        bold: true,
-        margin: 5,
-      },
-      subheader: {
-        fontSize: 15,
-        bold: true,
-        italics: true,
-        color: "#333",
-        margin: [0, 20, 0, 0],
-      },
-      para: {
+      defaultStyle: {
         fontSize: 12,
         bold: false,
-        color: "#333",
       },
-      number: {
-        color: "#333",
-        alignment: "right",
+      styles: {
+        thead: {
+          fontSize: 13,
+          bold: true,
+        },
+        header: {
+          fontSize: 20,
+          bold: true,
+          margin: 5,
+        },
+        subheader: {
+          fontSize: 15,
+          bold: true,
+          italics: true,
+          color: "#333",
+          margin: [0, 20, 0, 0],
+        },
+        para: {
+          fontSize: 12,
+          bold: false,
+          color: "#333",
+        },
+        number: {
+          color: "#333",
+          alignment: "right",
+        },
       },
-    },
+    };
   };
-  const pdfGenerator = pdfMake.createPdf(docDefinition);
+
+  useEffect(() => {
+    const sealing = records?.find((record) => record.type === "SEALING");
+    if (sealing) {
+      setUrl(sealing.link);
+    }
+  }, [records]);
+
   const handleDownload = () => {
-    pdfGenerator.download("receipt.pdf");
+    const doc = getSealingContent();
+    pdfMake.createPdf(doc).download(`sealing-${requestId}.pdf`);
   };
-  const savePdf = () => {
-    pdfGenerator.getBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
+  const handleCreateSealing = () => {
+    const doc = getSealingContent();
+    pdfMake.createPdf(doc).getDataUrl((url) => {
+      const body = {
+        link: url,
+        status: false,
+        type: "SEALING",
+        valuationRequestId: requestId,
+      };
+      createSealing(body);
     });
   };
+
   useEffect(() => {
     loadImageByPath("images/logo.png", setLogo);
-    pdfGenerator.getBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      setUrl(url);
-    });
   }, [logo]);
 
-  return (
-    <div>
-      <h1>Receipt</h1>
-      <Button variant={"contained"} onClick={handleDownload}>
-        Download
-      </Button>
-      <Button variant={"contained"} onClick={savePdf}>
-        Save
-      </Button>
-      <br />
-      <br />
+  /*
+  useEffect(() => {
+    const sealing = records?.find((record) => record.type === "SEALING");
+    if (request?.payment.length === 4 && sealing) {
+      setIsSigned(true);
+      const doc = getSealingContent(request.payment[2]);
+      pdfMake.createPdf(doc).getDataUrl((url) => {
+        const body = {
+          ...sealing,
+          link: url,
+          status: true,
+        };
+        updateSealing(body);
+      });
+    }
+  }, [request?.payment[2]]);
+  */
+  if (isCustomerLoading || isRequestLoading || isRecordFetching) {
+    return <UICircularIndeterminate />;
+  }
 
+  function handleRefreshSealing() {
+    const returned = records?.find((record) => record.type === "SEALING");
+    if (returned) {
+      const doc = getSealingContent();
+      pdfMake.createPdf(doc).getDataUrl((url) => {
+        const body = {
+          ...returned,
+          link: url,
+        };
+        updateSealing(body);
+      });
+    }
+  }
+
+  function handleSignSealing() {
+    const returned = records?.find((record) => record.type === "SEALING");
+    if (returned) {
+      const doc = getSealingContent(true);
+      pdfMake.createPdf(doc).getDataUrl((url) => {
+        const body = {
+          ...returned,
+          status: true,
+          link: url,
+        };
+        updateSealing(body);
+        setIsSigned(true);
+      });
+    }
+  }
+
+  return (
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <UIBreadCrumb pathNames={pathNames} />
+        <Typography variant="h4">Returned Record</Typography>
+
+        {!isSigned && (
+          <Button variant={"contained"} onClick={handleSignSealing}>
+            Sign Sealing
+          </Button>
+        )}
+      </Box>
+      <Stack direction={"row"} spacing={1}>
+        <IconButton
+          aria-label="Download"
+          color="primary"
+          onClick={handleDownload}
+        >
+          <DownloadIcon />
+        </IconButton>
+        {!isSigned && (
+          <>
+            <IconButton
+              aria-label="Save"
+              color="secondary"
+              onClick={handleCreateSealing}
+            >
+              <AddIcon />
+            </IconButton>
+            <IconButton
+              aria-label="Save"
+              color="status.processing"
+              onClick={handleRefreshSealing}
+            >
+              <LoopIcon />
+            </IconButton>
+          </>
+        )}
+      </Stack>
+      <br />
       {url && (
         <Box sx={{ w: "90%", margin: "0 auto" }}>
           <iframe src={url} style={{ width: "100%", height: "90vh" }} />
         </Box>
       )}
-    </div>
+      {!url && isRecordFetching && <UICircularIndeterminate />}
+    </Box>
   );
 };
 

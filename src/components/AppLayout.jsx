@@ -2,7 +2,6 @@ import { Container } from "@mui/material";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useTheme } from "@mui/material/styles";
-import * as React from "react";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";

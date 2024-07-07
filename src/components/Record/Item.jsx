@@ -3,16 +3,18 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { useParams } from "react-router-dom";
-import { useRequest } from "../../services/requests.js";
-import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
+import { useNavigate, useParams } from "react-router-dom";
+import { formattedDate } from "../../utilities/formatter.js";
+import { convertRecordStatus } from "../../utilities/Status.jsx";
 
-const RecordItem = ({ title, mode, handleMode, status, date }) => {
+const RecordItem = ({ title, navLink, status, date }) => {
+  const navigate = useNavigate();
   const { requestId } = useParams();
-  const { data: request, isLoading: isRequestLoading } = useRequest(requestId);
-  if (isRequestLoading) {
-    return <UICircularIndeterminate />;
+
+  function handleNavigateToDetail() {
+    navigate(navLink);
   }
+
   return (
     <Paper elevation={3} sx={{ mb: 0.5, minWidth: "275px" }}>
       <Card variant="outlined">
@@ -33,7 +35,13 @@ const RecordItem = ({ title, mode, handleMode, status, date }) => {
             >
               {title}
             </Typography>
-            <Typography variant="p">{status}</Typography>
+            {convertRecordStatus(
+              status === null || status === undefined
+                ? "Not yet"
+                : status === true
+                  ? "Done"
+                  : "Processing",
+            )}
           </Box>
         </CardContent>
         <CardActions>
@@ -42,7 +50,7 @@ const RecordItem = ({ title, mode, handleMode, status, date }) => {
             component="div"
             sx={{ fontSize: 14, ml: 1, width: "40%" }}
           >
-            {date}
+            {date ? formattedDate(date) : ""}
           </Typography>
 
           <Box
@@ -55,10 +63,10 @@ const RecordItem = ({ title, mode, handleMode, status, date }) => {
             <Box sx={{ flex: 1 }}></Box>
             <Button
               size="small"
-              variant={!mode ? "contained" : "outlined"}
-              onClick={handleMode}
+              variant="outlined"
+              onClick={handleNavigateToDetail}
             >
-              {!mode ? "Create" : "Detail"}
+              Detail
             </Button>
           </Box>
         </CardActions>

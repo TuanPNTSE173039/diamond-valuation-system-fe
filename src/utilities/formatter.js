@@ -35,6 +35,9 @@ export const formattedCaratWeight = (weight) => {
   }
   return `${weight} .ct`;
 };
+export const formatTotalDashboardItem = (total) => {
+  return total.toLocaleString();
+};
 
 export const formattedHour = (number) => {
   if (!number) {

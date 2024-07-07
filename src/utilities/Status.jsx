@@ -143,7 +143,7 @@ export const valuationRequestStatus = [
   },
   {
     id: 7,
-    name: "CANCELLED",
+    name: "CANCEL",
     roles: [Role.MANAGER, Role.CONSULTANT],
   },
   {
@@ -249,30 +249,6 @@ export const clarityCharacteristicConverter = (characteristic) => {
   });
 };
 
-export const statusConverter = (status) => {
-  switch (status) {
-    case "PENDING":
-      return (
-        <Typography sx={{ backgroundColor: "primary.main" }}>
-          Pending
-        </Typography>
-      );
-    case "PROCESSING":
-      return "PROCESSING";
-    case "RECEIVED":
-      return "RECEIVED";
-    case "COMPLETED":
-      return "COMPLETED";
-    case "SEALED":
-      return "SEALED";
-    case "CANCEL":
-      return "CANCELLED";
-    case "FINISHED":
-      return "FINISHED";
-    case "VALUATING":
-      return "VALUATING";
-  }
-};
 export const getPreviousStatus = (currentStatus) => {
   switch (currentStatus) {
     case "PENDING":
@@ -287,5 +263,193 @@ export const getPreviousStatus = (currentStatus) => {
       return "VALUATING";
     case "APPROVED":
       return "APPROVED";
+  }
+};
+export const convertStatus = (status) => {
+  switch (status) {
+    case "PENDING":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.pending" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Pending
+        </Typography>
+      );
+    case "PROCESSING":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.processing" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Processing
+        </Typography>
+      );
+    case "RECEIVED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.received" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Received
+        </Typography>
+      );
+    case "COMPLETED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.completed" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Completed
+        </Typography>
+      );
+    case "SEALED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.sealing" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Sealed
+        </Typography>
+      );
+    case "CANCEL":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.cancelled" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Cancelled
+        </Typography>
+      );
+    case "FINISHED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.finished" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Finished
+        </Typography>
+      );
+    case "VALUATING":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.valuating" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Valuating
+        </Typography>
+      );
+    case "VALUATED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.valuated" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Valuated
+        </Typography>
+      );
+    case "ASSESSING":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.assessing" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Assessing
+        </Typography>
+      );
+    case "ASSESSED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.assessed" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Assessed
+        </Typography>
+      );
+    case "APPROVED":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.approved" }}
+          p={"2px 8px"}
+          borderRadius={3}
+        >
+          Approved
+        </Typography>
+      );
+  }
+};
+export const convertRecordStatus = (status) => {
+  switch (status) {
+    case "Not yet":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.pending" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Not yet
+        </Typography>
+      );
+    case "Processing":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.processing" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Processing
+        </Typography>
+      );
+    case "Done":
+      return (
+        <Typography
+          color="status.color"
+          textAlign="center"
+          sx={{ bgcolor: "status.received" }}
+          borderRadius={3}
+          p={"2px 8px"}
+        >
+          Done
+        </Typography>
+      );
   }
 };

@@ -21,6 +21,7 @@ import RequestItem from "./components/Request/Item.jsx";
 import RequestList from "./components/Request/List.jsx";
 import StaffDetail from "./components/Staff/Detail.jsx";
 import StaffList from "./components/Staff/List.jsx";
+import RequestResultPayment from "./components/Request/PaymentResult.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
@@ -88,11 +89,29 @@ const router = createBrowserRouter([
               },
               {
                 path: "receipt",
-                element: <RecordScreenReceipt />,
+                children: [
+                  {
+                    index: true,
+                    element: <RecordScreenReceipt />,
+                  },
+                  {
+                    path: "payment",
+                    element: <RequestResultPayment />,
+                  },
+                ],
               },
               {
                 path: "return",
-                element: <RecordScreenReturn />,
+                children: [
+                  {
+                    index: true,
+                    element: <RecordScreenReturn />,
+                  },
+                  {
+                    path: "payment",
+                    element: <RequestResultPayment />,
+                  },
+                ],
               },
               {
                 path: "commitment",

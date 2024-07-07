@@ -70,9 +70,7 @@ export function EnhancedTableToolbar(props) {
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          {action}
-        </Tooltip>
+        <Tooltip title="Delete">{action}</Tooltip>
       ) : (
         <Tooltip title="Filter list">{children || <Box></Box>}</Tooltip>
       )}
@@ -118,7 +116,13 @@ export function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
+            align={
+              headCell.id === "status"
+                ? "center"
+                : headCell.numeric
+                  ? "right"
+                  : "left"
+            }
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
             sx={{ fontWeight: "bold", fontSize: 17 }}

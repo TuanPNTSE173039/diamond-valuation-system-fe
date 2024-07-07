@@ -9,6 +9,7 @@ import {
   formattedDateTime,
   formattedMoney,
 } from "../../utilities/formatter.js";
+import { convertStatus } from "../../utilities/Status.jsx";
 import DiamondValuationInforItem from "./InforItem.jsx";
 
 const DiamondValuationInfor = ({ valuationInfor, diamondInfor, ...props }) => {
@@ -21,7 +22,7 @@ const DiamondValuationInfor = ({ valuationInfor, diamondInfor, ...props }) => {
         {valuationInfor.deadline && formattedDateTime(valuationInfor.deadline)}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LabelIcon />} title="Status">
-        {valuationInfor.status}
+        {convertStatus(valuationInfor.status)}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem
         icon={<LocalAtmIcon />}

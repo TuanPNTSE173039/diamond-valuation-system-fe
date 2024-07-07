@@ -147,65 +147,65 @@ const RecordScreenResult = () => {
         {valuationRequestDetails?.map((item, index) => (
           <main
             key={item.id}
-            className="text-slate-800 mt-24 h-[161vh] flex flex-col w-full"
+            className="mt-24 flex w-full flex-col text-slate-800 h-[161vh]"
           >
-            <div className="flex flex-row justify-center items-center mb-2">
+            <div className="mb-2 flex flex-row items-center justify-center">
               <img src={logo} alt={"H&T Diamond"} className="h-20 w-auto" />
             </div>
             <h1 className="text-center text-2xl text-slate-800">H&T Diamond</h1>
-            <p className="pt-1 text-slate-400 text-center h-[35px]">
+            <p className="pt-1 text-center text-slate-400 h-[35px]">
               Valuation #{item.id}
             </p>
-            <div className="p-12 flex-grow bg-white rounded-2xl rounded-t-none shadow-xl shadow-black/10">
+            <div className="flex-grow rounded-2xl rounded-t-none bg-white p-12 shadow-xl shadow-black/10">
               <div className="">
-                {/*<div className="h-px bg-gray-300 my-4" />*/}
+                {/*<div className="my-4 h-px bg-gray-300" />*/}
                 <div>
-                  <p className="p-0 mb-1">
+                  <p className="mb-1 p-0">
                     <b>Diamond Attribute</b>
                   </p>
                   <div className="flex gap-10">
                     <div className="flex w-1/2">
                       <div className="w-1/2">
-                        <p className="p-0 mb-1">Diamond Origin</p>
-                        <p className="p-0 mb-1">Carat</p>
-                        <p className="p-0 mb-1">Color</p>
-                        <p className="p-0 mb-1">Clarity</p>
-                        <p className="p-0 mb-1">Cut</p>
-                        <p className="p-0 mb-1">Shape</p>
-                        <p className="p-0 mb-1">Polish</p>
-                        <p className="p-0 mb-1">Symmetry</p>
-                        <p className="p-0 mb-1">Fluorescence</p>
-                        <p className="p-0 mb-1">Clarity Characteristics</p>
+                        <p className="mb-1 p-0">Diamond Origin</p>
+                        <p className="mb-1 p-0">Carat</p>
+                        <p className="mb-1 p-0">Color</p>
+                        <p className="mb-1 p-0">Clarity</p>
+                        <p className="mb-1 p-0">Cut</p>
+                        <p className="mb-1 p-0">Shape</p>
+                        <p className="mb-1 p-0">Polish</p>
+                        <p className="mb-1 p-0">Symmetry</p>
+                        <p className="mb-1 p-0">Fluorescence</p>
+                        <p className="mb-1 p-0">Clarity Characteristics</p>
                       </div>
                       <div className="w-1/2 text-right">
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.diamondOrigin}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.caratWeight}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.color}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.clarity}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.cut}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.shape}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.polish}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.symmetry}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {item.diamondValuationNote.fluorescence}
                         </p>
-                        <p className="p-0 mb-1">
+                        <p className="mb-1 p-0">
                           {clarityCharacteristicConverter(
                             item.diamondValuationNote.clarityCharacteristic,
                           )
@@ -238,7 +238,7 @@ const RecordScreenResult = () => {
                     </div>
                   </div>
                 </div>
-                <div className="h-px bg-gray-300 my-4" />
+                <div className="my-4 h-px bg-gray-300" />
                 <div>
                   <div>
                     <img
@@ -366,9 +366,9 @@ const RecordScreenResult = () => {
                   */}
                 </div>
 
-                <div className="h-px bg-gray-300 my-4" />
+                <div className="my-4 h-px bg-gray-300" />
               </div>
-              <div className="bg-slate-100 px-6 py-2 rounded-md">
+              <div className="rounded-md bg-slate-100 px-6 py-2">
                 <table className="w-full">
                   <tr className="font-bold text-slate-700">
                     <td className="py-4">Estimated Retail Replacement Value</td>

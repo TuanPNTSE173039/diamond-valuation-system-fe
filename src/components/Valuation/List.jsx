@@ -11,7 +11,10 @@ import {
   formattedMoney,
 } from "../../utilities/formatter.js";
 
-import { diamondValuationStatus } from "../../utilities/Status.jsx";
+import {
+  convertStatus,
+  diamondValuationStatus,
+} from "../../utilities/Status.jsx";
 import { ValuationHeadCells } from "../../utilities/table.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UITable from "../UI/Table.jsx";
@@ -31,14 +34,13 @@ const DiamondValuationList = () => {
 
   const [statusIndex, setStatusIndex] = useState(0);
   const [selectedValuations, setSelectedValuations] = useState([]);
-  const { isLoading: isValuationLoading, data: valuations } = useValuations(
-    page,
-    rowsPerPage,
-    userRole,
-    currentUser?.id,
-  );
+  const {
+    isLoading: isValuationLoading,
+    data: valuations,
+    isFetching: isValuationFetching,
+  } = useValuations(page, rowsPerPage, userRole, currentUser?.id);
 
-  if (isValuationLoading) {
+  if (isValuationLoading || isValuationFetching) {
     return <UICircularIndeterminate />;
   }
   const rows = valuations.content.map((valuation) => {
@@ -51,7 +53,7 @@ const DiamondValuationList = () => {
       diamondOrigin: valuation.diamondOrigin,
       caratWeight: formattedCaratWeight(valuation?.caratWeight),
       valuationPrice: formattedMoney(valuation.valuationPrice),
-      status: valuation.status ? "Valuated" : "Valuating",
+      status: valuation.status ? "VALUATED" : "VALUATING",
     };
   });
   const handleChange = (event, newValue) => {
@@ -85,7 +87,7 @@ const DiamondValuationList = () => {
               .map((status, index) => (
                 <Tab
                   key={index}
-                  label={status.name}
+                  label={convertStatus(status.name)}
                   {...a11yProps(index + 1)}
                 />
               ))}

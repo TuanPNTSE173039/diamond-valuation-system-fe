@@ -22,4 +22,4 @@ export const useDetails = () => {
       return response.data;
     },
   });
-}
+};

@@ -124,7 +124,7 @@ const DiamondValuationItem = () => {
   const valuationInfor = {
     service: request?.service?.name,
     deadline: request?.returnDate,
-    status: !valuation?.status ? "Valuating" : "Valuated",
+    status: !valuation?.status ? "VALUATING" : "VALUATED",
   };
   const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({});
@@ -329,7 +329,7 @@ const DiamondValuationItem = () => {
             <Stack
               direction="row"
               spacing={4}
-              className="justify-between items-start"
+              className="items-start justify-between"
             >
               <DiamondValuationInfor
                 className="w-3/5"

@@ -17,6 +17,7 @@ import {
   EnhancedTableHead,
   EnhancedTableToolbar,
 } from "../../assets/styles/Table.jsx";
+import { convertStatus } from "../../utilities/Status.jsx";
 import { getComparator, stableSort } from "../../utilities/table.js";
 
 export default function UITable({
@@ -140,7 +141,7 @@ export default function UITable({
                   <TableCell
                     align="center"
                     colSpan={headCells.length}
-                    sx={{ p: 3, fontSize: 20 }}
+                    sx={{ p: "4px 2px", fontSize: 20 }}
                   >
                     There are no items is shown in this table
                   </TableCell>
@@ -173,12 +174,25 @@ export default function UITable({
                       {headCells.map((headCell) => (
                         <TableCell
                           key={headCell.id}
-                          align={headCell.numeric ? "right" : "left"}
+                          align={
+                            headCell.id === "status"
+                              ? "center"
+                              : headCell.numeric
+                                ? "right"
+                                : "left"
+                          }
                           padding={headCell.disablePadding ? "none" : "normal"}
                         >
-                          {readOnly && row[headCell.id]}
+                          {readOnly &&
+                            (headCell.id === "status"
+                              ? convertStatus(row[headCell.id])
+                              : row[headCell.id])}
                           {!readOnly && (
-                            <Link to={`${row.number}`}>{row[headCell.id]}</Link>
+                            <Link to={`${row.number}`}>
+                              {headCell.id === "status"
+                                ? convertStatus(row[headCell.id])
+                                : row[headCell.id]}
+                            </Link>
                           )}
                         </TableCell>
                       ))}
