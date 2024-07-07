@@ -9,6 +9,11 @@ export const getCustomer = async (customerID) => {
   const response = await axiosInstance.get(`customers/${customerID}`);
   return response.data;
 };
+export const banCustomer = async (customerID) => {
+  const response = await axiosInstance.delete(`/customers/${customerID}`);
+  return response.data;
+};
+
 
 // ---DIAMOND VALUATION---
 export const updateDiamondNote = (id, body) =>
@@ -75,7 +80,26 @@ export const updateServicePrice = async (id, body) =>
 export const postServicePrice = async (body) =>
   axiosInstance.post("service-price-lists", body);
 export const deleteServicePrice = async (id) => axiosInstance.delete(`service-price-lists/${id}`);
+// ---STAFF---
+export const registerStaff = async (staffData) => {
+  const response = await axiosInstance.post('auth/register-staff', staffData);
+  return response.data;
+};
 
+export const deleteStaff = async (staffId) => {
+  const response = await axiosInstance.delete(`/staffs/${staffId}`);
+  return response.data;
+};
+
+export const updateStaff = async (staffId, staffData) => {
+  const response = await axiosInstance.put(`/staffs/${staffId}`, staffData);
+  return response.data;
+};
+
+export const updateStaffPassword = async (authID, body) => {
+  const response = await axiosInstance.put(`auth/${authID}`, body);
+  return response.data;
+};
 // ---SUPPLIERS---
 export const updateSupplier = async (id, body) => axiosInstance.put(`suppliers/${id}`, body);
 export const postSupplier = async (body) => axiosInstance.post("suppliers", body);
