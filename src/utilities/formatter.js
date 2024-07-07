@@ -35,3 +35,6 @@ export const formattedCaratWeight = (weight) => {
   }
   return `${weight} .ct`;
 };
+export const formatTotalDashboardItem = (total) => {
+  return total.toLocaleString();
+};
