@@ -107,8 +107,10 @@ export const deleteSupplier = async (id) => axiosInstance.delete(`suppliers/${id
 
 // ---DIAMONDS---
 export const deleteDiamond = async (id) => axiosInstance.delete(`diamond-market/${id}`);
+export const createDiamond = async (body) => axiosInstance.post("diamond-market", body);
 
 // ---BLOG---
 export const postBlog = async (body) => axiosInstance.post("posts", body);
 export const updateBlog = async (id, body) => axiosInstance.put(`posts/${id}`, body);
 export const deleteBlog = async (id) => axiosInstance.delete(`posts/${id}`);
+
