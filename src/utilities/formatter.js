@@ -21,6 +21,10 @@ export const formattedMoney = (money) => {
   }).format(money);
 };
 
+export const formattedPercent = (percent) => {
+  return parseFloat(Math.abs(parseFloat(percent)).toFixed(2));
+};
+
 export const formattedDiamondSize = (size) => {
   if (size === "N/A" || size === undefined || size === null) {
     return "N/A";
@@ -43,5 +47,5 @@ export const formattedHour = (number) => {
   if (!number) {
     return "N/A";
   }
-  return `${number} hrs`
+  return `${number} hrs`;
 };

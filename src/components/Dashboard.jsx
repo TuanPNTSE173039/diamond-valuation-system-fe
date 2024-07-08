@@ -25,9 +25,21 @@ import {
 } from "@mui/x-charts";
 import { useState } from "react";
 import {
+  useAppointments,
+  useOverral,
+  useRevenue,
+} from "../services/dashboard.js";
+import {
+  dataMapping,
+  dataSeriesMapping,
+  yearFilter,
+} from "../utilities/dashboard.js";
+import {
   formattedMoney,
+  formattedPercent,
   formatTotalDashboardItem,
 } from "../utilities/formatter.js";
+import UICircularIndeterminate from "./UI/CircularIndeterminate.jsx";
 
 const chartSetting = {
   xAxis: [
@@ -138,278 +150,246 @@ const rows = [
   createData("Cupcake", 305, 3.7, 67, 4.3),
   createData("Gingerbread", 356, 16.0, 49, 3.9),
 ];
+
 const Dashboard = () => {
-  const [year, setYear] = useState("seoul");
+  const { data: overral, isLoading: isOverralLoading } = useOverral();
   const { revenue, appointment, user, valuation } = {
     revenue: {
-      total: 1234,
-      percent: 3.15,
-      status: true,
+      total: formattedMoney(+overral?.revenue.total),
+      percent: formattedPercent(overral?.revenue.percent),
+      status: overral?.revenue.status === "true",
     },
     user: {
-      total: 1234,
+      total: 12,
       percent: 1.5,
       status: false,
     },
     appointment: {
-      total: 1234,
-      percent: 1.5,
-      status: false,
+      total: overral?.appointment.total,
+      percent: formattedPercent(overral?.appointment.percent),
+      status: overral?.appointment.status === "true",
     },
     valuation: {
-      total: 1234,
-      percent: 1.5,
-      status: false,
+      total: overral?.valuation.total,
+      percent: formattedPercent(overral?.valuation.percent),
+      status: overral?.valuation.status === "true",
     },
   };
-  const revenueDataSet = [
-    {
-      2023: 100,
-      2024: 202,
-      month: "Jan",
-    },
-    {
-      2023: 1500,
-      2024: 2102,
-      month: "Feb",
-    },
-    {
-      2023: 200,
-      2024: 222,
-      month: "Mar",
-    },
-    {
-      2023: 250,
-      2024: 232,
-      month: "Apr",
-    },
-    {
-      2023: 300,
-      2024: 242,
-      month: "May",
-    },
-    {
-      2023: 1050,
-      2024: 1152,
-      month: "June",
-    },
-    {
-      2023: 400,
-      2024: 262,
-      month: "July",
-    },
-    {
-      2023: 450,
-      2024: 272,
-      month: "Aug",
-    },
-    {
-      2023: 500,
-      2024: 282,
-      month: "Sept",
-    },
-    {
-      2023: 550,
-      2024: 292,
-      month: "Oct",
-    },
-    {
-      2023: 600,
-      2024: 302,
-      month: "Nov",
-    },
-    {
-      2023: 650,
-      2024: 312,
-      month: "Dec",
-    },
-  ];
-  const moneyFormatter = (money) => formattedMoney(money);
+
+  const { data: revenueChart, isLoading: isRevenueChartLoading } = useRevenue();
+  const revenueDataSet = dataMapping(revenueChart);
+
+  const [year, setYear] = useState(new Date().getFullYear().toString());
+  const { data: appointmentChart, isLoading: isAppointmentChartLoading } =
+    useAppointments();
+
   const customYAxisFormatter = (value) => {
     if (value >= 1000) {
       return `${value / 1000}k$`;
     }
     return `${value}$`;
   };
+
+  if (isOverralLoading || isRevenueChartLoading || isAppointmentChartLoading) {
+    return <UICircularIndeterminate />;
+  }
+
   return (
     <>
       <Stack direction="row" spacing={3} justifyContent={"space-between"}>
-        <Card sx={{ width: "25%" }}>
-          <CardContent>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Box fontSize={12} fontWeight={700} color={grey[500]}>
-                  REVENUE
-                </Box>
-                <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
-                  {formatTotalDashboardItem(revenue.total)}
-                </Box>
-              </Box>
-              <Box
-                width={50}
-                height={50}
-                position="relative"
-                borderRadius="50%"
-                bgcolor={green[400]}
-              >
-                <PaidIcon
-                  fontSize="large"
-                  sx={{
-                    color: "#ffffff",
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                />
-              </Box>
-            </Stack>
-            <Stack direction="row" mt={2}>
-              <Typography color={revenue.status ? "green" : "red"} mr={2}>
-                {revenue.status ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}{" "}
-                {revenue.percent}%
-              </Typography>
-              <Typography color={grey[600]}>Since last month</Typography>
-            </Stack>
-          </CardContent>
-        </Card>
-        <Card sx={{ width: "25%" }}>
-          <CardContent>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Box fontSize={12} fontWeight={700} color={grey[500]}>
-                  NEW USERS
-                </Box>
-                <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
-                  {formatTotalDashboardItem(user.total)}
-                </Box>
-              </Box>
-              <Box
-                width={50}
-                height={50}
-                position="relative"
-                borderRadius="50%"
-                bgcolor={red[400]}
-              >
-                <DonutSmallIcon
-                  fontSize="large"
-                  sx={{
-                    color: "#ffffff",
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                />
-              </Box>
-            </Stack>
-            <Stack direction="row" mt={2}>
-              <Typography color={user.status ? "green" : "red"} mr={2}>
-                {user.status ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}{" "}
-                {user.percent}%
-              </Typography>
-              <Typography color={grey[600]}>Since last week</Typography>
-            </Stack>
-          </CardContent>
-        </Card>
-        <Card sx={{ width: "25%" }}>
-          <CardContent>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Box fontSize={12} fontWeight={700} color={grey[500]}>
-                  APPOINTMENTS
-                </Box>
-                <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
-                  {formatTotalDashboardItem(appointment.total)}
-                </Box>
-              </Box>
-              <Box
-                width={50}
-                height={50}
-                position="relative"
-                borderRadius="50%"
-                bgcolor={yellow[800]}
-              >
-                <ArticleIcon
-                  fontSize="large"
-                  sx={{
-                    color: "#ffffff",
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                />
-              </Box>
-            </Stack>
-            <Stack direction="row" mt={2}>
-              <Typography color={appointment.status ? "green" : "red"} mr={2}>
-                {appointment.status ? (
-                  <ArrowUpwardIcon />
-                ) : (
-                  <ArrowDownwardIcon />
-                )}{" "}
-                {appointment.percent}%
-              </Typography>
-              <Typography color={grey[600]}>Since last month</Typography>
-            </Stack>
-          </CardContent>
-        </Card>
-        <Card sx={{ width: "25%" }}>
-          <CardContent>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Box fontSize={12} fontWeight={700} color={grey[500]}>
-                  VALUATIONS
-                </Box>
-                <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
-                  {formatTotalDashboardItem(valuation.total)}
-                </Box>
-              </Box>
-              <Box
-                width={50}
-                height={50}
-                position="relative"
-                borderRadius="50%"
-                bgcolor={blue[400]}
-              >
-                <DiamondIcon
-                  fontSize="large"
-                  sx={{
-                    color: "#ffffff",
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                />
-              </Box>
-            </Stack>
-            <Stack direction="row" mt={2}>
-              <Typography color={valuation.status ? "green" : "red"} mr={2}>
-                {valuation.status ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}{" "}
-                {valuation.percent}%
-              </Typography>
-              <Typography color={grey[600]}>Since last month</Typography>
-            </Stack>
-          </CardContent>
-        </Card>
+        {isOverralLoading ? (
+          <UICircularIndeterminate />
+        ) : (
+          <>
+            <Card sx={{ width: "25%" }}>
+              <CardContent>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Box>
+                    <Box fontSize={12} fontWeight={700} color={grey[500]}>
+                      REVENUE
+                    </Box>
+                    <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
+                      {formatTotalDashboardItem(revenue.total)}
+                    </Box>
+                  </Box>
+                  <Box
+                    width={50}
+                    height={50}
+                    position="relative"
+                    borderRadius="50%"
+                    bgcolor={green[400]}
+                  >
+                    <PaidIcon
+                      fontSize="large"
+                      sx={{
+                        color: "#ffffff",
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    />
+                  </Box>
+                </Stack>
+                <Stack direction="row" mt={2}>
+                  <Typography color={revenue.status ? "green" : "red"} mr={2}>
+                    {revenue.status ? (
+                      <ArrowUpwardIcon />
+                    ) : (
+                      <ArrowDownwardIcon />
+                    )}{" "}
+                    {revenue.percent}%
+                  </Typography>
+                  <Typography color={grey[600]}>Since last month</Typography>
+                </Stack>
+              </CardContent>
+            </Card>
+            <Card sx={{ width: "25%" }}>
+              <CardContent>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Box>
+                    <Box fontSize={12} fontWeight={700} color={grey[500]}>
+                      NEW USERS
+                    </Box>
+                    <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
+                      {formatTotalDashboardItem(user?.total)}
+                    </Box>
+                  </Box>
+                  <Box
+                    width={50}
+                    height={50}
+                    position="relative"
+                    borderRadius="50%"
+                    bgcolor={red[400]}
+                  >
+                    <DonutSmallIcon
+                      fontSize="large"
+                      sx={{
+                        color: "#ffffff",
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    />
+                  </Box>
+                </Stack>
+                <Stack direction="row" mt={2}>
+                  <Typography color={user?.status ? "green" : "red"} mr={2}>
+                    {user?.status ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}{" "}
+                    {user?.percent}%
+                  </Typography>
+                  <Typography color={grey[600]}>Since last week</Typography>
+                </Stack>
+              </CardContent>
+            </Card>
+            <Card sx={{ width: "25%" }}>
+              <CardContent>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Box>
+                    <Box fontSize={12} fontWeight={700} color={grey[500]}>
+                      APPOINTMENTS
+                    </Box>
+                    <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
+                      {formatTotalDashboardItem(appointment.total)}
+                    </Box>
+                  </Box>
+                  <Box
+                    width={50}
+                    height={50}
+                    position="relative"
+                    borderRadius="50%"
+                    bgcolor={yellow[800]}
+                  >
+                    <ArticleIcon
+                      fontSize="large"
+                      sx={{
+                        color: "#ffffff",
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    />
+                  </Box>
+                </Stack>
+                <Stack direction="row" mt={2}>
+                  <Typography
+                    color={appointment.status ? "green" : "red"}
+                    mr={2}
+                  >
+                    {appointment.status ? (
+                      <ArrowUpwardIcon />
+                    ) : (
+                      <ArrowDownwardIcon />
+                    )}{" "}
+                    {appointment.percent}%
+                  </Typography>
+                  <Typography color={grey[600]}>Since last month</Typography>
+                </Stack>
+              </CardContent>
+            </Card>
+            <Card sx={{ width: "25%" }}>
+              <CardContent>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Box>
+                    <Box fontSize={12} fontWeight={700} color={grey[500]}>
+                      VALUATIONS
+                    </Box>
+                    <Box fontSize={24} lineHeight={1.2} fontWeight={700}>
+                      {formatTotalDashboardItem(valuation.total)}
+                    </Box>
+                  </Box>
+                  <Box
+                    width={50}
+                    height={50}
+                    position="relative"
+                    borderRadius="50%"
+                    bgcolor={blue[400]}
+                  >
+                    <DiamondIcon
+                      fontSize="large"
+                      sx={{
+                        color: "#ffffff",
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    />
+                  </Box>
+                </Stack>
+                <Stack direction="row" mt={2}>
+                  <Typography color={valuation.status ? "green" : "red"} mr={2}>
+                    {valuation.status ? (
+                      <ArrowUpwardIcon />
+                    ) : (
+                      <ArrowDownwardIcon />
+                    )}{" "}
+                    {valuation.percent}%
+                  </Typography>
+                  <Typography color={grey[600]}>Since last month</Typography>
+                </Stack>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </Stack>
 
       <Stack
@@ -424,20 +404,7 @@ const Dashboard = () => {
             dataset={revenueDataSet}
             xAxis={[{ scaleType: "band", dataKey: "month" }]}
             yAxis={[{ valueFormatter: customYAxisFormatter }]}
-            series={[
-              {
-                dataKey: "2023",
-                label: "2023",
-                color: blue[500],
-                valueFormatter: moneyFormatter,
-              },
-              {
-                dataKey: "2024",
-                label: "2024",
-                color: yellow[800],
-                valueFormatter: moneyFormatter,
-              },
-            ]}
+            series={dataSeriesMapping(revenueChart)}
             sx={{
               [`& .${axisClasses.left} .${axisClasses.label}`]: {
                 transform: "translateX(-10px)",
@@ -462,7 +429,7 @@ const Dashboard = () => {
               value={year}
               onChange={(e) => setYear(e.target.value)}
             >
-              {["seoul", "london"].map((option) => (
+              {yearFilter(appointmentChart).map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
@@ -470,11 +437,11 @@ const Dashboard = () => {
             </TextField>
           </Stack>
           <BarChart
-            dataset={dataset}
+            dataset={dataMapping(appointmentChart)}
             yAxis={[{ scaleType: "band", dataKey: "month" }]}
-            series={[{ dataKey: year, valueFormatter }]}
+            series={[{ dataKey: year }]}
             layout="horizontal"
-            xAxis={[{ label: "rainfall (mm)" }]}
+            xAxis={[{ label: "Number of appointments" }]}
             width={532}
             height={400}
           />

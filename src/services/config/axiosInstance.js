@@ -1,10 +1,10 @@
 import axios from "axios";
 import AuthService from "../auth.service.js";
 
-// export const frontendUrl = "http://localhost:5173/";
-export const frontendUrl = "https://console.hntdiamond.store";
-// export const basedUrl = "http://localhost:8080/api/v1/";
-export const basedUrl = "https://diamond-valuation-system.onrender.com/api/v1/";
+export const frontendUrl = "http://localhost:5173/";
+// export const frontendUrl = "https://console.hntdiamond.store";
+export const basedUrl = "http://localhost:8080/api/v1/";
+// export const basedUrl = "https://diamond-valuation-system.onrender.com/api/v1/";
 const axiosInstance = axios.create({
   baseURL: basedUrl,
   timeout: 50000,
