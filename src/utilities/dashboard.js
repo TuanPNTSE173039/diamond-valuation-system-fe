@@ -1,7 +1,7 @@
 import { formattedMoney } from "./formatter.js";
 
 export const dataMapping = (revenueChart) => {
-  return revenueChart.map((item) => {
+  return revenueChart?.map((item) => {
     const monthShortName =
       item.month.slice(0, 3).charAt(0).toUpperCase() +
       item.month.slice(1, 3).toLowerCase();
@@ -14,8 +14,7 @@ export const dataMapping = (revenueChart) => {
 
 export const dataSeriesMapping = (revenueChart) => {
   const combinedData = {};
-
-  revenueChart.forEach((item) => {
+  revenueChart?.forEach((item) => {
     Object.keys(item.data).forEach((year) => {
       if (!combinedData[year]) {
         combinedData[year] = {

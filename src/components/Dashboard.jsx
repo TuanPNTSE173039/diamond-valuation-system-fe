@@ -5,6 +5,7 @@ import DiamondIcon from "@mui/icons-material/Diamond";
 import DonutSmallIcon from "@mui/icons-material/DonutSmall";
 import PaidIcon from "@mui/icons-material/Paid";
 import { Card, CardContent, TextField } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { blue, green, grey, red, yellow } from "@mui/material/colors";
 import MenuItem from "@mui/material/MenuItem";
@@ -28,6 +29,8 @@ import {
   useAppointments,
   useOverral,
   useRevenue,
+  useTopFiveConsultants,
+  useTopFiveValuations,
 } from "../services/dashboard.js";
 import {
   dataMapping,
@@ -40,104 +43,6 @@ import {
   formatTotalDashboardItem,
 } from "../utilities/formatter.js";
 import UICircularIndeterminate from "./UI/CircularIndeterminate.jsx";
-
-const chartSetting = {
-  xAxis: [
-    {
-      label: "rainfall (mm)",
-    },
-  ],
-  width: 550,
-  height: 400,
-};
-
-const valueFormatter = (value) => `${value} mm`;
-const dataset = [
-  {
-    london: 59,
-    paris: 57,
-    newYork: 86,
-    seoul: 21,
-    month: "Jan",
-  },
-  {
-    london: 50,
-    paris: 52,
-    newYork: 78,
-    seoul: 28,
-    month: "Feb",
-  },
-  {
-    london: 47,
-    paris: 53,
-    newYork: 106,
-    seoul: 41,
-    month: "Mar",
-  },
-  {
-    london: 54,
-    paris: 56,
-    newYork: 92,
-    seoul: 73,
-    month: "Apr",
-  },
-  {
-    london: 57,
-    paris: 69,
-    newYork: 92,
-    seoul: 99,
-    month: "May",
-  },
-  {
-    london: 60,
-    paris: 63,
-    newYork: 103,
-    seoul: 144,
-    month: "June",
-  },
-  {
-    london: 59,
-    paris: 60,
-    newYork: 105,
-    seoul: 319,
-    month: "July",
-  },
-  {
-    london: 65,
-    paris: 60,
-    newYork: 106,
-    seoul: 249,
-    month: "Aug",
-  },
-  {
-    london: 51,
-    paris: 51,
-    newYork: 95,
-    seoul: 131,
-    month: "Sept",
-  },
-  {
-    london: 60,
-    paris: 65,
-    newYork: 97,
-    seoul: 55,
-    month: "Oct",
-  },
-  {
-    london: 67,
-    paris: 64,
-    newYork: 76,
-    seoul: 48,
-    month: "Nov",
-  },
-  {
-    london: 61,
-    paris: 70,
-    newYork: 103,
-    seoul: 25,
-    month: "Dec",
-  },
-];
 
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
@@ -183,6 +88,11 @@ const Dashboard = () => {
   const { data: appointmentChart, isLoading: isAppointmentChartLoading } =
     useAppointments();
 
+  const { data: topConsultant, isLoading: isTopConsultantLoading } =
+    useTopFiveConsultants();
+  const { data: topValuation, isLoading: isTopValuationLoading } =
+    useTopFiveValuations();
+
   const customYAxisFormatter = (value) => {
     if (value >= 1000) {
       return `${value / 1000}k$`;
@@ -190,7 +100,33 @@ const Dashboard = () => {
     return `${value}$`;
   };
 
-  if (isOverralLoading || isRevenueChartLoading || isAppointmentChartLoading) {
+  const getCurrentDateFormatted = () => {
+    const date = new Date();
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${month}, ${year}`;
+  };
+  if (
+    isOverralLoading ||
+    isRevenueChartLoading ||
+    isAppointmentChartLoading ||
+    isTopConsultantLoading ||
+    isTopValuationLoading
+  ) {
     return <UICircularIndeterminate />;
   }
 
@@ -448,65 +384,95 @@ const Dashboard = () => {
         </Paper>
       </Stack>
 
-      <Stack direction="row" spacing={3} mt={3}>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Dessert (100g serving)</TableCell>
-                <TableCell align="right">Calories</TableCell>
-                <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow
-                  key={row.name}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.calories}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
-                  <TableCell align="right">{row.carbs}</TableCell>
-                  <TableCell align="right">{row.protein}</TableCell>
+      <Stack direction="row" spacing={3} mt={3} width={"100%"}>
+        <Box component={Paper} p={2} width="50%">
+          <Typography variant="h6" fontSize={20} fontWeight="700" ml={2}>
+            Top 5 Consultants of month {getCurrentDateFormatted()}
+          </Typography>
+          <TableContainer>
+            <Table aria-label="consultant table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Consultant</TableCell>
+                  <TableCell align="left">Phone</TableCell>
+                  <TableCell align="right">Reqs</TableCell>
+                  <TableCell align="right">Sale</TableCell>
+                  <TableCell align="center">Rank</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Dessert (100g serving)</TableCell>
-                <TableCell align="right">Calories</TableCell>
-                <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow
-                  key={row.name}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.calories}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
-                  <TableCell align="right">{row.carbs}</TableCell>
-                  <TableCell align="right">{row.protein}</TableCell>
+              </TableHead>
+              <TableBody>
+                {topConsultant.map((row, index) => (
+                  <TableRow
+                    key={row.staffPhone}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Avatar sx={{ mr: 1 }}>{row.avatar}</Avatar>
+                      {row.staffName}
+                    </TableCell>
+                    <TableCell align="left">{row.staffPhone}</TableCell>
+                    <TableCell align="right">{row.totalAppointments}</TableCell>
+                    <TableCell align="right">
+                      {formattedMoney(row.totalServicePrice)}
+                    </TableCell>
+                    <TableCell align="center">Top {index + 1}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+        <Box component={Paper} p={2} width="50%">
+          <Typography variant="h6" fontSize={20} fontWeight="700" ml={2}>
+            Top 5 Valuations of month {getCurrentDateFormatted()}
+          </Typography>
+          <TableContainer>
+            <Table aria-label="valuation table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Valuation</TableCell>
+                  <TableCell align="left">Phone</TableCell>
+                  <TableCell align="right">Vals</TableCell>
+                  <TableCell align="right">Chosen</TableCell>
+                  <TableCell align="center">Rank</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {topValuation.map((row, index) => (
+                  <TableRow
+                    key={row.staffPhone}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Avatar sx={{ mr: 1 }}>{row.avatar}</Avatar>
+                      {row.staffName}
+                    </TableCell>
+                    <TableCell align="left">{row.staffPhone}</TableCell>
+                    <TableCell align="right">{row.totalValuation}</TableCell>
+                    <TableCell align="right">{row.valuationCount}</TableCell>
+                    <TableCell align="center">Top {index + 1}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Stack>
     </>
   );
