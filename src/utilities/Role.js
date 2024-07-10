@@ -1,0 +1,9 @@
+const Role = {
+  ADMIN: "ADMIN",
+  MANAGER: "MANAGER",
+  CUSTOMER: "CUSTOMER",
+  CONSULTANT: "CONSULTANT_STAFF",
+  VALUATION: "VALUATION_STAFF",
+};
+
+export default Role;
