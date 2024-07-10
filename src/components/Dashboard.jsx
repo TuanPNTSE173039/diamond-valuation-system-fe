@@ -415,7 +415,7 @@ const Dashboard = () => {
                         alignItems: "center",
                       }}
                     >
-                      <Avatar sx={{ mr: 1 }}>{row.avatar}</Avatar>
+                      <Avatar sx={{ mr: 1 }} src={row.avatar} />
                       {row.staffName}
                     </TableCell>
                     <TableCell align="left">{row.staffPhone}</TableCell>
@@ -460,7 +460,7 @@ const Dashboard = () => {
                         alignItems: "center",
                       }}
                     >
-                      <Avatar sx={{ mr: 1 }}>{row.avatar}</Avatar>
+                      <Avatar sx={{ mr: 1 }} src={row.avatar} />
                       {row.staffName}
                     </TableCell>
                     <TableCell align="left">{row.staffPhone}</TableCell>

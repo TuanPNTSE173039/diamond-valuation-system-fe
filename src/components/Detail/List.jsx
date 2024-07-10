@@ -128,6 +128,8 @@ const DetailList = () => {
     return <UICircularIndeterminate />;
   }
 
+  console.log(request);
+
   return (
     <>
       <Box
@@ -175,7 +177,11 @@ const DetailList = () => {
               <StyledTableCell align="right">Carat</StyledTableCell>
               <StyledTableCell align="right">Valuation Price</StyledTableCell>
               <StyledTableCell align="center">Status</StyledTableCell>
-              <StyledTableCell align="center">Action</StyledTableCell>
+
+              {(request.status === "PENDING" ||
+                request.status === "PROCESSING") && (
+                <StyledTableCell align="center">Action</StyledTableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -213,17 +219,20 @@ const DetailList = () => {
                 <StyledTableCell align="center">
                   {convertStatus(row.status)}
                 </StyledTableCell>
-                <StyledTableCell align="center">
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleEditClick(row.number)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton color="secondary">
-                    <DeleteForeverIcon />
-                  </IconButton>
-                </StyledTableCell>
+                {(request.status === "PENDING" ||
+                  request.status === "PROCESSING") && (
+                  <StyledTableCell align="center">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditClick(row.number)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="secondary">
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </StyledTableCell>
+                )}
               </StyledTableRow>
             ))}
           </TableBody>

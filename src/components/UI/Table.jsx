@@ -26,6 +26,7 @@ export default function UITable({
   headCells = [],
   children,
   readOnly = false,
+  isPagination = true,
   selectedAction = (
     <IconButton>
       <DeleteIcon />
@@ -212,16 +213,17 @@ export default function UITable({
             </TableBody>
           </Table>
         </TableContainer>
-
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 35]}
-          component="div"
-          count={count}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        {isPagination && (
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 35]}
+            component="div"
+            count={count}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        )}
       </Paper>
 
       <FormControlLabel

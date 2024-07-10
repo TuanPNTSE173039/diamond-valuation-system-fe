@@ -90,37 +90,58 @@ const DiamondValuationAssignTable = ({ detailState }) => {
       date: item.creationDate,
       price: item.valuationPrice,
       comment: item.comment,
-      status: item.status ? "VALUATED" : "VALUATING",
+      // status: item.status ? "VALUATED" : "VALUATING",
+      status: item.status,
     };
   });
-  const [valuationMode, setValuationMode] = useState("One");
+  const [valuationMode, setValuationMode] = useState("Average");
   const handleValuationModeChange = (event) => {
     const isAverageMode = event.target.checked;
     setValuationMode(isAverageMode ? "Average" : "One");
-    setSwitches(switches.map(() => isAverageMode)); // Enable the first switch when valuation mode changes
+    setSwitches(
+      switches.map((val) => ({
+        ...val,
+        value: isAverageMode,
+      })),
+    ); // Enable the first switch when valuation mode changes
   };
   const handleSwitchChange = (index) => {
     if (valuationMode === "One") {
-      setSwitches(switches.map((val, i) => i === index)); // Enable only the selected switch
+      setSwitches(
+        switches.map((val, i) => ({
+          ...val,
+          value: i === index,
+        })),
+      ); // Enable only the selected switch
     } else {
-      setSwitches(switches.map((val, i) => (i === index ? !val : val)));
+      setSwitches(
+        switches.map((val, i) => ({
+          ...val,
+          value: i === index ? !val : val,
+        })),
+      );
     }
   };
   const [switches, setSwitches] = useState(
-    valuationAssignment?.map((row, index) => index === 0),
+    valuationAssignment?.map((row) => ({
+      valuationId: row.id,
+      value: true,
+    })),
   ); // Enable the first switch by default
 
   //Assign Valuation Staff
-  const valuationStaffList = staffs?.content.map((staff) => {
-    return {
-      number: staff.id,
-      staffName: staff.firstName + " " + staff.lastName,
-      staffPhone: staff.phone,
-      yearExperience: staff.experience,
-      totalProjects: staff.countProject,
-      currentProjects: staff.currentTotalProject,
-    };
-  });
+  const valuationStaffList = staffs?.content
+    .filter((staff) => staff?.account.is_active)
+    .map((staff) => {
+      return {
+        number: staff.id,
+        staffName: staff.firstName + " " + staff.lastName,
+        staffPhone: staff.phone,
+        yearExperience: staff.experience,
+        totalProjects: staff.countProject,
+        currentProjects: staff.currentTotalProject,
+      };
+    });
   const [selectedStaffs, setSelectedStaffs] = useState([]);
   const [valuationStaff, setValuationStaff] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -137,6 +158,10 @@ const DiamondValuationAssignTable = ({ detailState }) => {
   //     status: "VALUATING",
   //   });
   // };
+
+  const getValuationAssignmentById = (id) => {
+    return valuationAssignment.find((item) => item.id === id);
+  };
 
   if (isStaffsLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
@@ -157,10 +182,18 @@ const DiamondValuationAssignTable = ({ detailState }) => {
               <TableCell sx={{ fontSize: 17, fontWeight: 700 }} align="center">
                 ID
               </TableCell>
-              <TableCell align="left" sx={{ fontSize: 17, fontWeight: 700 }}>
+              <TableCell
+                width="13%"
+                align="left"
+                sx={{ fontSize: 17, fontWeight: 700 }}
+              >
                 Staff Name
               </TableCell>
-              <TableCell align="left" sx={{ fontSize: 17, fontWeight: 700 }}>
+              <TableCell
+                width="17%"
+                align="left"
+                sx={{ fontSize: 17, fontWeight: 700 }}
+              >
                 Date
               </TableCell>
               <TableCell align="right" sx={{ fontSize: 17, fontWeight: 700 }}>
@@ -168,17 +201,23 @@ const DiamondValuationAssignTable = ({ detailState }) => {
               </TableCell>
               <TableCell
                 align="left"
-                width="50%"
+                width="40%"
                 sx={{ fontSize: 17, fontWeight: 700 }}
               >
                 Comments
               </TableCell>
-              <TableCell align="left" sx={{ fontSize: 17, fontWeight: 700 }}>
+              <TableCell align="center" sx={{ fontSize: 17, fontWeight: 700 }}>
                 Status
               </TableCell>
-              <TableCell align="center" sx={{ fontSize: 17, fontWeight: 700 }}>
-                Action
-              </TableCell>
+
+              {detail.status === "VALUATED" && (
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 17, fontWeight: 700 }}
+                >
+                  Action
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -207,15 +246,19 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                 </TableCell>
                 <TableCell align="right">{formattedMoney(row.price)}</TableCell>
                 <TableCell align="left">{row.comment}</TableCell>
-                <TableCell align="left">{convertStatus(row.status)}</TableCell>
                 <TableCell align="center">
-                  <Switch
-                    checked={switches[index]}
-                    onChange={() => handleSwitchChange(index)}
-                    inputProps={{ "aria-label": "controlled" }}
-                    disabled={valuationMode === "Average"}
-                  />
+                  {convertStatus(row.status ? "VALUATED" : "VALUATING")}
                 </TableCell>
+                {detail.status === "VALUATED" && (
+                  <TableCell align="center">
+                    <Switch
+                      checked={switches[index].value}
+                      onChange={() => handleSwitchChange(index)}
+                      inputProps={{ "aria-label": "action" }}
+                      disabled={valuationMode === "Average"}
+                    />
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
@@ -239,7 +282,9 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                 <UITable
                   rows={valuationStaffList}
                   headCells={StaffHeadCells}
-                  readOnly={true}
+                  heading="Valuation staff List"
+                  readOnly
+                  isPagination={false}
                   selected={selectedStaffs}
                   setSelected={setSelectedStaffs}
                   selectedAction={
@@ -290,6 +335,12 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                 const body = {
                   ...detail,
                   mode: valuationMode === "Average",
+                  diamondValuationAssign:
+                    valuationMode === "Average"
+                      ? null
+                      : getValuationAssignmentById(
+                          switches.find((val) => val.value).valuationId,
+                        ),
                   status: "APPROVED",
                 };
                 approve(body);

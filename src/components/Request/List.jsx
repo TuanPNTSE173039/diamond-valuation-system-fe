@@ -1,6 +1,4 @@
-import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import { useQueryClient } from "@tanstack/react-query";
@@ -132,16 +130,7 @@ const RequestList = () => {
           count={requests?.totalElement}
           rowsPerPage={rowsPerPage}
           setRowsPerPage={setRowsPerPage}
-        >
-          <Button
-            onClick={handleAddValuationRequest}
-            variant="contained"
-            size="large"
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
-        </UITable>
+        />
       </UITabPanel>
 
       {valuationRequestStatus

@@ -356,14 +356,6 @@ export const StaffHeadCells = [
     disablePadding: false,
     label: "Current Valuations",
   },
-  {
-    id: "role",
-    numeric: true,
-    disablePadding: false,
-    label: "Role",
-  },
-
-
 ];
 
 export const CustomerHeadCells = [
@@ -398,4 +390,3 @@ export const CustomerHeadCells = [
     label: "Identity Document",
   },
 ];
-

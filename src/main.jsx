@@ -53,7 +53,7 @@ const theme = createTheme({
     },
     status: {
       color: "#eff3f5",
-      pending: "#33595e",
+      pending: "#758694",
       processing: "#30cb83",
       received: "#2133a1",
       cancelled: "#e74c3c",

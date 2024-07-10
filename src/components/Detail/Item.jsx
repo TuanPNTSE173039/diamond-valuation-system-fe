@@ -332,11 +332,9 @@ const DetailItem = () => {
   const handleClickClose = () => {
     setMoreDetail(false);
   };
-  console.log(selectedValuationDetail);
   if (isStaffLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
   }
-
   return (
     <>
       <UIBreadCrumb pathNames={pathNames} />
@@ -422,22 +420,18 @@ const DetailItem = () => {
                   }}
                 >
                   {!detail.mode ? (
-                    <Avatar alt={resultStaff.staff.id} src="" />
+                    <Avatar src={resultStaff.staff.avatar} />
                   ) : (
                     resultStaff.map((item) => {
                       return (
-                        <Avatar
-                          key={item.staff.id}
-                          alt={item.staff.id}
-                          src=""
-                        />
+                        <Avatar key={item.staff.id} src={item.staff.avatar} />
                       );
                     })
                   )}
                 </AvatarGroup>
                 <Box>
                   {!detail.mode ? (
-                    <Box sx={{ mt: 2 }}>
+                    <Box sx={{ mt: 5.5 }}>
                       <h2 className="text-xl font-bold mb-1/2">
                         {resultStaff.staff.firstName +
                           " " +
@@ -455,7 +449,7 @@ const DetailItem = () => {
                       </Link>
                     </Box>
                   ) : (
-                    <Carousel sx={{ mt: 5, height: "100%" }}>
+                    <Carousel sx={{ mt: 5.5, height: "100%" }}>
                       {resultStaff.map((item, index) => (
                         <Box sx={{ mt: 2 }} key={index}>
                           <h2 className="text-xl font-bold mb-1/2">
@@ -482,8 +476,6 @@ const DetailItem = () => {
                   scroll={"body"}
                   fullWidth
                   maxWidth={"md"}
-                  aria-labelledby="scroll-dialog-title"
-                  aria-describedby="scroll-dialog-description"
                 >
                   <DialogTitle id="scroll-dialog-title">
                     Valuation Detail
@@ -663,7 +655,8 @@ const DetailItem = () => {
         (detailState.current === "ASSESSED" ||
           detailState.current === "VALUATING" ||
           detailState.current === "DRAFT_VALUATING" ||
-          detailState.current === "VALUATED") &&
+          detailState.current === "VALUATED" ||
+          detailState.current === "APPROVED") &&
         role === Role.MANAGER && (
           <>
             <DiamondValuationAssignTable

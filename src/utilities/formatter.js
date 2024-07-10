@@ -1,6 +1,9 @@
 import { format } from "date-fns";
 
 export function formattedDateTime(date) {
+  if (!date) {
+    return "N/A";
+  }
   return format(new Date(date), "yyyy/MM/dd - HH:mm:ss");
 }
 
