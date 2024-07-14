@@ -1,4 +1,5 @@
 import { axiosInstance } from "./config/axiosInstance.js";
+import * as http from "node:http";
 
 // ---CUSTOMERS---
 export const getCustomers = async () => {
@@ -114,3 +115,6 @@ export const postBlog = async (body) => axiosInstance.post("posts", body);
 export const updateBlog = async (id, body) => axiosInstance.put(`posts/${id}`, body);
 export const deleteBlog = async (id) => axiosInstance.delete(`posts/${id}`);
 
+
+//---Forget Password---
+export const forgotPassword = async (email) => axiosInstance.post("auth/forget-password", { email });
