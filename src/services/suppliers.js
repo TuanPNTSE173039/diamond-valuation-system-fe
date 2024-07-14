@@ -16,7 +16,7 @@ export const useSuppliers = () => {
 
 export const useDiamondsOfSupplier = (pageNo, pageSize, id) => {
     return useQuery({
-        queryKey: ["diamonds", { pageNo, pageSize, id }], // Thay đổi queryKey để bao gồm pageNo và pageSize
+        queryKey: ["diamonds", { pageNo, pageSize, id }],
         queryFn: async () => {
             const response = await axiosInstance.get(`suppliers/${id}/diamond-market?pageNo=${pageNo}&pageSize=${pageSize}`);
             if (response.data) {
