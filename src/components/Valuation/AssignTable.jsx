@@ -117,7 +117,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
       setSwitches(
         switches.map((val, i) => ({
           ...val,
-          value: i === index ? !val : val,
+          value: i === index ? !val.value : val.value,
         })),
       );
     }

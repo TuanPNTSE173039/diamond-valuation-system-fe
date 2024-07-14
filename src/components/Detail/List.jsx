@@ -178,8 +178,8 @@ const DetailList = () => {
               <StyledTableCell align="right">Valuation Price</StyledTableCell>
               <StyledTableCell align="center">Status</StyledTableCell>
 
-              {(request.status === "PENDING" ||
-                request.status === "PROCESSING") && (
+              {(request?.status === "PENDING" ||
+                request?.status === "PROCESSING") && (
                 <StyledTableCell align="center">Action</StyledTableCell>
               )}
             </TableRow>
@@ -219,8 +219,8 @@ const DetailList = () => {
                 <StyledTableCell align="center">
                   {convertStatus(row.status)}
                 </StyledTableCell>
-                {(request.status === "PENDING" ||
-                  request.status === "PROCESSING") && (
+                {(request?.status === "PENDING" ||
+                  request?.status === "PROCESSING") && (
                   <StyledTableCell align="center">
                     <IconButton
                       color="primary"

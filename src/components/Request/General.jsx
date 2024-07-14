@@ -114,7 +114,7 @@ const RequestGeneral = () => {
       <Grid container>
         <Grid item xs={4}>
           <ValuationRequestUserInfor icon={<PersonIcon />} title="Customer">
-            <Avatar sx={{ width: 35, height: 35 }} src={customer.avatar} />
+            <Avatar sx={{ width: 35, height: 35 }} src={customer?.avatar} />
             {customer?.firstName + " " + customer?.lastName}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<AssignmentIndIcon />} title="CCCD">
@@ -139,7 +139,7 @@ const RequestGeneral = () => {
               <>
                 <Avatar
                   sx={{ width: 35, height: 35 }}
-                  src={staff.avatar}
+                  src={staff?.avatar}
                 ></Avatar>
                 <Typography>
                   {staff?.firstName + " " + staff?.lastName}
