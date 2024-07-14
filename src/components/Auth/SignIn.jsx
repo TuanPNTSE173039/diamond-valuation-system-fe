@@ -2,12 +2,8 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useFormik } from "formik";
@@ -143,10 +139,10 @@ export default function AuthSignIn() {
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
+          {/*<FormControlLabel*/}
+          {/*  control={<Checkbox value="remember" color="primary" />}*/}
+          {/*  label="Remember me"*/}
+          {/*/>*/}
           <Button
             type="submit"
             fullWidth
@@ -154,20 +150,20 @@ export default function AuthSignIn() {
             sx={{ mt: 3, mb: 2 }}
           >
             {loading && <UICircularIndeterminate color={"secondary"} />}
-            Sign In
+            {!loading && <>Sign In</>}
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
+          {/*<Grid container>*/}
+          {/*  <Grid item xs>*/}
+          {/*    <Link href="#" variant="body2">*/}
+          {/*      Forgot password?*/}
+          {/*    </Link>*/}
+          {/*  </Grid>*/}
+          {/*  <Grid item>*/}
+          {/*    <Link href="#" variant="body2">*/}
+          {/*      {"Don't have an account? Sign Up"}*/}
+          {/*    </Link>*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
         </Box>
         {message && <Typography color={"secondary"}>{message}</Typography>}
       </Box>
