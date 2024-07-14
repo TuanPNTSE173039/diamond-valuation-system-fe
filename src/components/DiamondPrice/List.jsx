@@ -158,25 +158,7 @@ const DiamondPriceList = () => {
             {mode === ADD_MODE ? "Add new Diamond Price" : "Update Diamond Price"}
           </DialogTitle>
           <DialogContent sx={{ padding: 3 }}>
-            <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
-              <TextField
-                  label="Diamond Image"
-                  id="diamond-image"
-                  name="diamondImage"
-                  value={formData.diamondImage}
-                  onChange={handleInputChange}
-                  fullWidth
-              />
-              <TextField
-                  label="Creation Date"
-                  id="creation-date"
-                  name="creationDate"
-                  type="datetime-local"
-                  value={formData.creationDate}
-                  onChange={handleInputChange}
-                  fullWidth
-              />
-            </Box>
+
             <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
               <FormControl sx={{ width: "50%" }}>
                 <FormLabel id="diamond-origin">Diamond Origin</FormLabel>

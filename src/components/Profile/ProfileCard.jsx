@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import {DialogTitle, Grid} from "@mui/material";
@@ -19,6 +19,8 @@ import {useFormik} from "formik";
 import {useDispatch} from "react-redux";
 import {setMessage} from "../../redux/messageSlide.js";
 import {updateStaff, updateStaffPassword} from "../../services/api.js";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
 
 const styles = {
     details: {
@@ -131,7 +133,21 @@ export default function ProfileCard(props) {
         disabled: true,
         isEdit: true,
     });
+    const [avatarImage, setAvatarImage] = useState(null);
+    const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
+    const fileInputRef = useRef(null);
+    const [avatarChanged, setAvatarChanged] = useState(false);
 
+    const openFileDialog = () => {
+        console.log("Attempting to open file dialog"); // Debugging log
+        if (!isFileDialogOpen && fileInputRef.current) {
+            console.log("File dialog is not open, opening now"); // Debugging log
+            setIsFileDialogOpen(true); // Mark dialog as open
+            fileInputRef.current.click(); // Trigger file dialog
+        } else {
+            console.log("File dialog is already open, not opening again"); // Debugging log
+        }
+    };
     const getChangedFields = () => {
         const changedFields = {};
         for (const key in user) {
@@ -141,7 +157,6 @@ export default function ProfileCard(props) {
         }
         return changedFields;
     };
-    console.log(user.staffID);
     const handleUpdate = async () => {
         const changedFields = getChangedFields();
         if (Object.keys(changedFields).length > 0) {
@@ -197,6 +212,14 @@ export default function ProfileCard(props) {
         update({...edit});
     };
 
+    const handleSelectAvatarImage = (e) => {
+        if (e.target.files[0]) {
+            setAvatarImage(e.target.files[0]);
+            setAvatarChanged(true);
+        }
+        setIsFileDialogOpen(false); // Close file dialog after selection
+    };
+
     const formik = useFormik({
         initialValues: {
             firstName: props.firstName || "",
@@ -234,11 +257,39 @@ export default function ProfileCard(props) {
                     {/* PROFILE PHOTO */}
                     <Badge
                         overlap="circular"
-                        anchorOrigin={{vertical: "bottom", horizontal: "right"}}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     >
                         <Avatar
-                            sx={{width: 100, height: 100, mb: 1.5}}
-                            src={props.avatar}
+                            sx={{ width: 100, height: 100, mb: 1.5 }}
+                            src={
+                                avatarImage ? URL.createObjectURL(avatarImage) : props.avatar
+                            }
+                        />
+                        {!edit.isEdit && ( // Conditionally render only when not in edit mode
+                            <>
+                                <label htmlFor="icon-button-file">
+                                    <IconButton
+                                        color="primary"
+                                        aria-label="upload picture"
+                                        component="span"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            openFileDialog();
+                                        }}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                </label>
+                            </>
+                        )}
+                        <input
+                            ref={fileInputRef}
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            id="icon-button-file"
+                            type="file"
+                            onChange={handleSelectAvatarImage}
                         />
                     </Badge>
                     <Typography variant="h6">{fullName}</Typography>
