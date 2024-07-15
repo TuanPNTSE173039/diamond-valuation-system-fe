@@ -21,6 +21,9 @@ import {setMessage} from "../../redux/messageSlide.js";
 import {updateStaff, updateStaffPassword} from "../../services/api.js";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import { storage } from "../../services/config/firebase.js";
+import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
+
 
 const styles = {
     details: {
@@ -32,21 +35,17 @@ const styles = {
         borderTop: "1px solid #e1e1e1",
         color: "#899499",
     },
-    errorText: {
-        color: "red",
-        fontSize: "0.75rem", // Smaller font size
-        fontStyle: "italic", // Italic font style
-    },
 };
 
 export default function ProfileCard(props) {
     const dispatch = useDispatch();
-    // const { message } = useSelector((state) => state.message);
+    const [value, setValue] = useState([])
     const [user, setUser] = useState({
         firstName: props.firstName,
         lastName: props.lastName,
         phone: props.phone,
         email: props.email,
+        avatar: props.avatar,
         experience: props.experience,
         username: props.username,
         staffID: props.staffID,
@@ -96,9 +95,7 @@ export default function ProfileCard(props) {
             .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
             .required('Confirm password is required!')
     });
-
-    const [originalUser] = useState(user);
-
+    
     const [passwords, setPasswords] = useState({
         oldPassword: "",
         newPassword: "",
@@ -107,10 +104,15 @@ export default function ProfileCard(props) {
     const fullName = `${user.firstName} ${user.lastName}`;
 
     const changeField = (event) => {
-        const {name, value} = event.target;
-        setUser({...user, [name]: value});
+        const { name, value } = event.target;
+        setUser({ ...user, [name]: value });
         formik.setFieldValue(name, value);
         formik.setFieldTouched(name, true);
+
+        // Check if avatar image is changed
+        if (name === "avatar") {
+            setAvatarChanged(true);
+        }
     };
 
     const changePasswordField = (event) => {
@@ -133,6 +135,25 @@ export default function ProfileCard(props) {
         disabled: true,
         isEdit: true,
     });
+
+    const handleUpdate = async () => {
+        console.log("Handle update called"); // Debug log
+       // const changedFields = getChangedFields();
+        const values = {...user}
+            try {
+                if (avatarChanged) {
+                    console.log("Uploading avatar image..."); // Debug log
+                    await handleUploadAvatarImage(values);
+                } else {
+                    await updateStaff(user.staffID, values);
+                    toast.success("Staff information updated successfully!");
+                }
+            } catch (error) {
+                toast.error("Failed to update staff information.");
+                console.error("Failed to update staff information", error);
+            }
+    };
+
     const [avatarImage, setAvatarImage] = useState(null);
     const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
     const fileInputRef = useRef(null);
@@ -148,27 +169,25 @@ export default function ProfileCard(props) {
             console.log("File dialog is already open, not opening again"); // Debugging log
         }
     };
-    const getChangedFields = () => {
-        const changedFields = {};
-        for (const key in user) {
-            if (user[key] !== originalUser[key]) {
-                changedFields[key] = user[key];
-            }
-        }
-        return changedFields;
-    };
-    const handleUpdate = async () => {
-        const changedFields = getChangedFields();
-        if (Object.keys(changedFields).length > 0) {
-            try {
-                await updateStaff(user.staffID, user);
-                toast.success("Staff information updated successfully!");
-            } catch (error) {
-                toast.error("Failed to update staff information.");
-                console.error("Failed to update staff information", error);
-            }
+
+    const handleUploadAvatarImage = async (values) => {
+        if (!avatarImage) return;
+
+        const storageRef = ref(storage, `account/${user.authID}/${avatarImage.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, avatarImage);
+
+        try {
+            await uploadTask;
+            const downloadURL = await getDownloadURL(storageRef);
+            values.avatar = downloadURL;
+            await updateStaff(user.staffID, values);
+            toast.success("Avatar updated successfully");
+        } catch (error) {
+            console.error("Error uploading avatar or updating database:", error);
+            toast.error("Failed to upload avatar or update database");
         }
     };
+
 
     const handlePasswordUpdate = async () => {
         try {
@@ -204,12 +223,13 @@ export default function ProfileCard(props) {
     // EDIT -> UPDATE
     const changeButton = async (event) => {
         event.preventDefault();
+        console.log("Change button clicked"); // Debug log
         if (!edit.disabled) {
             await handleUpdate();
         }
         edit.disabled = !edit.disabled;
         edit.isEdit = !edit.isEdit;
-        update({...edit});
+        update({ ...edit });
     };
 
     const handleSelectAvatarImage = (e) => {
@@ -274,11 +294,12 @@ export default function ProfileCard(props) {
                                         component="span"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            e.stopPropagation();
+                                            e.stopPropagation(); // Stop event propagation
+                                            console.log("IconButton clicked"); // Debugging log
                                             openFileDialog();
                                         }}
                                     >
-                                        <EditIcon />
+                                        <EditIcon/>
                                     </IconButton>
                                 </label>
                             </>
@@ -286,7 +307,7 @@ export default function ProfileCard(props) {
                         <input
                             ref={fileInputRef}
                             accept="image/*"
-                            style={{ display: "none" }}
+                            style={{display: "none"}}
                             id="icon-button-file"
                             type="file"
                             onChange={handleSelectAvatarImage}
@@ -485,16 +506,17 @@ export default function ProfileCard(props) {
                         xs={6}
                     >
                         <Button
-                            sx={{p: "1rem 2rem", my: 2, height: "3rem"}}
+                            sx={{ p: "1rem 2rem", my: 2, height: "3rem" }}
                             component="button"
                             size="large"
                             variant="contained"
                             color="secondary"
                             type="submit"
-                            onClick={changeButton}
+                            onClick={changeButton} // Make sure this is correct
                         >
                             {edit.isEdit === false ? "UPDATE" : "EDIT"}
                         </Button>
+
                     </Grid>
                 </FormControl>
             </CardContent>
