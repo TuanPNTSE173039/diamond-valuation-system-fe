@@ -27,9 +27,10 @@ import {
 import * as React from "react";
 import { useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { setCurrent, setPrevious } from "../../redux/assessingSlice.js";
 import { updateDetail, updateDiamondNote } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
 import { useDetail } from "../../services/details.js";
@@ -76,6 +77,7 @@ export const metadata = {
 const DetailItem = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.account.role;
+
   const queryClient = useQueryClient();
   const { detailId } = useParams();
   const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
@@ -154,12 +156,13 @@ const DetailItem = () => {
     current: null,
   });
 
+  const assessState = useSelector((state) => state.assessing);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (detail) {
-      setDetailState({
-        previous: getPreviousStatus(detail?.status),
-        current: detail?.status,
-      });
+      dispatch(setCurrent(detail.status));
+      dispatch(setPrevious(getPreviousStatus(detail.status)));
     }
   }, [detail]);
   function handleAssessing() {
@@ -187,13 +190,6 @@ const DetailItem = () => {
     });
   }
   function handleSaveAssessing() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "ASSESSING",
-        current: "DRAFT_ASSESSING",
-      };
-    });
     const detailBody = {
       ...detail,
       status: "ASSESSING",
@@ -205,29 +201,18 @@ const DetailItem = () => {
       certificateDate: null,
     };
     mutateAssessment(assessmentBody);
+    dispatch(setCurrent("ASSESSING"));
+    dispatch(setPrevious("DOING"));
   }
-  function handleEditAssessment() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: prevState.previous,
-        current: "ASSESSING",
-      };
-    });
-  }
+
   function handleConfirmAssessment() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "",
-        current: "ASSESSED",
-      };
-    });
     const detailBody = {
       ...detail,
       status: "ASSESSED",
     };
     mutateDetail(detailBody);
+    dispatch(setPrevious("ASSESSING"));
+    dispatch(setCurrent("ASSESSED"));
   }
 
   //Image
@@ -335,8 +320,8 @@ const DetailItem = () => {
   if (isStaffLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
   }
+  console.log(assessState);
 
-  console.log("a", diamondInfor);
   return (
     <>
       <UIBreadCrumb pathNames={pathNames} />
@@ -351,14 +336,32 @@ const DetailItem = () => {
       >
         <UIDetailHeader title={"Valuation Request Detail"} detail={detail} />
 
-        {detailState.current === "PENDING" && (
-          <Button variant={"contained"} onClick={handleAssessing}>
+        {assessState.current === "PENDING" && (
+          <Button
+            variant={"contained"}
+            onClick={() => {
+              dispatch(setCurrent("DOING"));
+              dispatch(setPrevious("PENDING"));
+            }}
+          >
             Assessing
           </Button>
         )}
-        {detailState.current === "ASSESSING" && (
+        {assessState.current === "DOING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant={"outlined"} onClick={handleCancelAssessing}>
+            <Button
+              variant={"outlined"}
+              onClick={() => {
+                if (
+                  assessState.previous === "PENDING" &&
+                  assessState.current === "DOING"
+                ) {
+                  dispatch(setCurrent("PENDING"));
+                } else {
+                  dispatch(setCurrent("ASSESSING"));
+                }
+              }}
+            >
               Cancel
             </Button>
             <Button variant={"contained"} onClick={handleSaveAssessing}>
@@ -366,9 +369,14 @@ const DetailItem = () => {
             </Button>
           </Box>
         )}
-        {detailState.current === "DRAFT_ASSESSING" && (
+        {assessState.current === "ASSESSING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant={"outlined"} onClick={handleEditAssessment}>
+            <Button
+              variant={"outlined"}
+              onClick={() => {
+                dispatch(setCurrent("DOING"));
+              }}
+            >
               Edit
             </Button>
             <Button variant={"contained"} onClick={handleConfirmAssessment}>
@@ -535,53 +543,59 @@ const DetailItem = () => {
               cols={3}
               rowHeight={164}
             >
-              {!diamondImage && (
-                <ImageListItem>
-                  <Button
-                    component="label"
-                    role={undefined}
-                    variant="outlined"
-                    tabIndex={-1}
-                    startIcon={<CloudUploadIcon />}
-                    sx={{ height: 164 }}
-                  >
-                    Upload file
-                    <VisuallyHiddenInput
-                      type="file"
-                      onChange={handleSelectDiamondImage}
-                    />
-                  </Button>
-                </ImageListItem>
-              )}
-              {diamondImage && (
-                <ImageListItem sx={{ position: "relative" }}>
-                  <IconButton
-                    aria-label="delete"
-                    size="large"
-                    sx={{
-                      position: "absolute",
-                      bottom: 7,
-                      right: 7,
-                      bgcolor: "white",
-                      "&:hover": {
-                        bgcolor: "red",
-                      },
-                      p: 0.5,
-                    }}
-                  >
-                    <DeleteIcon
-                      sx={{ color: "red", "&:hover": { color: "white" } }}
-                    />
-                  </IconButton>
-                  <Box sx={{ w: 164, h: 164 }}>
-                    <img
-                      src={`${URL.createObjectURL(diamondImage)}`}
-                      alt="New upload image"
-                      loading="lazy"
-                      style={{ height: "164px", objectFit: "cover" }}
-                    />
-                  </Box>
-                </ImageListItem>
+              {(assessState.current === "PENDING" ||
+                assessState.current === "DOING" ||
+                assessState.current === "ASSESSING") && (
+                <Box>
+                  {!diamondImage && (
+                    <ImageListItem>
+                      <Button
+                        component="label"
+                        role={undefined}
+                        variant="outlined"
+                        tabIndex={-1}
+                        startIcon={<CloudUploadIcon />}
+                        sx={{ height: 164 }}
+                      >
+                        Upload file
+                        <VisuallyHiddenInput
+                          type="file"
+                          onChange={handleSelectDiamondImage}
+                        />
+                      </Button>
+                    </ImageListItem>
+                  )}
+                  {diamondImage && (
+                    <ImageListItem sx={{ position: "relative" }}>
+                      <IconButton
+                        aria-label="delete"
+                        size="large"
+                        sx={{
+                          position: "absolute",
+                          bottom: 7,
+                          right: 7,
+                          bgcolor: "white",
+                          "&:hover": {
+                            bgcolor: "red",
+                          },
+                          p: 0.5,
+                        }}
+                      >
+                        <DeleteIcon
+                          sx={{ color: "red", "&:hover": { color: "white" } }}
+                        />
+                      </IconButton>
+                      <Box sx={{ w: 164, h: 164 }}>
+                        <img
+                          src={`${URL.createObjectURL(diamondImage)}`}
+                          alt="New upload image"
+                          loading="lazy"
+                          style={{ height: "164px", objectFit: "cover" }}
+                        />
+                      </Box>
+                    </ImageListItem>
+                  )}
+                </Box>
               )}
               {uploadedDiamondImages
                 .map((item) => ({ img: item, title: "Diamond Image" }))
@@ -640,12 +654,11 @@ const DetailItem = () => {
         </Box>
       )}
 
-      {detailState.current !== "CANCEL" &&
-        detailState.current !== "PENDING" && (
+      {assessState.current !== "CANCEL" &&
+        assessState.current !== "PENDING" && (
           <DiamondValuationAssessment
             diamondInfor={diamondInfor}
             setDiamondInfor={setDiamondInfor}
-            detailState={detailState}
             proportionImage={proportionImage}
             clarityCharacteristicImage={clarityCharacteristicImage}
             clarities={clarities}
@@ -653,12 +666,11 @@ const DetailItem = () => {
           />
         )}
 
-      {detailState.current !== "CANCEL" &&
-        (detailState.current === "ASSESSED" ||
-          detailState.current === "VALUATING" ||
-          detailState.current === "DRAFT_VALUATING" ||
-          detailState.current === "VALUATED" ||
-          detailState.current === "APPROVED") &&
+      {assessState.current !== "CANCEL" &&
+        (assessState.current === "ASSESSED" ||
+          assessState.current === "VALUATING" ||
+          assessState.current === "VALUATED" ||
+          assessState.current === "APPROVED") &&
         role === Role.MANAGER && (
           <>
             <DiamondValuationAssignTable

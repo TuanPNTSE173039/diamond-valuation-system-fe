@@ -1,5 +1,6 @@
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
+import { InputAdornment } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -16,9 +17,12 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useFormik } from "formik";
+import * as React from "react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import * as Yup from "yup";
 import { StyledBadge } from "../../assets/styles/Badge.jsx";
 import { StyledTableCell, StyledTableRow } from "../../assets/styles/Table.jsx";
 import { checkDiamond } from "../../services/api.js";
@@ -67,36 +71,41 @@ const DetailList = () => {
       status: item.status,
     };
   });
+  const handleEditSave = () => {
+    const { id, diamondSize } = formik.values;
+    const detail = request?.valuationRequestDetails.find((d) => d.id === id);
+    const body = {
+      ...detail,
+      size: diamondSize,
+    };
+    mutate(body);
+    setOpenEdit(false);
+    formik.resetForm();
+  };
 
-  const [selectedDetail, setSelectedDetail] = useState({
-    id: undefined,
-    diamondSize: undefined,
+  const validationSchema = Yup.object({
+    diamondSize: Yup.number()
+      .required("Diamond size is required")
+      .min(0, "Diamond size must be greater than 0"),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      id: "",
+      diamondSize: "",
+    },
+    validationSchema,
+    onSubmit: handleEditSave,
   });
   const [openEdit, setOpenEdit] = useState(false);
   const handleEditClick = (id) => {
     setOpenEdit(true);
-    setSelectedDetail((prevState) => ({
-      ...prevState,
-      id,
-    }));
+    formik.setFieldValue("id", id);
+    const detail = request?.valuationRequestDetails.find((d) => d.id === id);
+    formik.setFieldValue("diamondSize", detail.size || "");
   };
   const handleEditClose = () => {
     setOpenEdit(false);
-  };
-  const handleEditSave = () => {
-    const detail = request?.valuationRequestDetails.find(
-      (d) => d.id === selectedDetail.id,
-    );
-    const body = {
-      ...detail,
-      size: selectedDetail.diamondSize,
-    };
-    mutate(body);
-    setOpenEdit(false);
-    setSelectedDetail({
-      id: undefined,
-      diamondSize: undefined,
-    });
   };
 
   const [openAdd, setOpenAdd] = useState(false);
@@ -112,13 +121,6 @@ const DetailList = () => {
     setOpenAdd(false);
   };
 
-  function handleDiamondSizeChange(e) {
-    setSelectedDetail((prevState) => ({
-      ...prevState,
-      diamondSize: e.target.value,
-    }));
-  }
-
   function handleGetResult() {
     navigate("results", { replace: true });
   }
@@ -126,8 +128,6 @@ const DetailList = () => {
   if (isRequestLoading) {
     return <UICircularIndeterminate />;
   }
-
-  console.log(request);
 
   return (
     <>
@@ -246,17 +246,26 @@ const DetailList = () => {
             margin="dense"
             id="diamondSize"
             label="Diamond Size"
-            type="text"
+            name="diamondSize"
+            type="number"
             fullWidth
-            value={selectedDetail.diamondSize}
-            onChange={handleDiamondSizeChange}
+            value={formik.values.diamondSize}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.diamondSize && Boolean(formik.errors.diamondSize)
+            }
+            helperText={formik.touched.diamondSize && formik.errors.diamondSize}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">mm</InputAdornment>,
+            }}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleEditClose} variant={"text"}>
             Cancel
           </Button>
-          <Button onClick={handleEditSave} variant={"contained"}>
+          <Button onClick={() => formik.submitForm()} variant={"contained"}>
             Save
           </Button>
         </DialogActions>

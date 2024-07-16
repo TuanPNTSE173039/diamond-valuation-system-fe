@@ -17,6 +17,7 @@ import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { assignValuationStaff, updateDetail } from "../../services/api.js";
@@ -36,6 +37,7 @@ import UITable from "../UI/Table.jsx";
 import DiamondValuationFieldGroup from "./FieldGroup.jsx";
 
 const DiamondValuationAssignTable = ({ detailState }) => {
+  const assessState = useSelector((state) => state.assessing);
   const { requestId, detailId } = useParams();
   const { data: detail, isLoading: isDetailLoading } = useDetail(detailId);
   const { data: staffs, isLoading: isStaffsLoading } = useStaffs(
@@ -151,14 +153,6 @@ const DiamondValuationAssignTable = ({ detailState }) => {
   const handleClose = () => {
     setIsDialogOpen(false);
   };
-  // const handleSave = () => {
-  //   setIsDialogOpen(false);
-  //   updateAssignStaff({
-  //     ...detail,
-  //     status: "VALUATING",
-  //   });
-  // };
-
   const getValuationAssignmentById = (id) => {
     return valuationAssignment.find((item) => item.id === id);
   };
@@ -266,7 +260,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
       </TableContainer>
 
       <Box sx={{ position: "absolute", top: 0, right: 0 }}>
-        {detailState.current === "ASSESSED" && (
+        {assessState.current === "ASSESSED" && (
           <>
             <Button
               onClick={handleClickAssign}
@@ -315,7 +309,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
           </>
         )}
 
-        {detailState.current === "VALUATED" && (
+        {assessState.current === "VALUATED" && (
           <Stack direction="row" spacing={3}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography sx={{ mr: 3, fontWeight: 600, color: "#3f51b5" }}>

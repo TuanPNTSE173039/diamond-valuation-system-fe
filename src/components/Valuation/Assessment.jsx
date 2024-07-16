@@ -25,6 +25,7 @@ import Typography from "@mui/material/Typography";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import * as React from "react";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { VisuallyHiddenInput } from "../../assets/styles/Input.jsx";
@@ -44,12 +45,11 @@ const DiamondValuationAssessment = ({
   setDiamondInfor,
   clarities,
   handleClarities,
-  detailState,
   proportionImage,
   clarityCharacteristicImage,
 }) => {
   const { detailId } = useParams();
-
+  const assessState = useSelector((state) => state.assessing);
   //Open image in detail
   const [imageOpen, setImageOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
@@ -229,14 +229,14 @@ const DiamondValuationAssessment = ({
                   value="NATURAL"
                   checked={diamondInfor.diamondOrigin === "NATURAL"}
                   control={<Radio />}
-                  disabled={detailState.current !== "ASSESSING"}
+                  disabled={assessState.current !== "DOING"}
                   label="Natural"
                 />
                 <FormControlLabel
                   value="LAB_GROWN"
                   checked={diamondInfor.diamondOrigin === "LAB_GROWN"}
                   control={<Radio />}
-                  disabled={detailState.current !== "ASSESSING"}
+                  disabled={assessState.current !== "DOING"}
                   label="Lab Grown"
                 />
               </RadioGroup>
@@ -246,7 +246,7 @@ const DiamondValuationAssessment = ({
               id="cut-score"
               type="number"
               sx={{ width: "50%" }}
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               value={diamondInfor.cutScore || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
@@ -270,7 +270,7 @@ const DiamondValuationAssessment = ({
                   <InputAdornment position="end">ct.</InputAdornment>
                 ),
               }}
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               value={diamondInfor.caratWeight || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
@@ -283,7 +283,7 @@ const DiamondValuationAssessment = ({
               id="color-grade"
               select
               label="Color Grade"
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               sx={{ width: "50%" }}
               value={diamondInfor.color || ""}
               onChange={(e) => {
@@ -305,7 +305,7 @@ const DiamondValuationAssessment = ({
               id="clarity-grade"
               select
               label="Clarity Grade"
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               sx={{ width: "50%" }}
               value={diamondInfor.clarity || ""}
               onChange={(e) => {
@@ -325,7 +325,7 @@ const DiamondValuationAssessment = ({
               id="cut-grade"
               select
               label="Cut Grade"
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               sx={{ width: "50%" }}
               value={diamondInfor.cut || ""}
               onChange={(e) => {
@@ -355,7 +355,7 @@ const DiamondValuationAssessment = ({
               label="Shape"
               sx={{ width: "50%" }}
               value={diamondInfor.shape || ""}
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,
@@ -373,7 +373,7 @@ const DiamondValuationAssessment = ({
               id="symmetry"
               select
               label="Symmetry"
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               sx={{ width: "50%" }}
               value={diamondInfor.symmetry || ""}
               onChange={(e) => {
@@ -395,7 +395,7 @@ const DiamondValuationAssessment = ({
               id="polish"
               select
               label="Polish"
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               sx={{ width: "50%" }}
               value={diamondInfor.polish || ""}
               onChange={(e) => {
@@ -415,7 +415,7 @@ const DiamondValuationAssessment = ({
               id="fluorescence"
               select
               label="Fluorescence"
-              disabled={detailState.current !== "ASSESSING"}
+              disabled={assessState.current !== "DOING"}
               sx={{ width: "50%" }}
               value={diamondInfor.fluorescence || ""}
               onChange={(e) => {

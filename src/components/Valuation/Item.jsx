@@ -17,9 +17,11 @@ import { getDownloadURL, listAll, ref } from "firebase/storage";
 import { useFormik } from "formik";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import { setCurrent, setPrevious } from "../../redux/valuateSlice.js";
 import { updateDiamondValuation } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
 import { useDetail } from "../../services/details.js";
@@ -27,7 +29,6 @@ import { useRequest } from "../../services/requests.js";
 import { useValuation } from "../../services/valuations.js";
 import { formattedDate } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
-import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIRichTextEditor from "../UI/RichTextEditor.jsx";
@@ -47,6 +48,9 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 const DiamondValuationItem = () => {
+  const valuateState = useSelector((state) => state.valuate);
+  const dispatch = useDispatch();
+
   const { valuationId } = useParams();
   const { isLoading: isValuationLoading, data: valuation } =
     useValuation(valuationId);
@@ -139,44 +143,53 @@ const DiamondValuationItem = () => {
     previous: null,
     current: null,
   });
-  useEffect(() => {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: getPreviousStatus(valuation?.status),
-        current: valuation?.status ? "VALUATED" : "ASSESSED",
-      };
-    });
-  }, [valuation]);
 
-  function handleCancelValuating() {
-    setDetailState((prevState) => {
-      if (prevState.previous === "ASSESSED") {
-        return {
-          ...prevState,
-          current: "ASSESSED",
-        };
-      }
-      return {
-        ...prevState,
-        previous: "VALUATING",
-        current: "DRAFT_VALUATING",
-      };
-    });
-    setValuationPrice(null);
-    // editorRef.current.setContent("");
+  function convertValuationStatus(status) {
+    if (status === "VALUATED") {
+      return status;
+    }
+    if (
+      status === "VALUATING" &&
+      (!valuation?.comment ||
+        !valuation?.commentDetail ||
+        !valuation?.valuationPrice)
+    ) {
+      return "PENDING";
+    }
+    return "DOING";
   }
 
   useEffect(() => {
-    if (detailState.previous === "ASSESSED") {
-      setDetailState((prevState) => {
-        return {
-          ...prevState,
-          current: "ASSESSED",
-        };
-      });
+    // setDetailState((prevState) => {
+    //   return {
+    //     ...prevState,
+    //     previous: getPreviousStatus(valuation?.status),
+    //     current: valuation?.status ? "VALUATED" : "ASSESSED",
+    //   };
+    // });
+    if (valuation) {
+      const current = !valuation.status
+        ? !valuation.comment &&
+          !valuation.commentDetail &&
+          !valuation.valuationPrice
+          ? "PENDING"
+          : "VALUATING"
+        : "VALUATED";
+      dispatch(setCurrent(current));
+      dispatch(setPrevious(current));
     }
-  }, []);
+  }, [valuation]);
+
+  function handleCancelValuating() {
+    if (valuateState.previous === "PENDING") {
+      dispatch(setCurrent("PENDING"));
+    } else {
+      dispatch(setCurrent("VALUATING"));
+    }
+    // setValuationPrice(null);
+    // editorRef.current.setContent("");
+    // formik.resetForm();
+  }
 
   function handleSaveValuation(formValue) {
     const { valuationPrice: valuationPrice, briefComment } = formValue;
@@ -207,13 +220,6 @@ const DiamondValuationItem = () => {
   }
 
   function handleConfirmValuation() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "",
-        current: "VALUATED",
-      };
-    });
     const body = {
       ...valuation,
       status: true,
@@ -306,28 +312,42 @@ const DiamondValuationItem = () => {
             Diamond Valuation Detail
           </Typography>
         </Box>
-        {detailState.current === "ASSESSED" && (
-          <Button variant={"contained"} onClick={handleValuating}>
-            Valuating
+        {valuateState.current === "PENDING" && (
+          <Button
+            variant={"contained"}
+            onClick={() => {
+              dispatch(setCurrent("DOING"));
+            }}
+          >
+            Valuate
           </Button>
         )}
-        {detailState.current === "VALUATING" && (
+        {valuateState.current === "DOING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button variant={"outlined"} onClick={handleCancelValuating}>
               Cancel
             </Button>
             <Button
               variant={"contained"}
-              onClick={() => formik.submitForm()}
+              onClick={async () => {
+                await formik.submitForm().resolve(() => {
+                  dispatch(setCurrent("VALUATING"));
+                });
+              }}
               type="submit"
             >
               Save
             </Button>
           </Box>
         )}
-        {detailState.current === "DRAFT_VALUATING" && (
+        {valuateState.current === "VALUATING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant={"outlined"} onClick={handleEditValuation}>
+            <Button
+              variant={"outlined"}
+              onClick={() => {
+                dispatch(setCurrent("DOING"));
+              }}
+            >
               Edit
             </Button>
             <Button variant={"contained"} onClick={handleConfirmValuation}>
@@ -382,7 +402,7 @@ const DiamondValuationItem = () => {
                     formik.touched.valuationPrice &&
                     formik.errors.valuationPrice
                   }
-                  disabled={detailState.current !== "VALUATING"}
+                  disabled={valuateState.current !== "DOING"}
                   InputProps={{
                     sx: { py: 1, px: 2, fontSize: 24 },
                     startAdornment: (
@@ -415,7 +435,7 @@ const DiamondValuationItem = () => {
               helperText={
                 formik.touched.briefComment && formik.errors.briefComment
               }
-              disabled={detailState.current !== "VALUATING"}
+              disabled={valuateState.current !== "DOING"}
               sx={{ mt: 0.5 }}
             />
           </Box>
@@ -484,7 +504,7 @@ const DiamondValuationItem = () => {
         <UIRichTextEditor
           ref={editorRef}
           value={commentDetail}
-          isDisabled={detailState.current !== "VALUATING"}
+          isDisabled={valuateState.current !== "DOING"}
         />
       </DiamondValuationFieldGroup>
 

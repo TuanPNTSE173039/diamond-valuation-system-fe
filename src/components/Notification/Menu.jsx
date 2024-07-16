@@ -54,9 +54,6 @@ const NotificationMenu = () => {
     const valuationPattern = /@(\d+)/;
 
     if (notifications) {
-      if (noti.length !== 0)
-        setUnreadNoti(noti.filter((notification) => !notification.read));
-
       setNoti(
         notifications.map((notification) => {
           const message = notification.message;
@@ -77,7 +74,12 @@ const NotificationMenu = () => {
         }),
       );
     }
-  }, [notifications, noti]);
+  }, [notifications]);
+
+  useEffect(() => {
+    if (noti.length !== 0)
+      setUnreadNoti(noti.filter((notification) => !notification.read));
+  }, [noti]);
 
   const chooseNoti = showUnread ? unreadNoti : noti;
 
