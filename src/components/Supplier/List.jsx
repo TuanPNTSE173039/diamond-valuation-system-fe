@@ -201,7 +201,7 @@ const SupplierList = () => {
   if (isLoading) {
     return <UICircularIndeterminate />;
   }
-  function handleUploadSupplierLogo(file) {
+  function handleUploadSupplierLogo(file, isEdit) {
     const storageRef = ref(storage, `suppliers/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file, metadata);
     uploadTask.on(
@@ -224,8 +224,8 @@ const SupplierList = () => {
       },
       async () => {
         const imageLink = await getDownloadURL(storageRef);
-        await formikEdit.setFieldValue("image", imageLink);
-        await formikAdd.setFieldValue("image", imageLink);
+        if (isEdit) await formikEdit.setFieldValue("image", imageLink);
+        else await formikAdd.setFieldValue("image", imageLink);
       },
     );
   }
@@ -277,12 +277,12 @@ const SupplierList = () => {
             {localSupplierList.map((supplier, index) => (
               <TableRow key={supplier.id}>
                 <TableCell align="center">{index + 1}</TableCell>
-                <TableCell align="center">
+                <TableCell align="center" sx={{ width: "20%" }}>
                   {supplier.image && (
                     <CardMedia
                       component="img"
                       src={supplier.image}
-                      sx={{ width: "100%", height: "100%" }}
+                      sx={{ width: "100%", height: "auto" }}
                     />
                   )}
                 </TableCell>
@@ -341,7 +341,7 @@ const SupplierList = () => {
                 type="file"
                 onChange={(e) => {
                   if (e.target.files[0]) {
-                    handleUploadSupplierLogo(e.target.files[0]);
+                    handleUploadSupplierLogo(e.target.files[0], false);
                   }
                 }}
               />
@@ -378,7 +378,7 @@ const SupplierList = () => {
                   type="file"
                   onChange={(e) => {
                     if (e.target.files[0]) {
-                      handleUploadSupplierLogo(e.target.files[0]);
+                      handleUploadSupplierLogo(e.target.files[0], false);
                     }
                   }}
                 />
@@ -440,7 +440,7 @@ const SupplierList = () => {
                 type="file"
                 onChange={(e) => {
                   if (e.target.files[0]) {
-                    handleUploadSupplierLogo(e.target.files[0]);
+                    handleUploadSupplierLogo(e.target.files[0], true);
                   }
                 }}
               />
@@ -477,7 +477,7 @@ const SupplierList = () => {
                   type="file"
                   onChange={(e) => {
                     if (e.target.files[0]) {
-                      handleUploadSupplierLogo(e.target.files[0]);
+                      handleUploadSupplierLogo(e.target.files[0], true);
                     }
                   }}
                 />

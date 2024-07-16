@@ -227,12 +227,14 @@ const DiamondValuationAssessment = ({
               >
                 <FormControlLabel
                   value="NATURAL"
+                  checked={diamondInfor.diamondOrigin === "NATURAL"}
                   control={<Radio />}
                   disabled={detailState.current !== "ASSESSING"}
                   label="Natural"
                 />
                 <FormControlLabel
                   value="LAB_GROWN"
+                  checked={diamondInfor.diamondOrigin === "LAB_GROWN"}
                   control={<Radio />}
                   disabled={detailState.current !== "ASSESSING"}
                   label="Lab Grown"

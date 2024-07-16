@@ -1,5 +1,5 @@
+import InfoIcon from "@mui/icons-material/Info";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import Avatar from "@mui/material/Avatar";
 import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
 import { grey } from "@mui/material/colors";
@@ -54,9 +54,9 @@ const NotificationMenu = () => {
     const valuationPattern = /@(\d+)/;
 
     if (notifications) {
-      setUnreadNoti(
-        notifications.filter((notification) => !notification.isRead),
-      );
+      if (noti.length !== 0)
+        setUnreadNoti(noti.filter((notification) => !notification.read));
+
       setNoti(
         notifications.map((notification) => {
           const message = notification.message;
@@ -77,14 +77,16 @@ const NotificationMenu = () => {
         }),
       );
     }
-  }, [notifications]);
+  }, [notifications, noti]);
+
+  const chooseNoti = showUnread ? unreadNoti : noti;
 
   if (isNotificationLoading) {
     return <UICircularIndeterminate />;
   }
 
   const handleNavigate = (notification) => {
-    if (!notification.isRead) {
+    if (!notification.read) {
       updateRead(notification.id);
     }
     if (notification.detail) {
@@ -177,17 +179,24 @@ const NotificationMenu = () => {
           <Typography fontSize={14} fontWeight={700} color={grey[500]} pl={2}>
             LATEST
           </Typography>
-          <Link sx={{ cursor: "pointer" }} onClick={() => {}}>
+          <Link
+            sx={{ cursor: "pointer" }}
+            onClick={() => {
+              unreadNoti.forEach(async (notification) => {
+                await updateReadAsync(notification.id);
+              });
+            }}
+          >
             Mark all as read
           </Link>
         </Stack>
-        {noti?.map((notification) => (
+        {chooseNoti?.map((notification) => (
           <MenuItem
             onClick={() => handleNavigate(notification)}
             key={notification?.id}
           >
             <Stack direction="row" alignItems="center">
-              <Avatar sx={{ width: 100, height: 100, mr: 3 }} src={"1"} />
+              <InfoIcon fontSize={"large"} />
               <Typography
                 sx={{
                   whiteSpace: "normal",
@@ -211,7 +220,7 @@ const NotificationMenu = () => {
                   })}
                 </Typography>
               </Typography>
-              {!notification?.isRead && (
+              {!notification?.read && (
                 <Box
                   width={10}
                   height={10}

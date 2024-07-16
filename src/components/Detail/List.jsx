@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import Box from "@mui/material/Box";
@@ -154,13 +153,13 @@ const DetailList = () => {
           >
             Get Results
           </Button>
-          <Button
-            onClick={handleAddClick}
-            variant={"outlined"}
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
+          {/*<Button*/}
+          {/*  onClick={handleAddClick}*/}
+          {/*  variant={"outlined"}*/}
+          {/*  endIcon={<AddIcon />}*/}
+          {/*>*/}
+          {/*  Add*/}
+          {/*</Button>*/}
         </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 0 }}>

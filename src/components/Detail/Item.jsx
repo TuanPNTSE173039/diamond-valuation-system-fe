@@ -335,6 +335,8 @@ const DetailItem = () => {
   if (isStaffLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
   }
+
+  console.log("a", diamondInfor);
   return (
     <>
       <UIBreadCrumb pathNames={pathNames} />
