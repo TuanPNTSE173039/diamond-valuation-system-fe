@@ -194,13 +194,13 @@ const RecordScreenReceipt = () => {
           {
             text: [
               {
-                text: `Signed by: ${customer.firstName} ${customer.lastName}\n`,
+                text: `Signed by: ${customer?.firstName} ${customer?.lastName}\n`,
               },
               {
-                text: `Sign date: ${formattedDateTime(payment.paytime)}\n`,
+                text: `Sign date: ${formattedDateTime(payment?.paytime)}\n`,
               },
               {
-                text: `Payment: ${payment.paymentMethod.name}\n`,
+                text: `Payment: ${payment?.paymentMethod.name}\n`,
               },
             ],
             color: "#EE4E4E",
@@ -213,7 +213,7 @@ const RecordScreenReceipt = () => {
                 text: `Signed by: H&T Diamond Representative\n`,
               },
               {
-                text: `Sign date: ${formattedDateTime(payment.paytime)}\n`,
+                text: `Sign date: ${formattedDateTime(payment?.paytime)}\n`,
               },
             ],
             color: "#EE4E4E",
@@ -281,19 +281,19 @@ const RecordScreenReceipt = () => {
             {
               text: [
                 {
-                  text: `Name: ${customer.firstName} ${customer.lastName}\n`,
+                  text: `Name: ${customer?.firstName} ${customer?.lastName}\n`,
                   style: "para",
                 },
                 {
-                  text: `Phone: ${customer.phone}\n`,
+                  text: `Phone: ${customer?.phone}\n`,
                   style: "para",
                 },
                 {
-                  text: `Email: ${customer.account.email}\n`,
+                  text: `Email: ${customer?.account.email}\n`,
                   style: "para",
                 },
                 {
-                  text: `Address: ${customer.address}\n`,
+                  text: `Address: ${customer?.address}\n`,
                   style: "para",
                 },
               ],
@@ -382,7 +382,7 @@ const RecordScreenReceipt = () => {
         {
           text: [
             {
-              text: `I, ${customer.firstName} ${customer.lastName}, confirm that I have handed over the above-mentioned quantity of diamonds to H&T Diamond Company for appraisal. I acknowledge that the information provided about the diamonds is accurate to the best of my knowledge and that I have read and understood the terms and conditions of the appraisal service.`,
+              text: `I, ${customer?.firstName} ${customer?.lastName}, confirm that I have handed over the above-mentioned quantity of diamonds to H&T Diamond Company for appraisal. I acknowledge that the information provided about the diamonds is accurate to the best of my knowledge and that I have read and understood the terms and conditions of the appraisal service.`,
               alignment: "justify",
             },
           ],
@@ -391,7 +391,7 @@ const RecordScreenReceipt = () => {
         {
           text: [
             {
-              text: `We, H&T Diamond Company, confirm that we have received the above-mentioned quantity of diamonds from ${customer.firstName} ${customer.lastName} for the purpose of appraisal. We guarantee that the diamonds will be appraised by our certified gemologists and will be handled with the utmost care.`,
+              text: `We, H&T Diamond Company, confirm that we have received the above-mentioned quantity of diamonds from ${customer?.firstName} ${customer?.lastName} for the purpose of appraisal. We guarantee that the diamonds will be appraised by our certified gemologists and will be handled with the utmost care.`,
               alignment: "justify",
             },
           ],
@@ -530,7 +530,7 @@ const RecordScreenReceipt = () => {
     const receipt = records?.find((record) => record.type === "RECEIPT");
     if (request?.payment.length === 2 && receipt) {
       setIsPaid(true);
-      const doc = getReceiptContent(request.payment[0]);
+      const doc = getReceiptContent(request?.payment[0]);
       pdfMake.createPdf(doc).getDataUrl((url) => {
         const body = {
           ...receipt,
@@ -540,7 +540,7 @@ const RecordScreenReceipt = () => {
         updateReceipt(body);
       });
     }
-  }, [request.payment[0]]);
+  }, [request?.payment[0]]);
 
   if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;

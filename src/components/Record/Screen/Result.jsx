@@ -20,7 +20,6 @@ import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
 const RecordScreenResult = () => {
   const { requestId } = useParams();
-  console.log(requestId);
 
   // Image Links
   const [proportionImages, setProportionImages] = useState([]);

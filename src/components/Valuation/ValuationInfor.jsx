@@ -3,6 +3,8 @@ import LabelIcon from "@mui/icons-material/Label";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import PersonIcon from "@mui/icons-material/Person";
 import Box from "@mui/material/Box";
+import { green, red } from "@mui/material/colors";
+import Typography from "@mui/material/Typography";
 import * as React from "react";
 
 import {
@@ -28,11 +30,15 @@ const DiamondValuationInfor = ({ valuationInfor, diamondInfor, ...props }) => {
         icon={<LocalAtmIcon />}
         title="Fair Price Estimate"
       >
-        {formattedMoney(diamondInfor.fairPrice)}
+        <Typography color={red[800]} fontWeight={700}>
+          {formattedMoney(diamondInfor.fairPrice)}
+        </Typography>
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LocalAtmIcon />} title="Price Range">
-        {formattedMoney(diamondInfor.minPrice)} -{" "}
-        {formattedMoney(diamondInfor.maxPrice)}
+        <Typography color={green[800]} fontWeight={700}>
+          {formattedMoney(diamondInfor.minPrice)} -{" "}
+          {formattedMoney(diamondInfor.maxPrice)}
+        </Typography>
       </DiamondValuationInforItem>
     </Box>
   );

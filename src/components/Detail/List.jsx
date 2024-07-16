@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import Box from "@mui/material/Box";
@@ -128,6 +127,8 @@ const DetailList = () => {
     return <UICircularIndeterminate />;
   }
 
+  console.log(request);
+
   return (
     <>
       <Box
@@ -152,13 +153,13 @@ const DetailList = () => {
           >
             Get Results
           </Button>
-          <Button
-            onClick={handleAddClick}
-            variant={"outlined"}
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
+          {/*<Button*/}
+          {/*  onClick={handleAddClick}*/}
+          {/*  variant={"outlined"}*/}
+          {/*  endIcon={<AddIcon />}*/}
+          {/*>*/}
+          {/*  Add*/}
+          {/*</Button>*/}
         </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 0 }}>
@@ -175,7 +176,11 @@ const DetailList = () => {
               <StyledTableCell align="right">Carat</StyledTableCell>
               <StyledTableCell align="right">Valuation Price</StyledTableCell>
               <StyledTableCell align="center">Status</StyledTableCell>
-              <StyledTableCell align="center">Action</StyledTableCell>
+
+              {(request?.status === "PENDING" ||
+                request?.status === "PROCESSING") && (
+                <StyledTableCell align="center">Action</StyledTableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -213,17 +218,20 @@ const DetailList = () => {
                 <StyledTableCell align="center">
                   {convertStatus(row.status)}
                 </StyledTableCell>
-                <StyledTableCell align="center">
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleEditClick(row.number)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton color="secondary">
-                    <DeleteForeverIcon />
-                  </IconButton>
-                </StyledTableCell>
+                {(request?.status === "PENDING" ||
+                  request?.status === "PROCESSING") && (
+                  <StyledTableCell align="center">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditClick(row.number)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="secondary">
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </StyledTableCell>
+                )}
               </StyledTableRow>
             ))}
           </TableBody>

@@ -1,5 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import pdfMake from "pdfmake/build/pdfmake";
 
 import React from "react";
@@ -53,7 +54,7 @@ const theme = createTheme({
     },
     status: {
       color: "#eff3f5",
-      pending: "#33595e",
+      pending: "#758694",
       processing: "#30cb83",
       received: "#2133a1",
       cancelled: "#e74c3c",
@@ -81,10 +82,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <App />
-          {/*<ReactQueryDevtools*/}
-          {/*  initialIsOpen={false}*/}
-          {/*  buttonPosition="bottom-left"*/}
-          {/*/>*/}
+          <ReactQueryDevtools
+            initialIsOpen={false}
+            buttonPosition="bottom-left"
+          />
         </QueryClientProvider>
       </Provider>
     </ThemeProvider>

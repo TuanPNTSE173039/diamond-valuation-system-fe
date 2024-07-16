@@ -8,6 +8,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import StraightenIcon from "@mui/icons-material/Straighten";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import { green, orange, red } from "@mui/material/colors";
+import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useParams } from "react-router-dom";
 import { useCustomer } from "../../services/customers.js";
@@ -46,7 +48,7 @@ const DiamondValuationUserInfor = ({ ...props }) => {
   return (
     <Box {...props}>
       <DiamondValuationInforItem icon={<PersonIcon />} title="Customer">
-        <Avatar sx={{ width: 35, height: 35 }}>1</Avatar>
+        <Avatar sx={{ width: 35, height: 35 }} src={customer.avatar} />
         {customer.firstName + " " + customer.lastName}
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LocalPhoneIcon />} title="Phone">
@@ -65,7 +67,9 @@ const DiamondValuationUserInfor = ({ ...props }) => {
         icon={<CurrencyYenIcon />}
         title="Service Price"
       >
-        {formattedMoney(infor.servicePrice)}
+        <Typography color={orange[800]} fontWeight={700}>
+          {formattedMoney(infor.servicePrice)}
+        </Typography>
       </DiamondValuationInforItem>
       <DiamondValuationInforItem icon={<LabelIcon />} title="Status">
         {convertStatus(infor.status)}
@@ -74,11 +78,15 @@ const DiamondValuationUserInfor = ({ ...props }) => {
         icon={<LocalAtmIcon />}
         title="Fair Price Estimate"
       >
-        {formattedMoney(infor.fairPriceEstimate)}
+        <Typography color={red[800]} fontWeight={700}>
+          {formattedMoney(infor.fairPriceEstimate)}
+        </Typography>
       </DiamondValuationInforItem>
 
       <DiamondValuationInforItem icon={<LocalAtmIcon />} title="Estimate Range">
-        {formattedMoney(infor.minPrice)} - {formattedMoney(infor.maxPrice)}
+        <Typography color={green[600]} fontWeight={700}>
+          {formattedMoney(infor.minPrice)} - {formattedMoney(infor.maxPrice)}
+        </Typography>
       </DiamondValuationInforItem>
     </Box>
   );

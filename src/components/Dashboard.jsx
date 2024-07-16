@@ -65,9 +65,9 @@ const Dashboard = () => {
       status: overral?.revenue.status === "true",
     },
     user: {
-      total: 12,
-      percent: 1.5,
-      status: false,
+      total: overral?.user.total,
+      percent: overral?.appointment.percent,
+      status: overral?.user.status === "true",
     },
     appointment: {
       total: overral?.appointment.total,
@@ -415,7 +415,7 @@ const Dashboard = () => {
                         alignItems: "center",
                       }}
                     >
-                      <Avatar sx={{ mr: 1 }}>{row.avatar}</Avatar>
+                      <Avatar sx={{ mr: 1 }} src={row.avatar} />
                       {row.staffName}
                     </TableCell>
                     <TableCell align="left">{row.staffPhone}</TableCell>
@@ -460,7 +460,7 @@ const Dashboard = () => {
                         alignItems: "center",
                       }}
                     >
-                      <Avatar sx={{ mr: 1 }}>{row.avatar}</Avatar>
+                      <Avatar sx={{ mr: 1 }} src={row.avatar} />
                       {row.staffName}
                     </TableCell>
                     <TableCell align="left">{row.staffPhone}</TableCell>

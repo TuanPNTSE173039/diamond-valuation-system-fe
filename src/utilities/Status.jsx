@@ -444,7 +444,7 @@ export const convertRecordStatus = (status) => {
         <Typography
           color="status.color"
           textAlign="center"
-          sx={{ bgcolor: "status.received" }}
+          sx={{ bgcolor: "status.valuated" }}
           borderRadius={3}
           p={"2px 8px"}
         >

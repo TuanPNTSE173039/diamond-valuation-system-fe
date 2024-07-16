@@ -35,7 +35,7 @@ export default function AppLayout() {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Container>
           <DrawerHeader />
-          <ToastContainer />
+          <ToastContainer position={"bottom-left"} />
           <Outlet />
         </Container>
       </Box>

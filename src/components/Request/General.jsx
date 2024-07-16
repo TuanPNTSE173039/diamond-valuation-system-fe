@@ -44,17 +44,21 @@ const RequestGeneral = () => {
   const { data: staffs, isLoading: isStaffsLoading } = useStaffs(
     Role.CONSULTANT,
   );
+  console.log(staffs?.content);
   const consultantList = staffs?.content
+    .filter((item) => item?.account.is_active)
     .map((item) => {
       return {
+        avatar: item.avatar,
         code: item.id,
         label: item.firstName + " " + item.lastName,
         years: item.experience,
         curProjects: item.currentTotalProject,
         totalProjects: item.countProject,
       };
-    })
-    .sort((a, b) => a.curProjects - b.curProjects);
+    });
+
+  console.log(consultantList);
 
   //Mutate data
   const queryClient = useQueryClient();
@@ -110,7 +114,7 @@ const RequestGeneral = () => {
       <Grid container>
         <Grid item xs={4}>
           <ValuationRequestUserInfor icon={<PersonIcon />} title="Customer">
-            <Avatar sx={{ width: 35, height: 35 }}>1</Avatar>
+            <Avatar sx={{ width: 35, height: 35 }} src={customer?.avatar} />
             {customer?.firstName + " " + customer?.lastName}
           </ValuationRequestUserInfor>
           <ValuationRequestUserInfor icon={<AssignmentIndIcon />} title="CCCD">
@@ -133,7 +137,10 @@ const RequestGeneral = () => {
           >
             {staff && (
               <>
-                <Avatar sx={{ width: 35, height: 35 }}>{staff?.id}</Avatar>
+                <Avatar
+                  sx={{ width: 35, height: 35 }}
+                  src={staff?.avatar}
+                ></Avatar>
                 <Typography>
                   {staff?.firstName + " " + staff?.lastName}
                 </Typography>

@@ -1,6 +1,9 @@
 import { format } from "date-fns";
 
 export function formattedDateTime(date) {
+  if (!date) {
+    return "N/A";
+  }
   return format(new Date(date), "yyyy/MM/dd - HH:mm:ss");
 }
 
@@ -40,7 +43,7 @@ export const formattedCaratWeight = (weight) => {
   return `${weight} .ct`;
 };
 export const formatTotalDashboardItem = (total) => {
-  return total.toLocaleString();
+  return total?.toLocaleString();
 };
 
 export const formattedHour = (number) => {

@@ -30,7 +30,7 @@ export const dataSeriesMapping = (revenueChart) => {
 };
 
 export const yearFilter = (revenueChart) => {
-  const allYears = revenueChart.flatMap((item) => Object.keys(item.data));
+  const allYears = revenueChart?.flatMap((item) => Object.keys(item.data));
   const uniqueYearsSet = new Set(allYears);
   return Array.from(uniqueYearsSet);
 };
