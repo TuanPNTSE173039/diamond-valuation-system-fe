@@ -19,7 +19,7 @@ import RegisterStaff from "./Form.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import { useStaffList } from "../../services/staffs";
 import Role from "../../utilities/Role.js";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 
 const staffStatus = [
     { id: 0, name: "All", roles: [Role.MANAGER, Role.ADMIN] },
@@ -27,6 +27,16 @@ const staffStatus = [
     { id: 2, name: "Valuation Staff", roles: [Role.MANAGER, Role.ADMIN] },
     { id: 3, name: "Former Staff", roles: [Role.MANAGER, Role.ADMIN] },
 ];
+
+const getRoleName = (role) => {
+    const roleNames = {
+        [Role.CONSULTANT]: "Consultant Staff",
+        [Role.VALUATION]: "Valuation Staff",
+        [Role.ADMIN]: "Admin Staff",
+        [Role.MANAGER]: "Manager Staff",
+    };
+    return roleNames[role] || "Unknown Role";
+};
 
 const StaffList = () => {
     const { user: currentUser } = useSelector((state) => state.auth);
@@ -65,30 +75,14 @@ const StaffList = () => {
         }
     };
 
-    const getRoleName = (role) => {
-        switch (role) {
-            case Role.CONSULTANT:
-                return "Consultant Staff";
-            case Role.VALUATION:
-                return "Valuation Staff";
-            case Role.ADMIN:
-                return "Admin Staff";
-            case Role.MANAGER:
-                return "Manager Staff";
-            default:
-                return "Unknown Role";
-        }
-    };
-
     const staffRows = (staffResponse.content || []).filter(filterStaff).map((row) => ({
         id: row.id,
         number: row.id,
         staffName: `${row.firstName} ${row.lastName}`,
         staffPhone: row.phone.trim(),
         yearExperience: row.experience,
-        totalProjects: row.countProject,
-        currentProjects: row.currentTotalProject,
         role: getRoleName(row.account.role),
+        sta: row.account.is_active ? "Active" : "Inactive"
     }));
 
     if (isFetching) {

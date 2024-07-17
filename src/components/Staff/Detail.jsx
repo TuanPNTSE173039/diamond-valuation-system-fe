@@ -217,6 +217,7 @@ const StaffDetail = () => {
 
                             <UITabPanel index={0} value={statusIndex}>
                                 <UITable
+                                    readOnly
                                     heading="All Valuations"
                                     headCells={ValuationHeadCells}
                                     rows={valuationRows}
@@ -231,6 +232,7 @@ const StaffDetail = () => {
                             {diamondValuationStatus.filter((status, index) => index !== 0).map((status, index) => (
                                 <UITabPanel key={index} index={index + 1} value={statusIndex}>
                                     <UITable
+                                        readOnly
                                         heading={statusIndex === index + 1 ? `${status.name} Valuations` : ""}
                                         headCells={ValuationHeadCells}
                                         rows={statusIndex === index + 1 ? valuationRows.filter((row) => row.status.toUpperCase() === status.name) : []}
@@ -253,6 +255,7 @@ const StaffDetail = () => {
                             <UICircularIndeterminate />
                         ) : (
                             <UITable
+                                readOnly
                                 heading="All Requests"
                                 headCells={RequestHeadCells}
                                 rows={valuationRows}
