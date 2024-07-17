@@ -528,7 +528,7 @@ const RecordScreenReceipt = () => {
 
   useEffect(() => {
     const receipt = records?.find((record) => record.type === "RECEIPT");
-    if (request?.payment.length === 2 && receipt) {
+    if (request?.payment.length === 1 && receipt) {
       setIsPaid(true);
       const doc = getReceiptContent(request?.payment[0]);
       pdfMake.createPdf(doc).getDataUrl((url) => {
@@ -541,7 +541,7 @@ const RecordScreenReceipt = () => {
       });
     }
   }, [request?.payment[0]]);
-
+  console.log(request);
   if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;
   }

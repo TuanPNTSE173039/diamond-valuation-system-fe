@@ -414,7 +414,7 @@ const RecordScreenSealing = () => {
         }}
       >
         <UIBreadCrumb pathNames={pathNames} />
-        <Typography variant="h4">Returned Record</Typography>
+        <Typography variant="h4">Sealing Record</Typography>
 
         {!isSigned && (
           <Button variant={"contained"} onClick={handleSignSealing}>

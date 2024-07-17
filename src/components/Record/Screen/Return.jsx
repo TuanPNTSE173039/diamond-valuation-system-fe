@@ -525,10 +525,9 @@ const RecordScreenReturn = () => {
 
   useEffect(() => {
     const returned = records?.find((record) => record.type === "RETURN");
-    console.log("ahihi");
-    if (request?.payment.length === 4 && returned) {
+    if (request?.payment.length === 2 && returned) {
       setIsPaid(true);
-      const doc = getReturnedContent(request.payment[2]);
+      const doc = getReturnedContent(request.payment[1]);
       pdfMake.createPdf(doc).getDataUrl((url) => {
         const body = {
           ...returned,
@@ -538,7 +537,7 @@ const RecordScreenReturn = () => {
         updateReturned(body);
       });
     }
-  }, [request?.payment[2]]);
+  }, [request?.payment[1]]);
 
   if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;

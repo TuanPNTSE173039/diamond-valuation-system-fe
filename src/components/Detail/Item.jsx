@@ -166,6 +166,7 @@ const DetailItem = () => {
     }
   }, [detail]);
   function handleSaveAssessing() {
+    const isValid = diamondInfor.cutScore > 0 && diamondInfor.cutScore <= 10;
     const detailBody = {
       ...detail,
       status: "ASSESSING",
@@ -296,7 +297,6 @@ const DetailItem = () => {
   if (isStaffLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
   }
-  console.log(assessState);
 
   return (
     <>
@@ -501,7 +501,7 @@ const DetailItem = () => {
                           <Typography>Created by: </Typography>
                           <Avatar
                             alt={selectedValuationDetail?.staff.id}
-                            src={""}
+                            src={selectedValuationDetail?.staff.avatar}
                           />
                           <Typography>
                             {selectedValuationDetail?.staff.firstName +

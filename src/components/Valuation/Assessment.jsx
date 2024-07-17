@@ -48,6 +48,10 @@ const DiamondValuationAssessment = ({
   proportionImage,
   clarityCharacteristicImage,
 }) => {
+  const [formError, setFormError] = useState({
+    cutScore: false,
+    caratWeight: false,
+  });
   const { detailId } = useParams();
   const assessState = useSelector((state) => state.assessing);
   //Open image in detail
@@ -193,20 +197,6 @@ const DiamondValuationAssessment = ({
                 ),
               }}
             />
-            {/*
-            <UIDatePicker
-              label="Certificate Date"
-              value={diamondInfor.giaCertDate}
-              disabled={detailState.current !== "ASSESSING"}
-              onChange={(newValue) =>
-                setDiamondInfor((prevState) => ({
-                  ...prevState,
-                  giaCertDate: newValue,
-                }))
-              }
-              sx={{ width: "50%" }}
-            />
-            */}
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
@@ -249,11 +239,23 @@ const DiamondValuationAssessment = ({
               disabled={assessState.current !== "DOING"}
               value={diamondInfor.cutScore || ""}
               onChange={(e) => {
+                const value = e.target.value;
+                const isValid =
+                  value === "" || (value > 0 && value <= 10 && !isNaN(value));
+                setFormError((prevState) => ({
+                  ...prevState,
+                  cutScore: !isValid,
+                }));
                 setDiamondInfor((prevState) => ({
                   ...prevState,
-                  cutScore: e.target.value,
+                  cutScore: value,
                 }));
               }}
+              error={formError.cutScore}
+              helperText={
+                formError.cutScore &&
+                "Cut score must be greater than 0 and less than or equal to 10"
+              }
             />
           </Box>
         </DiamondValuationFieldGroup>
@@ -273,11 +275,21 @@ const DiamondValuationAssessment = ({
               disabled={assessState.current !== "DOING"}
               value={diamondInfor.caratWeight || ""}
               onChange={(e) => {
+                const value = e.target.value;
+                const isValid = value === "" || (value > 0 && !isNaN(value));
+                setFormError((prevState) => ({
+                  ...prevState,
+                  caratWeight: !isValid,
+                }));
                 setDiamondInfor((prevState) => ({
                   ...prevState,
                   caratWeight: e.target.value,
                 }));
               }}
+              error={formError.caratWeight}
+              helperText={
+                formError.caratWeight && "Cut score must be greater than 0"
+              }
             />
             <TextField
               id="color-grade"

@@ -44,7 +44,6 @@ const RequestGeneral = () => {
   const { data: staffs, isLoading: isStaffsLoading } = useStaffs(
     Role.CONSULTANT,
   );
-  console.log(staffs?.content);
   const consultantList = staffs?.content
     .filter((item) => item?.account.is_active)
     .map((item) => {
@@ -57,8 +56,6 @@ const RequestGeneral = () => {
         totalProjects: item.countProject,
       };
     });
-
-  console.log(consultantList);
 
   //Mutate data
   const queryClient = useQueryClient();

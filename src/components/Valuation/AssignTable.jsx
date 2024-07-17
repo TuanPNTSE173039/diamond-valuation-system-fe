@@ -100,19 +100,28 @@ const DiamondValuationAssignTable = ({ detailState }) => {
   const handleValuationModeChange = (event) => {
     const isAverageMode = event.target.checked;
     setValuationMode(isAverageMode ? "Average" : "One");
-    setSwitches(
-      switches.map((val) => ({
-        ...val,
-        value: isAverageMode,
-      })),
-    ); // Enable the first switch when valuation mode changes
+    if (isAverageMode) {
+      setSwitches(
+        switches.map((val) => ({
+          ...val,
+          value: isAverageMode,
+        })),
+      ); // Enable the first switch when valuation mode changes
+    } else {
+      setSwitches(
+        switches.map((val, i) => ({
+          ...val,
+          value: i === 0,
+        })),
+      ); // Enable the first switch when valuation mode changes
+    }
   };
   const handleSwitchChange = (index, id) => {
     if (valuationMode === "One") {
       setSwitches(
         switches.map((val, i) => ({
           ...val,
-          value: i === index,
+          value: val.valuationId === id,
         })),
       ); // Enable only the selected switch
     } else {
@@ -246,7 +255,9 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                 {detail.status === "VALUATED" && (
                   <TableCell align="center">
                     <Switch
-                      checked={switches[index].value}
+                      checked={
+                        switches.find((sw) => sw.valuationId === row.id).value
+                      }
                       onChange={() => handleSwitchChange(index, row.id)}
                       inputProps={{ "aria-label": "action" }}
                       disabled={valuationMode === "Average"}
@@ -337,8 +348,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                         ),
                   status: "APPROVED",
                 };
-                console.log(switches);
-                // approve(body);
+                approve(body);
               }}
             >
               Approve

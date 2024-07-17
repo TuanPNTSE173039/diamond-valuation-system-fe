@@ -122,11 +122,11 @@ const NotificationMenu = () => {
         anchorEl={anchorEl}
         open={open}
         onClose={handleNavigate}
-        sx={{ width: 500 }}
+        sx={{ width: 500, maxHeight: 600 }}
         PaperProps={{
           elevation: 0,
           sx: {
-            overflow: "visible",
+            overflow: "auto",
             filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
             minWidth: 450,
             p: 1,

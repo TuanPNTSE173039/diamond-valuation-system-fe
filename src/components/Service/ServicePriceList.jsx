@@ -103,7 +103,10 @@ const ServicePriceList = () => {
       toast.success("Service price updated successfully");
       await refetch();
     } catch (error) {
-      toast.error("Failed to update service price");
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to update service price",
+      );
     }
 
     handleEditClose();
@@ -122,7 +125,9 @@ const ServicePriceList = () => {
       toast.success("Service price deleted successfully");
       await refetch();
     } catch (error) {
-      toast.error("Failed to delete service price");
+      toast.error(
+        error?.response?.data?.message || "Failed to delete service price",
+      );
     }
   };
 
@@ -159,7 +164,9 @@ const ServicePriceList = () => {
       toast.success("Service price added successfully");
       await refetch();
     } catch (error) {
-      toast.error("Failed to add service price");
+      toast.error(
+        error?.response?.data?.message || "Failed to add service price",
+      );
     }
 
     handleAddClose();

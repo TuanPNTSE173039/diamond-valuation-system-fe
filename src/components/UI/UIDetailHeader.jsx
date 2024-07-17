@@ -1,5 +1,5 @@
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {TextField} from "@mui/material";
+import { TextField } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -10,10 +10,12 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useFormik } from "formik";
 import * as React from "react";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import * as Yup from "yup";
 import { checkDiamond } from "../../services/api.js";
 
 export default function UIDetailHeader({ title, detail }) {
@@ -50,16 +52,27 @@ export default function UIDetailHeader({ title, detail }) {
   const handleCancelDialogClose = () => {
     setCancelDialogOpen(false);
   };
-  const handleCancelDialogSave = () => {
-    const body = {
-      ...detail,
-      status: "CANCEL",
-      cancelReason: reason,
-      diamond: false,
-    };
-    mutate(body);
-    setCancelDialogOpen(false);
-  };
+
+  const formik = useFormik({
+    initialValues: {
+      cancelReason: "",
+    },
+    validationSchema: Yup.object({
+      cancelReason: Yup.string()
+        .required("Reason is required")
+        .min(50, "Reason must be greater than 50 characters"),
+    }),
+    onSubmit: (values) => {
+      const body = {
+        ...detail,
+        status: "CANCEL",
+        cancelReason: values.cancelReason,
+        diamond: false,
+      };
+      mutate(body);
+      setCancelDialogOpen(false);
+    },
+  });
 
   return (
     <>
@@ -123,22 +136,23 @@ export default function UIDetailHeader({ title, detail }) {
               name="cancelReason"
               label="Your Reason"
               InputProps={{ sx: { borderRadius: 2 } }}
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
-              inputProps={{
-                min: 50,
-              }}
-              error={reason.length < 50}
+              value={formik.values.cancelReason}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.cancelReason && formik.errors.cancelReason}
               helperText={
-                reason.length < 50
-                  ? "Reason must be greater than 50 characters"
-                  : null
+                formik.touched.cancelReason && formik.errors.cancelReason
               }
             />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCancelDialogClose}>Cancel</Button>
-            <Button onClick={handleCancelDialogSave} variant={"contained"}>
+            <Button
+              onClick={() => {
+                formik.submitForm();
+              }}
+              variant={"contained"}
+            >
               Save
             </Button>
           </DialogActions>
