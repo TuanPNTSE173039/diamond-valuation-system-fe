@@ -296,7 +296,7 @@ const DetailItem = () => {
 
   //ResultStaff after approve
   const resultStaff =
-    detail?.valuationPrice === 0
+    detail?.valuationPrice === null
       ? null
       : !detail?.mode
         ? {
@@ -406,13 +406,13 @@ const DetailItem = () => {
             }}
           >
             <DiamondValuationUserInfor
-              sx={{ width: detail.valuationPrice === 0.0 ? "100%" : "50%" }}
+              sx={{ width: detail.valuationPrice === null ? "100%" : "50%" }}
             />
 
-            {detail.valuationPrice !== 0.0 && (
+            {detail.valuationPrice !== null && (
               <Box
                 sx={{
-                  width: detail.valuationPrice === 0.0 ? undefined : "50%",
+                  width: detail.valuationPrice === null ? undefined : "50%",
                   textAlign: "center",
                   position: "relative",
                 }}
