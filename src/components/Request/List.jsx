@@ -24,7 +24,7 @@ const RequestList = () => {
   // const { data: customers, isPending: isCustomerPending } = useCustomers();
 
   const queryClient = useQueryClient();
-
+  const common = useSelector((state) => state.filter);
   const { user: currentUser } = useSelector((state) => state.auth);
   const userRole = currentUser?.account.role;
 
@@ -35,6 +35,8 @@ const RequestList = () => {
     rowsPerPage,
     userRole,
     currentUser?.id,
+    common.startDate.format("MM/DD/YYYY"),
+    common.endDate.format("MM/DD/YYYY"),
   );
 
   const [selectedRequests, setSelectedRequests] = useState([]);

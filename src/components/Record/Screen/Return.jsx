@@ -15,7 +15,9 @@ import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { format } from "date-fns";
+import { sha512 } from "js-sha512";
 import pdfMake from "pdfmake/build/pdfmake";
+import qs from "qs";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -383,7 +385,7 @@ const RecordScreenReturn = () => {
         {
           text: [
             {
-              text: `I, ${customer.firstName} ${customer.lastName}, confirm that I have received the above-listed diamonds in the condition specified and acknowledge the second payment for the appraisal service`,
+              text: `I, ${customer?.firstName} ${customer?.lastName}, confirm that I have received the above-listed diamonds in the condition specified and acknowledge the second payment for the appraisal service`,
               alignment: "justify",
             },
           ],

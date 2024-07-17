@@ -19,7 +19,9 @@ export const useBriefRequests = (
   pageSize,
   userRole,
   userId,
-  status,
+  startDate = undefined,
+  endDate = undefined,
+  status = undefined,
 ) => {
   let url;
   if (userRole === Role.CONSULTANT) {
@@ -30,8 +32,14 @@ export const useBriefRequests = (
   if (status) {
     url += `&status=${status}`;
   }
+  if (startDate && endDate) {
+    url += `&startDate=${startDate}&endDate=${endDate}`;
+  }
   return useQuery({
-    queryKey: ["briefRequests", { pageNo, pageSize, userRole, userId, status }],
+    queryKey: [
+      "briefRequests",
+      { pageNo, pageSize, userRole, userId, status, startDate, endDate },
+    ],
     queryFn: async () => {
       const response = await axiosInstance.get(url);
       return response.data;
