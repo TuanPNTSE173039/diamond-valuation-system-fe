@@ -21,6 +21,7 @@ export const useBriefRequests = (
   userId,
   startDate = undefined,
   endDate = undefined,
+  search = undefined,
   status = undefined,
 ) => {
   let url;
@@ -35,10 +36,22 @@ export const useBriefRequests = (
   if (startDate && endDate) {
     url += `&startDate=${startDate}&endDate=${endDate}`;
   }
+  if (search) {
+    url += `&search=${search}`;
+  }
   return useQuery({
     queryKey: [
       "briefRequests",
-      { pageNo, pageSize, userRole, userId, status, startDate, endDate },
+      {
+        pageNo,
+        pageSize,
+        userRole,
+        userId,
+        status,
+        startDate,
+        endDate,
+        search,
+      },
     ],
     queryFn: async () => {
       const response = await axiosInstance.get(url);

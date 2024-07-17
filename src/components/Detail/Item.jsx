@@ -165,30 +165,6 @@ const DetailItem = () => {
       dispatch(setPrevious(getPreviousStatus(detail.status)));
     }
   }, [detail]);
-  function handleAssessing() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: prevState.previous,
-        current: "ASSESSING",
-      };
-    });
-  }
-  function handleCancelAssessing() {
-    setDetailState((prevState) => {
-      if (prevState.previous === "PENDING") {
-        return {
-          ...prevState,
-          current: "PENDING",
-        };
-      }
-      return {
-        ...prevState,
-        previous: "ASSESSING",
-        current: "DRAFT_ASSESSING",
-      };
-    });
-  }
   function handleSaveAssessing() {
     const detailBody = {
       ...detail,
@@ -412,7 +388,7 @@ const DetailItem = () => {
             {detail.valuationPrice !== null && (
               <Box
                 sx={{
-                  width: detail.valuationPrice === null ? undefined : "50%",
+                  width: detail.valuationPrice !== null ? "50%" : undefined,
                   textAlign: "center",
                   position: "relative",
                 }}

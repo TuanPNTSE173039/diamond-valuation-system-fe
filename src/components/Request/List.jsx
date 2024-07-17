@@ -20,9 +20,6 @@ import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
 const RequestList = () => {
-  // const { data: requests, isFetching: isRequestPending } = useRequests();
-  // const { data: customers, isPending: isCustomerPending } = useCustomers();
-
   const queryClient = useQueryClient();
   const common = useSelector((state) => state.filter);
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -35,8 +32,9 @@ const RequestList = () => {
     rowsPerPage,
     userRole,
     currentUser?.id,
-    common.startDate.format("MM/DD/YYYY"),
-    common.endDate.format("MM/DD/YYYY"),
+    common.startDate?.format("YYYY/MM/DD"),
+    common.endDate?.format("YYYY/MM/DD"),
+    common.searchValue,
   );
 
   const [selectedRequests, setSelectedRequests] = useState([]);

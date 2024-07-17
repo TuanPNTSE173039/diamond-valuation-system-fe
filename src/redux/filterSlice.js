@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import dayjs from "dayjs";
 
 const initialState = {
+  keyword: "",
   searchValue: "",
-  startDate: dayjs(new Date().toDateString()).subtract(7, "day"),
-  endDate: dayjs(new Date().toDateString()),
+  startDate: null,
+  endDate: null,
 };
 
 export const filterSlice = createSlice({
@@ -20,12 +20,15 @@ export const filterSlice = createSlice({
     setSearchValue: (state, action) => {
       state.searchValue = action.payload;
     },
+    setKeyword: (state, action) => {
+      state.keyword = action.payload;
+    },
     clearSearchValue: (state) => {
       state.searchValue = "";
     },
     clearDates: (state) => {
-      state.startDate = dayjs(new Date().toDateString()).subtract(7, "day");
-      state.endDate = dayjs(new Date().toDateString());
+      state.startDate = null;
+      state.endDate = null;
     },
   },
 });
@@ -35,6 +38,7 @@ export const {
   setEndDate,
   setSearchValue,
   setStartDate,
+  setKeyword,
   clearDates,
   clearSearchValue,
 } = actions;
