@@ -19,13 +19,7 @@ export const useDiamondsOfSupplier = (pageNo, pageSize, id) => {
         queryKey: ["diamonds", { pageNo, pageSize, id }],
         queryFn: async () => {
             const response = await axiosInstance.get(`suppliers/${id}/diamond-market?pageNo=${pageNo}&pageSize=${pageSize}`);
-            if (response.data) {
-                return {
-                    diamonds: response.data.content,
-                    totalCount: response.data.totalElement
-                };
-            }
-            return { diamonds: [], totalCount: 0 };
+            return response.data
         },
         enabled: id !== undefined && id !== null,
     });
