@@ -105,6 +105,8 @@ export const updateStaffPassword = async (authID, body) => {
 export const updateSupplier = async (id, body) => axiosInstance.put(`suppliers/${id}`, body);
 export const postSupplier = async (body) => axiosInstance.post("suppliers", body);
 export const deleteSupplier = async (id) => axiosInstance.delete(`suppliers/${id}`);
+export const crawlDiamondBaseOnSupplier = async (id) => axiosInstance.get(`diamond-market/crawl/supplier/${id}`);
+
 
 // ---DIAMONDS---
 export const deleteDiamond = async (id) => axiosInstance.delete(`diamond-market/${id}`);
