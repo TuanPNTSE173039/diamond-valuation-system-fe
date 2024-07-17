@@ -447,7 +447,17 @@ const DetailItem = () => {
                           " " +
                           resultStaff.staff.lastName}
                       </h2>
-                      <p>{resultStaff.comment}</p>
+                      <Typography
+                        sx={{
+                          maxHeight: "100px",
+                          whiteSpace: "normal",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          p: 1,
+                        }}
+                      >
+                        {resultStaff.comment}
+                      </Typography>
                       <Link
                         component="button"
                         onClick={() => {
@@ -465,7 +475,17 @@ const DetailItem = () => {
                           <h2 className="text-xl font-bold mb-1/2">
                             {item.staff.firstName + " " + item.staff.lastName}
                           </h2>
-                          <p>{item.comment}</p>
+                          <Typography
+                            sx={{
+                              maxHeight: "100px",
+                              whiteSpace: "normal",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              p: 1,
+                            }}
+                          >
+                            {item.comment}
+                          </Typography>
                           <Link
                             component="button"
                             onClick={() => {

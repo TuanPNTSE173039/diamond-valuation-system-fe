@@ -107,7 +107,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
       })),
     ); // Enable the first switch when valuation mode changes
   };
-  const handleSwitchChange = (index) => {
+  const handleSwitchChange = (index, id) => {
     if (valuationMode === "One") {
       setSwitches(
         switches.map((val, i) => ({
@@ -247,7 +247,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                   <TableCell align="center">
                     <Switch
                       checked={switches[index].value}
-                      onChange={() => handleSwitchChange(index)}
+                      onChange={() => handleSwitchChange(index, row.id)}
                       inputProps={{ "aria-label": "action" }}
                       disabled={valuationMode === "Average"}
                     />
@@ -337,7 +337,8 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                         ),
                   status: "APPROVED",
                 };
-                approve(body);
+                console.log(switches);
+                // approve(body);
               }}
             >
               Approve

@@ -71,7 +71,7 @@ export const diamondAttribute = {
     label: clarity,
     value: clarity,
   })),
-  cut: ["FAIR", "GOOD", "EXCELLENT", "VERY_GOOD"].map((cut) => ({
+  cut: ["FAIR", "GOOD", "EXCELLENT", "VERY_GOOD", "IDEAL"].map((cut) => ({
     label: cut,
     value: cut,
   })),
