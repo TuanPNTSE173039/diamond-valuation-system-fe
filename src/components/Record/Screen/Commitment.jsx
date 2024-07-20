@@ -51,6 +51,9 @@ const RecordScreenCommitment = () => {
         queryKey: ["records", { requestId: requestId }],
       });
     },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Create commitment failed");
+    },
   });
   const { mutate: updateCommitment } = useMutation({
     mutationFn: (body) => {
@@ -147,7 +150,7 @@ const RecordScreenCommitment = () => {
         },
         {
           text: `- Pursuant to the Sale and Purchase Agreement between the Company and the Customer
-- Based on the Order dated ${format(new Date(receipt.creationDate), "dd MMM, yyyy")} of the Company`,
+- Based on the Order dated ${receipt?.creationDate ? format(new Date(receipt.creationDate), "dd MMM, yyyy") : ""} of the Company`,
           style: "italicText",
         },
         {

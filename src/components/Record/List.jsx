@@ -28,22 +28,10 @@ export default function RecordList() {
       setRecordInfo((prev) => {
         return {
           ...prev,
-          receiptRecord: {
-            status: receipt?.status,
-            date: receipt?.creationDate,
-          },
-          returnRecord: {
-            status: returned?.status,
-            date: returned?.creationDate,
-          },
-          commitmentRecord: {
-            status: commitment?.status,
-            date: commitment?.creationDate,
-          },
-          sealingRecord: {
-            status: sealing?.status,
-            date: sealing?.creationDate,
-          },
+          receiptRecord: receipt,
+          returnRecord: returned,
+          commitmentRecord: commitment,
+          sealingRecord: sealing,
         };
       });
     }
@@ -62,25 +50,25 @@ export default function RecordList() {
           title="Receipt"
           navLink="receipt"
           status={recordInfo.receiptRecord?.status}
-          date={recordInfo.receiptRecord?.date}
+          date={recordInfo.receiptRecord?.creationDate}
         />
         <RecordItem
           title="Return"
           navLink="return"
           status={recordInfo.returnRecord?.status}
-          date={recordInfo.returnRecord?.date}
+          date={recordInfo.returnRecord?.creationDate}
         />
         <RecordItem
           title="Commitment"
           navLink="commitment"
           status={recordInfo.commitmentRecord?.status}
-          date={recordInfo.commitmentRecord?.date}
+          date={recordInfo.commitmentRecord?.creationDate}
         />
         <RecordItem
           title="Sealing"
           navLink="sealing"
           status={recordInfo.sealingRecord?.status}
-          date={recordInfo.sealingRecord?.date}
+          date={recordInfo.sealingRecord?.creationDate}
         />
       </Box>
     </Box>

@@ -3,13 +3,12 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { formattedDate } from "../../utilities/formatter.js";
 import { convertRecordStatus } from "../../utilities/Status.jsx";
 
 const RecordItem = ({ title, navLink, status, date }) => {
   const navigate = useNavigate();
-  const { requestId } = useParams();
 
   function handleNavigateToDetail() {
     navigate(navLink);

@@ -1,7 +1,8 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import DeleteIcon from "@mui/icons-material/Delete";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import EventIcon from "@mui/icons-material/Event";
 import {
+  CardMedia,
   FormControl,
   FormLabel,
   InputAdornment,
@@ -22,7 +23,7 @@ import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import * as React from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -45,8 +46,6 @@ const DiamondValuationAssessment = ({
   setDiamondInfor,
   clarities,
   handleClarities,
-  proportionImage,
-  clarityCharacteristicImage,
 }) => {
   const [formError, setFormError] = useState({
     cutScore: false,
@@ -66,29 +65,12 @@ const DiamondValuationAssessment = ({
   };
 
   //Proportion & ClarityCharacteristic
-  const [proportionFile, setProportionFile] = useState(null);
-  const [clarityCharacteristicFile, setClarityCharacteristicFile] =
-    useState(null);
-  function handleProportionChange(e) {
-    if (e.target.files[0]) {
-      setProportionFile(e.target.files[0]);
-    }
-  }
-  function handleClarityCharacteristicChange(e) {
-    if (e.target.files[0]) {
-      setClarityCharacteristicFile(e.target.files[0]);
-    }
-  }
-  const handleUploadProportion = () => {
+  const handleUploadProportion = (file) => {
     const storageRef = ref(
       storage,
-      `diamonds/${detailId}/proportion/${proportionFile.name}`,
+      `diamonds/${detailId}/proportion/${file.name}`,
     );
-    const uploadTask = uploadBytesResumable(
-      storageRef,
-      proportionFile,
-      metadata,
-    );
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -105,28 +87,24 @@ const DiamondValuationAssessment = ({
         }
       },
       (error) => {
-        // Handle unsuccessful uploads
+        toast.error(error);
       },
-      () => {
-        const imageLink = `diamonds/${detailId}/proportion/${proportionFile.name}`;
+      async () => {
+        const imageLink = await getDownloadURL(storageRef);
         setDiamondInfor((prevState) => ({
           ...prevState,
           proportions: imageLink,
         }));
-        toast.success("Upload image successfully");
+        toast.success("Upload proportions successfully");
       },
     );
   };
-  function handleUploadClarityCharacteristic() {
+  function handleUploadClarityCharacteristic(file) {
     const storageRef = ref(
       storage,
-      `diamonds/${detailId}/clarity/${clarityCharacteristicFile.name}`,
+      `diamonds/${detailId}/clarity/${file.name}`,
     );
-    const uploadTask = uploadBytesResumable(
-      storageRef,
-      clarityCharacteristicFile,
-      metadata,
-    );
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -143,16 +121,16 @@ const DiamondValuationAssessment = ({
         }
       },
       (error) => {
-        // Handle unsuccessful uploads
+        toast.error(error);
       },
-      () => {
-        const imageLink = `diamonds/${detailId}/clarity/${clarityCharacteristicFile.name}`;
+      async () => {
+        const imageLink = await getDownloadURL(storageRef);
         setDiamondInfor((prevState) => ({
           ...prevState,
           clarityCharacteristicLink: imageLink,
         }));
 
-        toast.success("Upload image successfully");
+        toast.success("Upload clarity successfully");
       },
     );
   }
@@ -233,7 +211,8 @@ const DiamondValuationAssessment = ({
             </FormControl>
             <TextField
               label="Cut Score"
-              id="cut-score"
+              id="cutScore"
+              name={"cutScore"}
               type="number"
               sx={{ width: "50%" }}
               disabled={assessState.current !== "DOING"}
@@ -264,7 +243,8 @@ const DiamondValuationAssessment = ({
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <TextField
               label="Carat Weight"
-              id="carat-weight"
+              id="caratWeight"
+              name="caratWeight"
               type="number"
               sx={{ width: "50%" }}
               InputProps={{
@@ -276,7 +256,8 @@ const DiamondValuationAssessment = ({
               value={diamondInfor.caratWeight || ""}
               onChange={(e) => {
                 const value = e.target.value;
-                const isValid = value === "" || (value > 0 && !isNaN(value));
+                const isValid =
+                  value === "" || (value > 0 && value <= 50 && !isNaN(value));
                 setFormError((prevState) => ({
                   ...prevState,
                   caratWeight: !isValid,
@@ -288,11 +269,13 @@ const DiamondValuationAssessment = ({
               }}
               error={formError.caratWeight}
               helperText={
-                formError.caratWeight && "Cut score must be greater than 0"
+                formError.caratWeight &&
+                "Cut score must be greater than 0 and less than or equal to 50"
               }
             />
             <TextField
-              id="color-grade"
+              id="coloGrade"
+              name={"colorGrade"}
               select
               label="Color Grade"
               disabled={assessState.current !== "DOING"}
@@ -314,7 +297,8 @@ const DiamondValuationAssessment = ({
           </Box>
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <TextField
-              id="clarity-grade"
+              id="clarityGrade"
+              name={"clarityGrade"}
               select
               label="Clarity Grade"
               disabled={assessState.current !== "DOING"}
@@ -334,7 +318,8 @@ const DiamondValuationAssessment = ({
               ))}
             </TextField>
             <TextField
-              id="cut-grade"
+              id="cutGrade"
+              name={"cutGrade"}
               select
               label="Cut Grade"
               disabled={assessState.current !== "DOING"}
@@ -363,10 +348,10 @@ const DiamondValuationAssessment = ({
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <TextField
               id="shape"
+              name={"shape"}
               select
               label="Shape"
               sx={{ width: "50%" }}
-              value={diamondInfor.shape || ""}
               disabled={assessState.current !== "DOING"}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
@@ -383,6 +368,7 @@ const DiamondValuationAssessment = ({
             </TextField>
             <TextField
               id="symmetry"
+              name={"symmetry"}
               select
               label="Symmetry"
               disabled={assessState.current !== "DOING"}
@@ -405,6 +391,7 @@ const DiamondValuationAssessment = ({
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
             <TextField
               id="polish"
+              name={"polish"}
               select
               label="Polish"
               disabled={assessState.current !== "DOING"}
@@ -425,6 +412,7 @@ const DiamondValuationAssessment = ({
             </TextField>
             <TextField
               id="fluorescence"
+              name={"fluorescence"}
               select
               label="Fluorescence"
               disabled={assessState.current !== "DOING"}
@@ -451,17 +439,17 @@ const DiamondValuationAssessment = ({
           title="Proportions"
           sx={{ mt: 0.5, position: "relative" }}
         >
-          {!proportionImage && proportionFile && (
-            <Button
-              variant={"outlined"}
-              sx={{ position: "absolute", top: 0, right: 0 }}
-              size={"small"}
-              onClick={handleUploadProportion}
-            >
-              Upload
-            </Button>
-          )}
-          {!proportionImage && !proportionFile && (
+          {/*{!proportionImage && proportionFile && (*/}
+          {/*  <Button*/}
+          {/*    variant={"outlined"}*/}
+          {/*    sx={{ position: "absolute", top: 0, right: 0 }}*/}
+          {/*    size={"small"}*/}
+          {/*    onClick={handleUploadProportion}*/}
+          {/*  >*/}
+          {/*    Upload*/}
+          {/*  </Button>*/}
+          {/*)}*/}
+          {!diamondInfor.proportions && (
             <Button
               component="label"
               role={undefined}
@@ -472,27 +460,36 @@ const DiamondValuationAssessment = ({
             >
               Upload file
               <VisuallyHiddenInput
+                disabled={assessState.current !== "DOING"}
                 type="file"
-                onChange={handleProportionChange}
+                onChange={(e) => {
+                  if (e.target.files[0]) {
+                    handleUploadProportion(e.target.files[0]);
+                  }
+                }}
               />
             </Button>
           )}
-          {!proportionImage && proportionFile && (
+          {diamondInfor.proportions && (
             <Box sx={{ position: "relative" }}>
-              <img
-                src={URL.createObjectURL(proportionFile)}
+              <CardMedia
+                component={"img"}
+                src={diamondInfor.proportions}
                 alt={"Proportion"}
-                loading="lazy"
-                style={{
+                sx={{
                   height: 240,
                   width: "100%",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   cursor: "pointer",
                 }}
+                onClick={() => handleClickOpen(diamondInfor.proportions)}
               />
               <IconButton
-                aria-label="delete"
+                aria-label="update"
                 size="large"
+                component="label"
+                tabIndex={-1}
+                role={undefined}
                 sx={{
                   position: "absolute",
                   bottom: 7,
@@ -504,42 +501,17 @@ const DiamondValuationAssessment = ({
                   p: 0.5,
                 }}
               >
-                <DeleteIcon
+                <DriveFileRenameOutlineIcon
                   sx={{ color: "red", "&:hover": { color: "white" } }}
                 />
-              </IconButton>
-            </Box>
-          )}
-          {proportionImage && (
-            <Box sx={{ position: "relative" }}>
-              <img
-                src={proportionImage}
-                alt={"a"}
-                loading="lazy"
-                style={{
-                  height: 240,
-                  width: "100%",
-                  objectFit: "cover",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleClickOpen(proportionImage)}
-              />
-              <IconButton
-                aria-label="delete"
-                size="large"
-                sx={{
-                  position: "absolute",
-                  bottom: 7,
-                  right: 7,
-                  bgcolor: "white",
-                  "&:hover": {
-                    bgcolor: "red",
-                  },
-                  p: 0.5,
-                }}
-              >
-                <DeleteIcon
-                  sx={{ color: "red", "&:hover": { color: "white" } }}
+                <VisuallyHiddenInput
+                  type="file"
+                  disabled={assessState.current !== "DOING"}
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      handleUploadProportion(e.target.files[0]);
+                    }
+                  }}
                 />
               </IconButton>
             </Box>
@@ -550,17 +522,7 @@ const DiamondValuationAssessment = ({
           title="Clarity Characteristics"
           sx={{ mt: 2.5, position: "relative" }}
         >
-          {!clarityCharacteristicImage && clarityCharacteristicFile && (
-            <Button
-              variant={"outlined"}
-              sx={{ position: "absolute", top: 0, right: 0 }}
-              size={"small"}
-              onClick={handleUploadClarityCharacteristic}
-            >
-              Upload
-            </Button>
-          )}
-          {!clarityCharacteristicImage && !clarityCharacteristicFile && (
+          {!diamondInfor.clarityCharacteristicLink && (
             <Button
               component="label"
               role={undefined}
@@ -572,26 +534,35 @@ const DiamondValuationAssessment = ({
               Upload file
               <VisuallyHiddenInput
                 type="file"
-                onChange={handleClarityCharacteristicChange}
+                disabled={assessState.current !== "DOING"}
+                onChange={(e) =>
+                  handleUploadClarityCharacteristic(e.target.files[0])
+                }
               />
             </Button>
           )}
-          {!clarityCharacteristicImage && clarityCharacteristicFile && (
+          {diamondInfor.clarityCharacteristicLink && (
             <Box sx={{ position: "relative" }}>
-              <img
-                src={URL.createObjectURL(clarityCharacteristicFile)}
+              <CardMedia
+                component={"img"}
+                src={diamondInfor.clarityCharacteristicLink}
                 alt={"Clarity Characteristic"}
-                loading="lazy"
                 style={{
                   height: 240,
                   width: "100%",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   cursor: "pointer",
                 }}
+                onClick={() =>
+                  handleClickOpen(diamondInfor.clarityCharacteristicLink)
+                }
               />
               <IconButton
-                aria-label="delete"
+                aria-label="update"
                 size="large"
+                component="label"
+                tabIndex={-1}
+                role={undefined}
                 sx={{
                   position: "absolute",
                   bottom: 7,
@@ -603,42 +574,17 @@ const DiamondValuationAssessment = ({
                   p: 0.5,
                 }}
               >
-                <DeleteIcon
+                <DriveFileRenameOutlineIcon
                   sx={{ color: "red", "&:hover": { color: "white" } }}
                 />
-              </IconButton>
-            </Box>
-          )}
-          {clarityCharacteristicImage && (
-            <Box sx={{ position: "relative" }}>
-              <img
-                src={clarityCharacteristicImage}
-                alt={"Clarity Characteristic"}
-                loading="lazy"
-                style={{
-                  height: 240,
-                  width: "100%",
-                  objectFit: "cover",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleClickOpen(clarityCharacteristicImage)}
-              />
-              <IconButton
-                aria-label="delete"
-                size="large"
-                sx={{
-                  position: "absolute",
-                  bottom: 7,
-                  right: 7,
-                  bgcolor: "white",
-                  "&:hover": {
-                    bgcolor: "red",
-                  },
-                  p: 0.5,
-                }}
-              >
-                <DeleteIcon
-                  sx={{ color: "red", "&:hover": { color: "white" } }}
+                <VisuallyHiddenInput
+                  type="file"
+                  disabled={assessState.current !== "DOING"}
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      handleUploadClarityCharacteristic(e.target.files[0]);
+                    }
+                  }}
                 />
               </IconButton>
             </Box>
@@ -647,6 +593,7 @@ const DiamondValuationAssessment = ({
           <ToggleButtonGroup
             value={clarities}
             onChange={handleClarities}
+            disabled={assessState.current !== "DOING"}
             aria-label="clarity-characteristic"
             sx={{ mt: 1 }}
           >
@@ -657,6 +604,11 @@ const DiamondValuationAssessment = ({
                     <ToggleButton
                       value={clarity.code}
                       aria-label={clarity.label}
+                      sx={{
+                        "&.Mui-selected": {
+                          backgroundColor: "status.assessing",
+                        },
+                      }}
                     >
                       <Stack
                         direction="row"
@@ -675,7 +627,7 @@ const DiamondValuationAssessment = ({
                             objectFit: "contain",
                           }}
                         />
-                        <Typography sx={{ color: "gray" }}>
+                        <Typography sx={{ color: "main.white" }}>
                           {clarity.label}
                         </Typography>
                       </Stack>

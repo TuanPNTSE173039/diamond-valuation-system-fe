@@ -50,6 +50,10 @@ const DetailList = () => {
       });
       toast.success("Add size successfully");
     },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Add size failed");
+      console.log(error);
+    },
   });
 
   const details = request?.valuationRequestDetails?.map((item) => {

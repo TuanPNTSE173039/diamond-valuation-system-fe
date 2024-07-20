@@ -37,7 +37,6 @@ import { useDetail } from "../../services/details.js";
 import { useStaffs } from "../../services/staffs.js";
 import { getStaffById } from "../../utilities/filtering.js";
 import { formattedDate, formattedMoney } from "../../utilities/formatter.js";
-import { loadImageByPath } from "../../utilities/imageLoader.js";
 import Role from "../../utilities/Role.js";
 import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
@@ -87,7 +86,7 @@ const DetailItem = () => {
   const pathNames = location.pathname.split("/").filter((x) => x);
 
   //Mutate
-  const { mutate: mutateDetail } = useMutation({
+  const { mutateAsync: mutateDetail } = useMutation({
     mutationFn: (body) => {
       return updateDetail(detail.id, body);
     },
@@ -95,13 +94,19 @@ const DetailItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["detail", { detailId: detailId }],
       });
-      if (body.data.status === "ASSESSING")
+      if (body.data.status === "ASSESSING") {
         toast.success("Save assessment successfully");
-      else if (body.data.status === "ASSESSED")
+      } else if (body.data.status === "ASSESSED") {
         toast.success("Confirm assessment successfully");
+        dispatch(setPrevious("ASSESSING"));
+        dispatch(setCurrent("ASSESSED"));
+      }
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message || "An error occurred");
     },
   });
-  const { mutate: mutateAssessment } = useMutation({
+  const { mutateAsync: mutateAssessment } = useMutation({
     mutationFn: (body) => {
       return updateDiamondNote(detail?.diamondValuationNote.id, body);
     },
@@ -109,6 +114,8 @@ const DetailItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["detail", { detailId: detailId }],
       });
+      dispatch(setCurrent("ASSESSING"));
+      dispatch(setPrevious("DOING"));
     },
   });
 
@@ -165,39 +172,40 @@ const DetailItem = () => {
       dispatch(setPrevious(getPreviousStatus(detail.status)));
     }
   }, [detail]);
-  function handleSaveAssessing() {
-    const isValid = diamondInfor.cutScore > 0 && diamondInfor.cutScore <= 10;
+  async function handleSaveAssessing() {
+    const isValid =
+      diamondInfor.cutScore > 0 &&
+      diamondInfor.cutScore <= 10 &&
+      diamondInfor.caratWeight > 0 &&
+      diamondInfor.caratWeight <= 50;
+    // if (!isValid) {
+    //   toast.error("Invalid cut score or carat weight");
+    //   return;
+    // }
     const detailBody = {
       ...detail,
       status: "ASSESSING",
     };
-    mutateDetail(detailBody);
+    await mutateDetail(detailBody);
     const assessmentBody = {
       ...diamondInfor,
       clarityCharacteristic: clarities,
       certificateDate: null,
     };
-    mutateAssessment(assessmentBody);
-    dispatch(setCurrent("ASSESSING"));
-    dispatch(setPrevious("DOING"));
+    await mutateAssessment(assessmentBody);
   }
 
-  function handleConfirmAssessment() {
+  async function handleConfirmAssessment() {
     const detailBody = {
       ...detail,
       status: "ASSESSED",
     };
-    mutateDetail(detailBody);
-    dispatch(setPrevious("ASSESSING"));
-    dispatch(setCurrent("ASSESSED"));
+    await mutateDetail(detailBody);
   }
 
   //Image
   const [diamondImage, setDiamondImage] = useState(null);
   const [uploadedDiamondImages, setUploadedDiamondImages] = useState([]);
-  const [proportionImage, setProportionImage] = useState(null);
-  const [clarityCharacteristicImage, setClarityCharacteristicImage] =
-    useState(null);
   function handleSelectDiamondImage(e) {
     if (e.target.files[0]) {
       setDiamondImage(e.target.files[0]);
@@ -226,18 +234,6 @@ const DetailItem = () => {
   };
   useEffect(() => {
     getListAllImages();
-    if (detail?.diamondValuationNote?.proportions) {
-      loadImageByPath(
-        detail?.diamondValuationNote?.proportions,
-        setProportionImage,
-      );
-    }
-    if (detail?.diamondValuationNote?.clarityCharacteristicLink) {
-      loadImageByPath(
-        detail?.diamondValuationNote?.clarityCharacteristicLink,
-        setClarityCharacteristicImage,
-      );
-    }
   }, [detail]);
   const handleUploadDiamondImage = () => {
     const storageRef = ref(storage, `${imageLinks}/${diamondImage.name}`);
@@ -320,7 +316,7 @@ const DetailItem = () => {
               dispatch(setPrevious("PENDING"));
             }}
           >
-            Assessing
+            Assess Now
           </Button>
         )}
         {assessState.current === "DOING" && (
@@ -655,8 +651,6 @@ const DetailItem = () => {
           <DiamondValuationAssessment
             diamondInfor={diamondInfor}
             setDiamondInfor={setDiamondInfor}
-            proportionImage={proportionImage}
-            clarityCharacteristicImage={clarityCharacteristicImage}
             clarities={clarities}
             handleClarities={handleClarities}
           />

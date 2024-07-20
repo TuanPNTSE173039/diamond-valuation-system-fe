@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
 import LoopIcon from "@mui/icons-material/Loop";
+import { CardMedia } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -13,15 +14,12 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { format } from "date-fns";
-import { sha512 } from "js-sha512";
 import pdfMake from "pdfmake/build/pdfmake";
-import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { frontendUrl } from "../../../services/config/axiosInstance.js";
+import qr from "../../../assets/images/qr.png";
+import { axiosInstance } from "../../../services/config/axiosInstance.js";
 import { useCustomer } from "../../../services/customers.js";
 import {
   createRecord,
@@ -75,7 +73,31 @@ const RecordScreenReceipt = () => {
       });
     },
   });
-
+  const { mutate: saveTransaction } = useMutation({
+    mutationFn: (body) => {
+      return axiosInstance.post(`payments`, body);
+    },
+    onSuccess: (body) => {
+      toast.success("Payment successful");
+      queryClient.invalidateQueries({
+        queryKey: ["records", { requestId: requestId }],
+      });
+      const receipt = records?.find((record) => record.type === "RECEIPT");
+      setIsPaid(true);
+      const doc = getReceiptContent(body.data);
+      pdfMake.createPdf(doc).getDataUrl((url) => {
+        const body = {
+          ...receipt,
+          link: url,
+          status: true,
+        };
+        updateReceipt(body);
+      });
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Payment failed");
+    },
+  });
   const [logo, setLogo] = useState(null);
   const [url, setUrl] = useState(null);
 
@@ -84,6 +106,7 @@ const RecordScreenReceipt = () => {
     setPaymentMethod(newPaymentMethod);
   };
 
+  /*
   const [vnPayParam, setVnPayParam] = useState({
     vnp_Amount: "",
     vnp_Command: "pay",
@@ -153,24 +176,15 @@ const RecordScreenReceipt = () => {
       convertCurrency(request.totalServicePrice * 0.4);
     }
   }, [request]);
+  */
 
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
   const handleDialogOpen = () => {
     setOpenDialog(true);
-  };
-  const handleVNPayPayment = () => {
-    const vnPayURL = getVNPayURL(vnPayParam);
-    window.location.href = vnPayURL;
-    handleDialogClose();
-  };
-  const handleCashPayment = () => {
-    navigate(`/requests/${requestId}/receipt/payment?transaction_status=00`, {
-      replace: true,
-    });
-    handleDialogClose();
   };
 
   const getReceiptContent = (payment = null) => {
@@ -530,18 +544,9 @@ const RecordScreenReceipt = () => {
     const receipt = records?.find((record) => record.type === "RECEIPT");
     if (request?.payment.length === 1 && receipt) {
       setIsPaid(true);
-      const doc = getReceiptContent(request?.payment[0]);
-      pdfMake.createPdf(doc).getDataUrl((url) => {
-        const body = {
-          ...receipt,
-          link: url,
-          status: true,
-        };
-        updateReceipt(body);
-      });
     }
   }, [request?.payment[0]]);
-  console.log(request);
+
   if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;
   }
@@ -603,6 +608,43 @@ const RecordScreenReceipt = () => {
             >
               <LoopIcon />
             </IconButton>
+            <Dialog
+              open={openConfirm}
+              onClose={() => setOpenConfirm(false)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                {"Confirm Payment"}
+              </DialogTitle>
+              <DialogContent>
+                <Typography id="alert-dialog-description">
+                  Are you sure to confirm this payment?
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenConfirm(false)} variant="text">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    saveTransaction({
+                      amount: request.totalServicePrice * 0.4,
+                      paymentMethod: {
+                        id: paymentMethod === "Bank" ? 2 : 1,
+                      },
+                      valuationRequestID: requestId,
+                    });
+                    setOpenConfirm(false);
+                    setOpenDialog(false);
+                  }}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Confirm
+                </Button>
+              </DialogActions>
+            </Dialog>
           </>
         )}
       </Stack>
@@ -613,10 +655,19 @@ const RecordScreenReceipt = () => {
         </Box>
       )}
       {!url && isRecordFetching && <UICircularIndeterminate />}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        fullWidth
+        maxWidth={"sm"}
+      >
         <DialogTitle>Payment Information</DialogTitle>
         <DialogContent>
-          <Box>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <ToggleButtonGroup
               color="primary"
               value={paymentMethod}
@@ -625,20 +676,28 @@ const RecordScreenReceipt = () => {
               aria-label="Payment"
             >
               <ToggleButton value="Cash">Cash</ToggleButton>
-              <ToggleButton value="VNPay">VNPay</ToggleButton>
+              <ToggleButton value="Bank">Bank</ToggleButton>
             </ToggleButtonGroup>
-          </Box>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <Typography variant="h6">Payment Amount:</Typography>
+              <Typography variant="h6">
+                {formattedMoney(request.totalServicePrice * 0.4)}
+              </Typography>
+            </Stack>
+          </Stack>
+          {paymentMethod === "Bank" && (
+            <CardMedia
+              src={qr}
+              component="img"
+              sx={{ width: "auto", height: 400, mt: 2, margin: "0 auto" }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} variant="outlined">
             Close
           </Button>
-          <Button
-            onClick={
-              paymentMethod === "Cash" ? handleCashPayment : handleVNPayPayment
-            }
-            variant="contained"
-          >
+          <Button onClick={() => setOpenConfirm(true)} variant="contained">
             {paymentMethod === "Cash" ? "Confirm" : "Pay now"}
           </Button>
         </DialogActions>
