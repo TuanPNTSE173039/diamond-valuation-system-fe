@@ -2,6 +2,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import { alpha, InputBase } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setKeyword, setSearchValue } from "../../redux/filterSlice.js";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -25,6 +27,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  cursor: "pointer",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -45,12 +48,21 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const UISearch = () => {
+  const common = useSelector((state) => state.filter);
+  const dispatch = useDispatch();
   return (
     <Search>
       <SearchIconWrapper>
         <SearchIcon />
       </SearchIconWrapper>
       <StyledInputBase
+        value={common.keyword}
+        onChange={(e) => dispatch(setKeyword(e.target.value))}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            dispatch(setSearchValue(common.keyword));
+          }
+        }}
         placeholder="Search…"
         inputProps={{ "aria-label": "search" }}
       />

@@ -24,7 +24,12 @@ const UIAutocomplete = ({ value, onChange, data }) => {
           {...props}
           sx={{ display: "flex", flexDirection: "row", width: "100%", gap: 3 }}
         >
-          <Avatar sx={{ width: 40, height: 40, mr: 2 }}>{option.code}</Avatar>
+          {option.avatar && (
+            <Avatar sx={{ width: 40, height: 40, mr: 2 }} src={option.avatar} />
+          )}
+          {!option.avatar && (
+            <Avatar sx={{ width: 40, height: 40, mr: 2 }}>{option.code}</Avatar>
+          )}
           <Tooltip title="Full Name">
             <Typography sx={{ flex: 1 }}>{option.label}</Typography>
           </Tooltip>

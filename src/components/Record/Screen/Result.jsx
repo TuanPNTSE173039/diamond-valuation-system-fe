@@ -20,7 +20,6 @@ import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
 const RecordScreenResult = () => {
   const { requestId } = useParams();
-  console.log(requestId);
 
   // Image Links
   const [proportionImages, setProportionImages] = useState([]);
@@ -79,7 +78,6 @@ const RecordScreenResult = () => {
     },
   });
 
-  console.log(request);
   const loadImage = async (imagePath, setLink) => {
     const imageRef = loadImageRef(storage, imagePath);
     try {
@@ -126,9 +124,7 @@ const RecordScreenResult = () => {
         <Stack direction="row" spacing={1}>
           <div
             onClick={() => {
-              console.log(proportionImages);
               toPDF();
-              console.log(proportionImages);
             }}
           >
             <IconButton color="primary" aria-label="download">

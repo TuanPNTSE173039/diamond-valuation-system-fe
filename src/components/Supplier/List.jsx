@@ -1,7 +1,10 @@
-import * as React from "react";
-import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import AddIcon from "@mui/icons-material/Add";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import DiamondIcon from "@mui/icons-material/Diamond";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import {CardMedia} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -18,22 +21,35 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { useSuppliers } from "../../services/suppliers";
-import { postSupplier, updateSupplier, deleteSupplier } from "../../services/api";
+import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
+import {useFormik} from "formik";
+import * as React from "react";
+import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 import * as Yup from "yup";
-import AddIcon from "@mui/icons-material/Add";
-import DiamondIcon from "@mui/icons-material/Diamond";
+import {VisuallyHiddenInput} from "../../assets/styles/Input.jsx";
+import {
+    crawlDiamondBaseOnSupplier,
+    deleteSupplier,
+    postSupplier,
+    updateSupplier,
+} from "../../services/api";
+import {storage} from "../../services/config/firebase.js";
+import {useSuppliers} from "../../services/suppliers";
+import {metadata} from "../Detail/Item.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
+import BugReportIcon from '@mui/icons-material/BugReport';
+import {useState} from "react";
 
 const SupplierList = () => {
-    const { data: supplierList, isLoading, refetch } = useSuppliers();
+    const [loading, setLoading] = useState(false);
+    const {data: supplierList, isLoading, refetch} = useSuppliers();
     const [localSupplierList, setLocalSupplierList] = React.useState([]);
     const [selectedDetail, setSelectedDetail] = React.useState({
         id: undefined,
         name: "",
         link: "",
+        image: "",
     });
     const [openEdit, setOpenEdit] = React.useState(false);
     const [openAdd, setOpenAdd] = React.useState(false);
@@ -54,6 +70,7 @@ const SupplierList = () => {
             id: supplier.id,
             name: supplier.name,
             link: supplier.link,
+            image: supplier.image,
         });
     };
 
@@ -63,6 +80,7 @@ const SupplierList = () => {
             id: undefined,
             name: "",
             link: "",
+            image: "",
         });
     };
 
@@ -71,12 +89,12 @@ const SupplierList = () => {
             id: selectedDetail.id,
             name: values.name,
             link: values.link,
+            image: values.image,
         };
-
         try {
             await updateSupplier(selectedDetail.id, updatedSupplier);
             const updatedList = localSupplierList.map((supplier) =>
-                supplier.id === selectedDetail.id ? updatedSupplier : supplier
+                supplier.id === selectedDetail.id ? updatedSupplier : supplier,
             );
             setLocalSupplierList(updatedList);
             toast.success("Supplier updated successfully");
@@ -84,13 +102,25 @@ const SupplierList = () => {
         } catch (error) {
             toast.error("Failed to update supplier");
         }
-
+        formikEdit.resetForm();
         handleEditClose();
     };
 
     const handleDeleteClick = (id) => {
         setSelectedDeleteId(id);
         setOpenDeleteConfirm(true);
+    };
+
+    const handleCrawlClick = async (id) => {
+        setLoading(true);
+        try {
+            console.log(id)
+            await crawlDiamondBaseOnSupplier(id);
+        } catch (error) {
+            toast.error("Something error. Try again");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleDeleteConfirmClose = () => {
@@ -101,7 +131,9 @@ const SupplierList = () => {
     const handleDeleteConfirm = async () => {
         try {
             await deleteSupplier(selectedDeleteId);
-            const updatedSupplierList = localSupplierList.filter((supplier) => supplier.id !== selectedDeleteId);
+            const updatedSupplierList = localSupplierList.filter(
+                (supplier) => supplier.id !== selectedDeleteId,
+            );
             setLocalSupplierList(updatedSupplierList);
             toast.success("Supplier deleted successfully");
             await refetch();
@@ -118,6 +150,7 @@ const SupplierList = () => {
             id: undefined,
             name: "",
             link: "",
+            image: "",
         });
     };
 
@@ -127,13 +160,16 @@ const SupplierList = () => {
             id: undefined,
             name: "",
             link: "",
+            image: "",
         });
+        formikAdd.resetForm();
     };
 
     const handleAddSave = async (values) => {
         const newSupplier = {
             name: values.name,
             link: values.link,
+            image: values.image,
         };
 
         try {
@@ -145,7 +181,7 @@ const SupplierList = () => {
         } catch (error) {
             toast.error("Failed to add supplier");
         }
-
+        formikAdd.resetForm();
         handleAddClose();
     };
 
@@ -158,6 +194,7 @@ const SupplierList = () => {
         initialValues: {
             name: selectedDetail.name,
             link: selectedDetail.link,
+            image: selectedDetail.image,
         },
         enableReinitialize: true,
         validationSchema: validationSchema,
@@ -168,6 +205,7 @@ const SupplierList = () => {
         initialValues: {
             name: "",
             link: "",
+            image: "",
         },
         validationSchema: validationSchema,
         onSubmit: handleAddSave,
@@ -177,11 +215,40 @@ const SupplierList = () => {
     };
 
     if (isLoading) {
-        return <UICircularIndeterminate />;
+        return <UICircularIndeterminate/>;
+    }
+
+    function handleUploadSupplierLogo(file, isEdit) {
+        const storageRef = ref(storage, `suppliers/${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+        uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+                const progress =
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log("Upload is " + progress + "% done");
+                switch (snapshot.state) {
+                    case "paused":
+                        console.log("Upload is paused");
+                        break;
+                    case "running":
+                        console.log("Upload is running");
+                        break;
+                }
+            },
+            (error) => {
+                // Handle unsuccessful uploads
+            },
+            async () => {
+                const imageLink = await getDownloadURL(storageRef);
+                if (isEdit) await formikEdit.setFieldValue("image", imageLink);
+                else await formikAdd.setFieldValue("image", imageLink);
+            },
+        );
     }
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <Box sx={{width: "100%"}}>
             <Box
                 sx={{
                     mt: 2,
@@ -191,30 +258,34 @@ const SupplierList = () => {
                     justifyContent: "space-between",
                 }}
             >
-                <Typography variant="h6" sx={{ fontWeight: "600" }}>
+                <Typography variant="h6" sx={{fontWeight: "600"}}>
                     SUPPLIERS
                 </Typography>
-                <Button onClick={handleAddClick} variant="outlined" endIcon={<AddIcon />}>
+                <Button
+                    onClick={handleAddClick}
+                    variant="outlined"
+                    endIcon={<AddIcon/>}
+                >
                     Add
                 </Button>
             </Box>
-            <TableContainer component={Paper} sx={{ mt: 0 }}>
-                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableContainer component={Paper} sx={{mt: 0}}>
+                <Table sx={{minWidth: 700}} aria-label="customized table">
                     <TableHead>
-                        <TableRow sx={{ backgroundColor: "primary.main" }}>
-                            <TableCell align="center" sx={{ color: "white" }}>
+                        <TableRow sx={{backgroundColor: "primary.main"}}>
+                            <TableCell align="center" sx={{color: "white"}}>
                                 No.
                             </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
+                            <TableCell align="center" sx={{color: "white"}}>
                                 Supplier Image
                             </TableCell>
-                            <TableCell align="left" sx={{ color: "white" }}>
+                            <TableCell align="left" sx={{color: "white"}}>
                                 Supplier Name
                             </TableCell>
-                            <TableCell align="left" sx={{ color: "white" }}>
+                            <TableCell align="left" sx={{color: "white"}}>
                                 Link
                             </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
+                            <TableCell align="center" sx={{color: "white"}}>
                                 Action
                             </TableCell>
                         </TableRow>
@@ -223,10 +294,22 @@ const SupplierList = () => {
                         {localSupplierList.map((supplier, index) => (
                             <TableRow key={supplier.id}>
                                 <TableCell align="center">{index + 1}</TableCell>
-                                <TableCell align="center">{supplier.image}</TableCell>
+                                <TableCell align="center" sx={{width: "20%"}}>
+                                    {supplier.image && (
+                                        <CardMedia
+                                            component="img"
+                                            src={supplier.image}
+                                            sx={{width: "100%", height: "auto"}}
+                                        />
+                                    )}
+                                </TableCell>
                                 <TableCell align="left">{supplier.name}</TableCell>
                                 <TableCell align="left">
-                                    <a href={supplier.link} target="_blank" rel="noopener noreferrer">
+                                    <a
+                                        href={supplier.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
                                         {supplier.link}
                                     </a>
                                 </TableCell>
@@ -235,16 +318,29 @@ const SupplierList = () => {
                                         color="primary"
                                         onClick={() => handlePriceClick(supplier.id)}
                                     >
-                                        <DiamondIcon />
+                                        <DiamondIcon/>
                                     </IconButton>
-                                    <IconButton color="primary" onClick={() => handleEditClick(supplier.id)}>
-                                        <EditIcon />
+                                    <IconButton
+                                        color="primary"
+                                        onClick={() => handleEditClick(supplier.id)}
+                                    >
+                                        <EditIcon/>
                                     </IconButton>
-                                    <IconButton color="secondary" onClick={() => handleDeleteClick(supplier.id)}>
-                                        <DeleteForeverIcon />
+                                    <IconButton
+                                        color="secondary"
+                                        onClick={() => handleDeleteClick(supplier.id)}
+                                    >
+                                        <DeleteForeverIcon/>
                                     </IconButton>
+                                    <IconButton
+                                        color="primary"
+                                        onClick={() => handleCrawlClick(supplier.id)}
+                                    >
+                                        <BugReportIcon/>
+                                    </IconButton>
+
                                 </TableCell>
-                                <TableCell style={{ display: "none" }}>{supplier.id}</TableCell>
+                                <TableCell style={{display: "none"}}>{supplier.id}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -255,6 +351,65 @@ const SupplierList = () => {
             <Dialog open={openAdd} onClose={handleAddClose}>
                 <DialogTitle>Add Supplier</DialogTitle>
                 <DialogContent>
+                    {!formikAdd.values.image && (
+                        <Button
+                            component="label"
+                            role={undefined}
+                            variant="outlined"
+                            tabIndex={-1}
+                            startIcon={<CloudUploadIcon/>}
+                            sx={{height: 200, width: "100%"}}
+                        >
+                            Upload Logo
+                            <VisuallyHiddenInput
+                                type="file"
+                                onChange={(e) => {
+                                    if (e.target.files[0]) {
+                                        handleUploadSupplierLogo(e.target.files[0], false);
+                                    }
+                                }}
+                            />
+                        </Button>
+                    )}
+                    {formikAdd.values.image && (
+                        <Box sx={{position: "relative", mb: 2}}>
+                            <CardMedia
+                                component="img"
+                                src={formikAdd.values.image}
+                                sx={{width: "100%", height: 200, objectFit: "contain"}}
+                            />
+                            <IconButton
+                                aria-label="update"
+                                size="large"
+                                component="label"
+                                tabIndex={-1}
+                                role={undefined}
+                                sx={{
+                                    position: "absolute",
+                                    bottom: 7,
+                                    right: 7,
+                                    bgcolor: "white",
+                                    "&:hover": {
+                                        bgcolor: "red",
+                                    },
+                                    p: 0.5,
+                                }}
+                            >
+                                <DriveFileRenameOutlineIcon
+                                    sx={{color: "red", "&:hover": {color: "white"}}}
+                                />
+                                <VisuallyHiddenInput
+                                    type="file"
+                                    onChange={(e) => {
+                                        if (e.target.files[0]) {
+                                            handleUploadSupplierLogo(e.target.files[0], false);
+                                        }
+                                    }}
+                                />
+                            </IconButton>
+                        </Box>
+                    )}
+
                     <TextField
                         autoFocus
                         margin="dense"
@@ -295,6 +450,65 @@ const SupplierList = () => {
             <Dialog open={openEdit} onClose={handleEditClose}>
                 <DialogTitle>Edit Supplier</DialogTitle>
                 <DialogContent>
+                    {!formikEdit.values.image && (
+                        <Button
+                            component="label"
+                            role={undefined}
+                            variant="outlined"
+                            tabIndex={-1}
+                            startIcon={<CloudUploadIcon/>}
+                            sx={{height: 200, width: "100%", mb: 2}}
+                        >
+                            Upload Logo
+                            <VisuallyHiddenInput
+                                type="file"
+                                onChange={(e) => {
+                                    if (e.target.files[0]) {
+                                        handleUploadSupplierLogo(e.target.files[0], true);
+                                    }
+                                }}
+                            />
+                        </Button>
+                    )}
+                    {formikEdit.values.image && (
+                        <Box sx={{position: "relative"}}>
+                            <CardMedia
+                                component="img"
+                                src={formikEdit.values.image}
+                                sx={{width: "100%", height: 200}}
+                            />
+                            <IconButton
+                                aria-label="update"
+                                component="label"
+                                role={undefined}
+                                tabIndex={-1}
+                                size="large"
+                                sx={{
+                                    position: "absolute",
+                                    bottom: 7,
+                                    right: 7,
+                                    bgcolor: "white",
+                                    "&:hover": {
+                                        bgcolor: "red",
+                                    },
+                                    p: 0.5,
+                                }}
+                            >
+                                <DriveFileRenameOutlineIcon
+                                    sx={{color: "red", "&:hover": {color: "white"}}}
+                                />
+                                <VisuallyHiddenInput
+                                    type="file"
+                                    onChange={(e) => {
+                                        if (e.target.files[0]) {
+                                            handleUploadSupplierLogo(e.target.files[0], true);
+                                        }
+                                    }}
+                                />
+                            </IconButton>
+                        </Box>
+                    )}
+
                     <TextField
                         autoFocus
                         margin="dense"
@@ -348,7 +562,11 @@ const SupplierList = () => {
                     <Button onClick={handleDeleteConfirmClose} variant="text">
                         Cancel
                     </Button>
-                    <Button onClick={handleDeleteConfirm} variant="contained" color="secondary">
+                    <Button
+                        onClick={handleDeleteConfirm}
+                        variant="contained"
+                        color="secondary"
+                    >
                         Delete
                     </Button>
                 </DialogActions>

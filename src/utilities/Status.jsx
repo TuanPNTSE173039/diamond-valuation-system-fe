@@ -71,7 +71,7 @@ export const diamondAttribute = {
     label: clarity,
     value: clarity,
   })),
-  cut: ["FAIR", "GOOD", "EXCELLENT", "VERY_GOOD"].map((cut) => ({
+  cut: ["FAIR", "GOOD", "EXCELLENT", "VERY_GOOD", "IDEAL"].map((cut) => ({
     label: cut,
     value: cut,
   })),
@@ -444,7 +444,7 @@ export const convertRecordStatus = (status) => {
         <Typography
           color="status.color"
           textAlign="center"
-          sx={{ bgcolor: "status.received" }}
+          sx={{ bgcolor: "status.valuated" }}
           borderRadius={3}
           p={"2px 8px"}
         >

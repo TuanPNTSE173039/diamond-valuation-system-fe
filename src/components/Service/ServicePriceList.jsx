@@ -19,6 +19,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useFormik } from "formik";
 import * as React from "react";
+import { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -42,8 +43,10 @@ const ServicePriceList = () => {
   const [localServicePriceList, setLocalServicePriceList] =
     React.useState(null);
   const [selectedDetail, setSelectedDetail] = React.useState(null);
+  const [selectedDelete, setSelectedDelete] = useState(null);
   const [openEdit, setOpenEdit] = React.useState(false);
   const [openAdd, setOpenAdd] = React.useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const location = useLocation();
   const pathNames = location.pathname.split("/").filter((x) => x);
 
@@ -100,7 +103,10 @@ const ServicePriceList = () => {
       toast.success("Service price updated successfully");
       await refetch();
     } catch (error) {
-      toast.error("Failed to update service price");
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to update service price",
+      );
     }
 
     handleEditClose();
@@ -119,7 +125,9 @@ const ServicePriceList = () => {
       toast.success("Service price deleted successfully");
       await refetch();
     } catch (error) {
-      toast.error("Failed to delete service price");
+      toast.error(
+        error?.response?.data?.message || "Failed to delete service price",
+      );
     }
   };
 
@@ -131,6 +139,7 @@ const ServicePriceList = () => {
   const handleAddClose = () => {
     setOpenAdd(false);
     setSelectedDetail(null);
+    formikAdd.resetForm();
   };
 
   const handleAddSave = async (values) => {
@@ -155,7 +164,9 @@ const ServicePriceList = () => {
       toast.success("Service price added successfully");
       await refetch();
     } catch (error) {
-      toast.error("Failed to add service price");
+      toast.error(
+        error?.response?.data?.message || "Failed to add service price",
+      );
     }
 
     handleAddClose();
@@ -164,7 +175,8 @@ const ServicePriceList = () => {
   const validationSchema = Yup.object().shape({
     min_size: Yup.number()
       .required("Min Size is required")
-      .positive("Min Size must be a positive number"),
+      .positive("Min Size must be a positive number")
+      .min(1, "Min Size must be greater than 0"),
     max_size: Yup.number()
       .required("Max Size is required")
       .positive("Max Size must be a positive number")
@@ -172,15 +184,15 @@ const ServicePriceList = () => {
     init_price: Yup.number()
       .required("Init Price is required")
       .positive("Init Price must be a positive number"),
-    unit_price: Yup.number().required("Unit Price is required"),
+    unit_price: Yup.number(),
   });
 
   const formikEdit = useFormik({
     initialValues: {
-      min_size: selectedDetail ? selectedDetail.minSize : 0.0,
-      max_size: selectedDetail ? selectedDetail.maxSize : 0.0,
-      init_price: selectedDetail ? selectedDetail.initPrice : 0.0,
-      unit_price: selectedDetail ? selectedDetail.unitPrice : 0.0,
+      min_size: selectedDetail ? selectedDetail.minSize : "",
+      max_size: selectedDetail ? selectedDetail.maxSize : "",
+      init_price: selectedDetail ? selectedDetail.initPrice : "",
+      unit_price: selectedDetail ? selectedDetail.unitPrice : "",
     },
     enableReinitialize: true,
     validationSchema: validationSchema,
@@ -189,10 +201,10 @@ const ServicePriceList = () => {
 
   const formikAdd = useFormik({
     initialValues: {
-      min_size: 0.0,
-      max_size: 0.0,
-      init_price: 0.0,
-      unit_price: 0.0,
+      min_size: "",
+      max_size: "",
+      init_price: "",
+      unit_price: "",
     },
     validationSchema: validationSchema,
     onSubmit: handleAddSave,
@@ -288,7 +300,10 @@ const ServicePriceList = () => {
                         <IconButton
                           aria-label="delete"
                           color="secondary"
-                          onClick={() => handleDelete(service.id)}
+                          onClick={() => {
+                            setSelectedDelete(service.id);
+                            setOpenDelete(true);
+                          }}
                         >
                           <DeleteForeverIcon />
                         </IconButton>
@@ -314,6 +329,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikAdd.values.min_size}
                 onChange={formikAdd.handleChange}
+                onBlur={formikAdd.handleBlur}
                 error={
                   formikAdd.touched.min_size &&
                   Boolean(formikAdd.errors.min_size)
@@ -331,6 +347,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikAdd.values.max_size}
                 onChange={formikAdd.handleChange}
+                onBlur={formikAdd.handleBlur}
                 error={
                   formikAdd.touched.max_size &&
                   Boolean(formikAdd.errors.max_size)
@@ -348,6 +365,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikAdd.values.init_price}
                 onChange={formikAdd.handleChange}
+                onBlur={formikAdd.handleBlur}
                 error={
                   formikAdd.touched.init_price &&
                   Boolean(formikAdd.errors.init_price)
@@ -365,6 +383,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikAdd.values.unit_price}
                 onChange={formikAdd.handleChange}
+                onBlur={formikAdd.handleBlur}
                 error={
                   formikAdd.touched.unit_price &&
                   Boolean(formikAdd.errors.unit_price)
@@ -375,8 +394,10 @@ const ServicePriceList = () => {
               />
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleAddClose}>Cancel</Button>
-              <Button type="submit">Save</Button>
+              <Button onClick={handleAddClose}>Close</Button>
+              <Button type="submit" variant={"contained"}>
+                Create
+              </Button>
             </DialogActions>
           </form>
         </Dialog>
@@ -395,6 +416,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikEdit.values.min_size}
                 onChange={formikEdit.handleChange}
+                onBlur={formikEdit.handleBlur}
                 error={
                   formikEdit.touched.min_size &&
                   Boolean(formikEdit.errors.min_size)
@@ -412,6 +434,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikEdit.values.max_size}
                 onChange={formikEdit.handleChange}
+                onBlur={formikEdit.handleBlur}
                 error={
                   formikEdit.touched.max_size &&
                   Boolean(formikEdit.errors.max_size)
@@ -429,6 +452,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikEdit.values.init_price}
                 onChange={formikEdit.handleChange}
+                onBlur={formikEdit.handleBlur}
                 error={
                   formikEdit.touched.init_price &&
                   Boolean(formikEdit.errors.init_price)
@@ -446,6 +470,7 @@ const ServicePriceList = () => {
                 fullWidth
                 value={formikEdit.values.unit_price}
                 onChange={formikEdit.handleChange}
+                onBlur={formikEdit.handleBlur}
                 error={
                   formikEdit.touched.unit_price &&
                   Boolean(formikEdit.errors.unit_price)
@@ -457,9 +482,48 @@ const ServicePriceList = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleEditClose}>Cancel</Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit" variant={"contained"}>
+                Save changes
+              </Button>
             </DialogActions>
           </form>
+        </Dialog>
+
+        {/*    Delete Confirm dialog*/}
+        <Dialog
+          open={openDelete}
+          onClose={() => {
+            setOpenDelete(false);
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography id="alert-dialog-description">
+              Are you sure you want to delete this service price?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setOpenDelete(false);
+              }}
+              variant="text"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                await handleDelete(selectedDelete);
+                setOpenDelete(false);
+              }}
+              variant="contained"
+              color="secondary"
+            >
+              Delete
+            </Button>
+          </DialogActions>
         </Dialog>
       </Box>
     </>

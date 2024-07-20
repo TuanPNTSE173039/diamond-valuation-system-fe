@@ -1,11 +1,10 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
-  FormControl,
   ImageList,
   ImageListItem,
   InputAdornment,
-  OutlinedInput,
+  TextField,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -15,10 +14,14 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
+import { useFormik } from "formik";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import * as Yup from "yup";
+import { setCurrent, setPrevious } from "../../redux/valuateSlice.js";
 import { updateDiamondValuation } from "../../services/api.js";
 import { storage } from "../../services/config/firebase.js";
 import { useDetail } from "../../services/details.js";
@@ -26,7 +29,6 @@ import { useRequest } from "../../services/requests.js";
 import { useValuation } from "../../services/valuations.js";
 import { formattedDate } from "../../utilities/formatter.js";
 import { loadImageByPath } from "../../utilities/imageLoader.js";
-import { getPreviousStatus } from "../../utilities/Status.jsx";
 import UIBreadCrumb from "../UI/BreadCrumb.jsx";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import UIRichTextEditor from "../UI/RichTextEditor.jsx";
@@ -46,6 +48,9 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 const DiamondValuationItem = () => {
+  const valuateState = useSelector((state) => state.valuate);
+  const dispatch = useDispatch();
+
   const { valuationId } = useParams();
   const { isLoading: isValuationLoading, data: valuation } =
     useValuation(valuationId);
@@ -128,15 +133,128 @@ const DiamondValuationItem = () => {
   };
   const serverDiamondInfor = detail?.diamondValuationNote;
   const [diamondInfor, setDiamondInfor] = useState({});
-
-  //Valuation Infor
-  const [valuationPrice, setValuationPrice] = useState(null);
-  const [comment, setComment] = useState("");
   const editorRef = useRef();
   const commentDetail =
     valuation?.commentDetail === null ? "" : valuation?.commentDetail;
   const [clarities, setClarities] = useState([]);
 
+  //State button mgt
+  const [detailState, setDetailState] = useState({
+    previous: null,
+    current: null,
+  });
+
+  function convertValuationStatus(status) {
+    if (status === "VALUATED") {
+      return status;
+    }
+    if (
+      status === "VALUATING" &&
+      (!valuation?.comment ||
+        !valuation?.commentDetail ||
+        !valuation?.valuationPrice)
+    ) {
+      return "PENDING";
+    }
+    return "DOING";
+  }
+
+  useEffect(() => {
+    // setDetailState((prevState) => {
+    //   return {
+    //     ...prevState,
+    //     previous: getPreviousStatus(valuation?.status),
+    //     current: valuation?.status ? "VALUATED" : "ASSESSED",
+    //   };
+    // });
+    if (valuation) {
+      const current = !valuation.status
+        ? !valuation.comment &&
+          !valuation.commentDetail &&
+          !valuation.valuationPrice
+          ? "PENDING"
+          : "VALUATING"
+        : "VALUATED";
+      dispatch(setCurrent(current));
+      dispatch(setPrevious(current));
+    }
+  }, [valuation]);
+
+  function handleCancelValuating() {
+    if (valuateState.previous === "PENDING") {
+      dispatch(setCurrent("PENDING"));
+    } else {
+      dispatch(setCurrent("VALUATING"));
+    }
+    // setValuationPrice(null);
+    // editorRef.current.setContent("");
+    // formik.resetForm();
+  }
+
+  function handleSaveValuation(formValue) {
+    const { valuationPrice: valuationPrice, briefComment } = formValue;
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: "VALUATING",
+        current: "DRAFT_VALUATING",
+      };
+    });
+    const body = {
+      ...valuation,
+      commentDetail: editorRef.current.getContent(),
+      comment: briefComment,
+      valuationPrice: valuationPrice,
+    };
+    saveMutate(body);
+  }
+
+  function handleEditValuation() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        previous: prevState.previous,
+        current: "VALUATING",
+      };
+    });
+  }
+
+  function handleConfirmValuation() {
+    const body = {
+      ...valuation,
+      status: true,
+    };
+    saveMutate(body);
+  }
+
+  function handleValuating() {
+    setDetailState((prevState) => {
+      return {
+        ...prevState,
+        current: "VALUATING",
+      };
+    });
+  }
+
+  const initialValues = {
+    valuationPrice: 0,
+    briefComment: "",
+  };
+
+  const validationSchema = Yup.object().shape({
+    valuationPrice: Yup.number()
+      .min(0, "Valuation Price is greater than 0")
+      .required("Valuation price is required"),
+    briefComment: Yup.string()
+      .min(10, "Brief comment is greater than 10 characters")
+      .required("Brief comment is required"),
+  });
+
+  const formik = useFormik({
+    initialValues,
+    validationSchema,
+    onSubmit: handleSaveValuation,
+  });
   useEffect(() => {
     if (detail) {
       setDiamondInfor((prev) => {
@@ -166,107 +284,12 @@ const DiamondValuationItem = () => {
       setClarities(serverDiamondInfor?.clarityCharacteristic);
     }
     if (valuation) {
-      setValuationPrice(
-        valuation?.valuationPrice === 0 ? "" : valuation?.valuationPrice,
-      );
-      setComment(valuation?.comment);
-    }
-  }, [detail, valuation]);
-
-  //State button mgt
-  const [detailState, setDetailState] = useState({
-    previous: null,
-    current: null,
-  });
-  useEffect(() => {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: getPreviousStatus(valuation?.status),
-        current: valuation?.status ? "VALUATED" : "ASSESSED",
-      };
-    });
-  }, [valuation]);
-
-  function handleCancelValuating() {
-    setDetailState((prevState) => {
-      if (prevState.previous === "ASSESSED") {
-        return {
-          ...prevState,
-          current: "ASSESSED",
-        };
-      }
-      return {
-        ...prevState,
-        previous: "VALUATING",
-        current: "DRAFT_VALUATING",
-      };
-    });
-    setValuationPrice(null);
-    // editorRef.current.setContent("");
-  }
-
-  useEffect(() => {
-    if (detailState.previous === "ASSESSED") {
-      setDetailState((prevState) => {
-        return {
-          ...prevState,
-          current: "ASSESSED",
-        };
+      formik.setValues({
+        valuationPrice: valuation?.valuationPrice,
+        briefComment: valuation?.comment,
       });
     }
-  }, []);
-
-  function handleSaveValuation() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "VALUATING",
-        current: "DRAFT_VALUATING",
-      };
-    });
-    const body = {
-      ...valuation,
-      commentDetail: editorRef.current.getContent(),
-      comment: comment,
-      valuationPrice,
-    };
-    saveMutate(body);
-  }
-
-  function handleEditValuation() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: prevState.previous,
-        current: "VALUATING",
-      };
-    });
-  }
-
-  function handleConfirmValuation() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        previous: "",
-        current: "VALUATED",
-      };
-    });
-    const body = {
-      ...valuation,
-      status: true,
-    };
-    saveMutate(body);
-  }
-
-  function handleValuating() {
-    setDetailState((prevState) => {
-      return {
-        ...prevState,
-        current: "VALUATING",
-      };
-    });
-  }
+  }, [valuation, detail]);
 
   if (isRequestLoading || isValuationLoading || isDetailLoading) {
     return <UICircularIndeterminate />;
@@ -289,24 +312,42 @@ const DiamondValuationItem = () => {
             Diamond Valuation Detail
           </Typography>
         </Box>
-        {detailState.current === "ASSESSED" && (
-          <Button variant={"contained"} onClick={handleValuating}>
-            Valuating
+        {valuateState.current === "PENDING" && (
+          <Button
+            variant={"contained"}
+            onClick={() => {
+              dispatch(setCurrent("DOING"));
+            }}
+          >
+            Valuate
           </Button>
         )}
-        {detailState.current === "VALUATING" && (
+        {valuateState.current === "DOING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button variant={"outlined"} onClick={handleCancelValuating}>
               Cancel
             </Button>
-            <Button variant={"contained"} onClick={handleSaveValuation}>
+            <Button
+              variant={"contained"}
+              onClick={async () => {
+                await formik.submitForm().resolve(() => {
+                  dispatch(setCurrent("VALUATING"));
+                });
+              }}
+              type="submit"
+            >
               Save
             </Button>
           </Box>
         )}
-        {detailState.current === "DRAFT_VALUATING" && (
+        {valuateState.current === "VALUATING" && (
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant={"outlined"} onClick={handleEditValuation}>
+            <Button
+              variant={"outlined"}
+              onClick={() => {
+                dispatch(setCurrent("DOING"));
+              }}
+            >
               Edit
             </Button>
             <Button variant={"contained"} onClick={handleConfirmValuation}>
@@ -325,7 +366,7 @@ const DiamondValuationItem = () => {
         }}
       >
         <DiamondValuationFieldGroup title="Description" className="w-1/2">
-          <Box className="h-[329px]">
+          <Box className="h-[329px]" component="form">
             <Stack
               direction="row"
               spacing={4}
@@ -338,16 +379,33 @@ const DiamondValuationItem = () => {
               />
 
               <Box className="w-2/5">
-                <FormControl sx={{ width: "100%" }} variant="outlined">
-                  <label
-                    htmlFor="valuation-price"
-                    className="text-left text-xl font-semibold text-primary"
-                  >
-                    Valuation Price
-                  </label>
-                  <OutlinedInput
-                    id="valuation-price"
-                    startAdornment={
+                <label
+                  htmlFor="valuation-price"
+                  className="text-center text-xl font-semibold text-primary"
+                >
+                  Valuation Price
+                </label>
+                <TextField
+                  id="valuation-price"
+                  type="number"
+                  name="valuationPrice"
+                  fullWidth
+                  sx={{ mt: 1 }}
+                  value={formik.values.valuationPrice}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.valuationPrice &&
+                    Boolean(formik.errors.valuationPrice)
+                  }
+                  helperText={
+                    formik.touched.valuationPrice &&
+                    formik.errors.valuationPrice
+                  }
+                  disabled={valuateState.current !== "DOING"}
+                  InputProps={{
+                    sx: { py: 1, px: 2, fontSize: 24 },
+                    startAdornment: (
                       <InputAdornment position="start">
                         <Typography
                           sx={{ fontSize: 28, color: "primary.main" }}
@@ -355,48 +413,31 @@ const DiamondValuationItem = () => {
                           $
                         </Typography>
                       </InputAdornment>
-                    }
-                    inputProps={{
-                      "aria-label": "valuation-price",
-                    }}
-                    sx={{ fontSize: 28 }}
-                    type="number"
-                    value={valuationPrice}
-                    onChange={(e) => {
-                      setValuationPrice(e.target.value);
-                    }}
-                    disabled={detailState.current !== "VALUATING"}
-                  />
-                </FormControl>
+                    ),
+                  }}
+                />
               </Box>
             </Stack>
-            <Box>
-              <label
-                htmlFor={"brief-comment"}
-                style={{
-                  marginTop: 2,
-                  fontSize: 20,
-                  fontWeight: 600,
-                  color: "primary.main",
-                }}
-              >
-                Brief Comment
-              </label>
-              <textarea
-                id={"brief-comment"}
-                style={{
-                  width: "100%",
-                  height: "110px",
-                  resize: "none",
-                  outline: "1px solid #333",
-                  borderRadius: 4,
-                  padding: "8px 16px",
-                }}
-                onChange={(e) => setComment(e.target.value)}
-                disabled={detailState.current !== "VALUATING"}
-                value={comment}
-              />
-            </Box>
+            <TextField
+              label={"Brief Comments"}
+              multiline
+              rows={4}
+              fullWidth
+              id="brief-comment"
+              name="briefComment"
+              value={formik.values.briefComment}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.briefComment &&
+                Boolean(formik.errors.briefComment)
+              }
+              helperText={
+                formik.touched.briefComment && formik.errors.briefComment
+              }
+              disabled={valuateState.current !== "DOING"}
+              sx={{ mt: 0.5 }}
+            />
           </Box>
         </DiamondValuationFieldGroup>
 
@@ -463,7 +504,7 @@ const DiamondValuationItem = () => {
         <UIRichTextEditor
           ref={editorRef}
           value={commentDetail}
-          isDisabled={detailState.current !== "VALUATING"}
+          isDisabled={valuateState.current !== "DOING"}
         />
       </DiamondValuationFieldGroup>
 

@@ -11,6 +11,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { updateValuationRequest } from "../../../services/api.js";
 import { useCustomer } from "../../../services/customers.js";
 import {
   createRecord,
@@ -47,13 +48,34 @@ const RecordScreenSealing = () => {
         queryKey: ["records", { requestId: requestId }],
       });
     },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Create return failed");
+    },
   });
+  const { mutate: updateRequest } = useMutation({
+    mutationFn: (body) => {
+      return updateValuationRequest(requestId, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["requests", { requestId: requestId }],
+      });
+    },
+  });
+
   const { mutate: updateSealing } = useMutation({
     mutationFn: (body) => {
       return updateRecord(body);
     },
-    onSuccess: () => {
-      toast.success("Update sealing successfully");
+    onSuccess: (body) => {
+      if (!body.status) toast.success("Update sealing successfully");
+      else {
+        toast.success("Sign sealing successfully");
+        updateRequest({
+          ...request,
+          status: "SEALED",
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: ["records", { requestId: requestId }],
       });
@@ -352,23 +374,13 @@ const RecordScreenSealing = () => {
     loadImageByPath("images/logo.png", setLogo);
   }, [logo]);
 
-  /*
   useEffect(() => {
     const sealing = records?.find((record) => record.type === "SEALING");
-    if (request?.payment.length === 4 && sealing) {
+    if (sealing?.status) {
       setIsSigned(true);
-      const doc = getSealingContent(request.payment[2]);
-      pdfMake.createPdf(doc).getDataUrl((url) => {
-        const body = {
-          ...sealing,
-          link: url,
-          status: true,
-        };
-        updateSealing(body);
-      });
     }
-  }, [request?.payment[2]]);
-  */
+  }, []);
+
   if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;
   }
@@ -414,7 +426,7 @@ const RecordScreenSealing = () => {
         }}
       >
         <UIBreadCrumb pathNames={pathNames} />
-        <Typography variant="h4">Returned Record</Typography>
+        <Typography variant="h4">Sealing Record</Typography>
 
         {!isSigned && (
           <Button variant={"contained"} onClick={handleSignSealing}>

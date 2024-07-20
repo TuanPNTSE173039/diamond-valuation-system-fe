@@ -1,4 +1,5 @@
 import { axiosInstance } from "./config/axiosInstance.js";
+import * as http from "node:http";
 
 // ---CUSTOMERS---
 export const getCustomers = async () => {
@@ -104,6 +105,8 @@ export const updateStaffPassword = async (authID, body) => {
 export const updateSupplier = async (id, body) => axiosInstance.put(`suppliers/${id}`, body);
 export const postSupplier = async (body) => axiosInstance.post("suppliers", body);
 export const deleteSupplier = async (id) => axiosInstance.delete(`suppliers/${id}`);
+export const crawlDiamondBaseOnSupplier = async (id) => axiosInstance.get(`diamond-market/crawl/supplier/${id}`);
+
 
 // ---DIAMONDS---
 export const deleteDiamond = async (id) => axiosInstance.delete(`diamond-market/${id}`);
@@ -114,3 +117,6 @@ export const postBlog = async (body) => axiosInstance.post("posts", body);
 export const updateBlog = async (id, body) => axiosInstance.put(`posts/${id}`, body);
 export const deleteBlog = async (id) => axiosInstance.delete(`posts/${id}`);
 
+
+//---Forget Password---
+export const forgotPassword = async (email) => axiosInstance.post("auth/forget-password", { email });

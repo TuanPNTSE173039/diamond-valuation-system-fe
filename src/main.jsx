@@ -53,7 +53,7 @@ const theme = createTheme({
     },
     status: {
       color: "#eff3f5",
-      pending: "#33595e",
+      pending: "#758694",
       processing: "#30cb83",
       received: "#2133a1",
       cancelled: "#e74c3c",
@@ -76,17 +76,15 @@ const theme = createTheme({
 });
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-          <App />
-          {/*<ReactQueryDevtools*/}
-          {/*  initialIsOpen={false}*/}
-          {/*  buttonPosition="bottom-left"*/}
-          {/*/>*/}
-        </QueryClientProvider>
-      </Provider>
-    </ThemeProvider>
-  </React.StrictMode>,
+  <ThemeProvider theme={theme}>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+        {/*<ReactQueryDevtools*/}
+        {/*  initialIsOpen={false}*/}
+        {/*  buttonPosition="bottom-left"*/}
+        {/*/>*/}
+      </QueryClientProvider>
+    </Provider>
+  </ThemeProvider>,
 );

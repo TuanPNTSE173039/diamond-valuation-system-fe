@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
 import LoopIcon from "@mui/icons-material/Loop";
+import { CardMedia } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -15,11 +16,17 @@ import Typography from "@mui/material/Typography";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { format } from "date-fns";
+import { sha512 } from "js-sha512";
 import pdfMake from "pdfmake/build/pdfmake";
-import { useEffect, useState } from "react";
+import qs from "qs";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { frontendUrl } from "../../../services/config/axiosInstance.js";
+import qr from "../../../assets/images/qr.png";
+import {
+  axiosInstance,
+  frontendUrl,
+} from "../../../services/config/axiosInstance.js";
 import { useCustomer } from "../../../services/customers.js";
 import {
   createRecord,
@@ -61,6 +68,9 @@ const RecordScreenReturn = () => {
         queryKey: ["records", { requestId: requestId }],
       });
     },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Create return failed");
+    },
   });
   const { mutate: updateReturned } = useMutation({
     mutationFn: (body) => {
@@ -73,7 +83,31 @@ const RecordScreenReturn = () => {
       });
     },
   });
-
+  const { mutate: saveTransaction } = useMutation({
+    mutationFn: (body) => {
+      return axiosInstance.post(`payments`, body);
+    },
+    onSuccess: (body) => {
+      toast.success("Payment successful");
+      queryClient.invalidateQueries({
+        queryKey: ["records", { requestId: requestId }],
+      });
+      const returned = records?.find((record) => record.type === "RETURN");
+      setIsPaid(true);
+      const doc = getReturnedContent(body.data);
+      pdfMake.createPdf(doc).getDataUrl((url) => {
+        const body = {
+          ...returned,
+          link: url,
+          status: true,
+        };
+        updateReturned(body);
+      });
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Payment failed");
+    },
+  });
   const [logo, setLogo] = useState(null);
   const [url, setUrl] = useState(null);
 
@@ -152,6 +186,7 @@ const RecordScreenReturn = () => {
     }
   }, [request]);
 
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -159,6 +194,8 @@ const RecordScreenReturn = () => {
   const handleDialogOpen = () => {
     setOpenDialog(true);
   };
+
+  /*
   const handleVNPayPayment = () => {
     const vnPayURL = getVNPayURL(vnPayParam);
     window.location.href = vnPayURL;
@@ -173,13 +210,26 @@ const RecordScreenReturn = () => {
     );
     handleDialogClose();
   };
-
+*/
+  const sealing = records.find((record) => record.type === "SEALING");
+  let total = request.totalServicePrice * 0.6;
+  if (sealing) total += request.totalServicePrice * 0.1;
   const getReturnedContent = (payment = null) => {
     let payStatus = {};
     let signature = {
       text: "",
       margin: [0, 50],
     };
+    let sealArea = {};
+    if (sealing) {
+      sealArea = {
+        text: `Open seal: ${formattedMoney(request.totalServicePrice * 0.1)} (10%)\n`,
+        style: "subheader",
+        color: "#b33771",
+        alignment: "right",
+        margin: [0, 5, 0, 5],
+      };
+    }
 
     if (payment) {
       payStatus = {
@@ -366,24 +416,50 @@ const RecordScreenReturn = () => {
             body: gerServiceInformation(request.valuationRequestDetails),
           },
         },
+        {
+          columns: [
+            {
+              text: [
+                {
+                  text: `Total Service Price: ${formattedMoney(request.totalServicePrice)}`,
+                  style: "subheader",
+                  alignment: "left",
+                  margin: [0, 20, 0, 5],
+                },
+              ],
+              margin: [0, 20, 0, 0],
+              width: "50%",
+            },
+            {
+              text: [
+                {
+                  text: `Second payment: ${formattedMoney(request.totalServicePrice * 0.6)} (60%)\n`,
+                  style: "subheader",
+                  color: "#EE4E4E",
+                  alignment: "right",
+                  margin: [0, 5, 0, 5],
+                },
+                sealArea,
+                {
+                  text: `Total: ${formattedMoney(total)}\n`,
+                  bold: true,
+                  italics: true,
+                  fontSize: 25,
+                  color: "#30cb83",
+                  alignment: "right",
+                  margin: [0, 5, 0, 5],
+                },
+              ],
+              margin: [0, 20, 0, 0],
+              width: "50%",
+            },
+          ],
+        },
 
-        {
-          text: `Total Service Price: ${formattedMoney(request.totalServicePrice)}`,
-          style: "subheader",
-          alignment: "right",
-          margin: [0, 20, 0, 5],
-        },
-        {
-          text: `Total Price (Second payment): ${formattedMoney(request.totalServicePrice * 0.6)}`,
-          style: "subheader",
-          color: "#EE4E4E",
-          alignment: "right",
-          margin: [0, 5, 0, 5],
-        },
         {
           text: [
             {
-              text: `I, ${customer.firstName} ${customer.lastName}, confirm that I have received the above-listed diamonds in the condition specified and acknowledge the second payment for the appraisal service`,
+              text: `I, ${customer?.firstName} ${customer?.lastName}, confirm that I have received the above-listed diamonds in the condition specified and acknowledge the second payment for the appraisal service`,
               alignment: "justify",
             },
           ],
@@ -502,7 +578,7 @@ const RecordScreenReturn = () => {
 
   const handleDownload = () => {
     const doc = getReturnedContent();
-    pdfMake.createPdf(doc).download(`receipt-${requestId}.pdf`);
+    pdfMake.createPdf(doc).download(`returned-${requestId}.pdf`);
   };
   const handleCreateReturned = () => {
     const doc = getReturnedContent();
@@ -523,20 +599,10 @@ const RecordScreenReturn = () => {
 
   useEffect(() => {
     const returned = records?.find((record) => record.type === "RETURN");
-    console.log("ahihi");
-    if (request?.payment.length === 4 && returned) {
+    if (request?.payment.length === 2 && returned) {
       setIsPaid(true);
-      const doc = getReturnedContent(request.payment[2]);
-      pdfMake.createPdf(doc).getDataUrl((url) => {
-        const body = {
-          ...returned,
-          link: url,
-          status: true,
-        };
-        updateReturned(body);
-      });
     }
-  }, [request?.payment[2]]);
+  }, [request?.payment[1]]);
 
   if (isCustomerLoading || isRequestLoading || isRecordFetching) {
     return <UICircularIndeterminate />;
@@ -599,6 +665,43 @@ const RecordScreenReturn = () => {
             >
               <LoopIcon />
             </IconButton>
+            <Dialog
+              open={openConfirm}
+              onClose={() => setOpenConfirm(false)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                {"Confirm Payment"}
+              </DialogTitle>
+              <DialogContent>
+                <Typography id="alert-dialog-description">
+                  Are you sure to confirm this payment?
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenConfirm(false)} variant="text">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    saveTransaction({
+                      amount: request.totalServicePrice * 0.6,
+                      paymentMethod: {
+                        id: paymentMethod === "Bank" ? 2 : 1,
+                      },
+                      valuationRequestID: requestId,
+                    });
+                    setOpenConfirm(false);
+                    setOpenDialog(false);
+                  }}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Confirm
+                </Button>
+              </DialogActions>
+            </Dialog>
           </>
         )}
       </Stack>
@@ -609,10 +712,19 @@ const RecordScreenReturn = () => {
         </Box>
       )}
       {!url && isRecordFetching && <UICircularIndeterminate />}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        fullWidth
+        maxWidth={"sm"}
+      >
         <DialogTitle>Payment Information</DialogTitle>
         <DialogContent>
-          <Box>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <ToggleButtonGroup
               color="primary"
               value={paymentMethod}
@@ -621,20 +733,26 @@ const RecordScreenReturn = () => {
               aria-label="Payment"
             >
               <ToggleButton value="Cash">Cash</ToggleButton>
-              <ToggleButton value="VNPay">VNPay</ToggleButton>
+              <ToggleButton value="Bank">Bank</ToggleButton>
             </ToggleButtonGroup>
-          </Box>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <Typography variant="h6">Payment Amount:</Typography>
+              <Typography variant="h6">{formattedMoney(total)}</Typography>
+            </Stack>
+          </Stack>
+          {paymentMethod === "Bank" && (
+            <CardMedia
+              src={qr}
+              component="img"
+              sx={{ width: "auto", height: 400, mt: 2, margin: "0 auto" }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} variant="outlined">
             Close
           </Button>
-          <Button
-            onClick={
-              paymentMethod === "Cash" ? handleCashPayment : handleVNPayPayment
-            }
-            variant="contained"
-          >
+          <Button onClick={() => setOpenConfirm(true)} variant="contained">
             {paymentMethod === "Cash" ? "Confirm" : "Pay now"}
           </Button>
         </DialogActions>

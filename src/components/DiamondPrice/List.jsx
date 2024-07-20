@@ -24,7 +24,7 @@ import UITable from "../UI/Table.jsx";
 import { useDiamondMarket } from "../../services/diamondMarket.js";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import { useSuppliers } from "../../services/suppliers.js";
-import {deleteDiamond} from "../../services/api.js";
+import {createDiamond, deleteDiamond} from "../../services/api.js";
 import {toast} from "react-toastify";
 
 const { cut, clarity, color, shape, symmetry, polish, fluorescence } = diamondAttribute;
@@ -36,7 +36,22 @@ const DiamondPriceList = () => {
   const [selectedDiamonds, setSelectedDiamonds] = useState([]);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState(ADD_MODE);
-
+  const [formData, setFormData] = useState({
+    diamondImage: "",
+    creationDate: "",
+    diamondOrigin: "NATURAL",
+    caratWeight: "",
+    color: "",
+    clarity: "",
+    cut: "",
+    polish: "",
+    symmetry: "",
+    shape: "",
+    fluorescence: "",
+    cutScore: "",
+    price: "",
+    supplierId: ""
+  });
   const { data: diamondPriceList = {}, isFetching, refetch } = useDiamondMarket(page, rowsPerPage);
   const { data: supplier } = useSuppliers(0, 1000);
 
@@ -47,13 +62,25 @@ const DiamondPriceList = () => {
   const handleOpenDialog = () => {
     setOpen(true);
   };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
   const handleCloseDialog = () => {
     setOpen(false);
   };
-  const handleAddDiamondPrice = () => {
-    console.log("Add Diamond Price");
+  const handleAddDiamondPrice = async () => {
+    try {
+      await createDiamond(formData);
+      toast.success("Diamond price added successfully!");
+      handleCloseDialog();
+      await refetch()
+      // Optionally, refresh the data or update the state to reflect the new addition
+    } catch (error) {
+      toast.error("Failed to add diamond price. Please try again.");
+    }
   };
-
   const handleEditDiamondPrice = () => {
     console.log("Edit Diamond Price");
   };
@@ -131,13 +158,16 @@ const DiamondPriceList = () => {
             {mode === ADD_MODE ? "Add new Diamond Price" : "Update Diamond Price"}
           </DialogTitle>
           <DialogContent sx={{ padding: 3 }}>
+
             <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
               <FormControl sx={{ width: "50%" }}>
                 <FormLabel id="diamond-origin">Diamond Origin</FormLabel>
                 <RadioGroup
                     row
                     aria-labelledby="diamond-origin"
-                    name="diamond-origin"
+                    name="diamondOrigin"
+                    value={formData.diamondOrigin}
+                    onChange={handleInputChange}
                 >
                   <FormControlLabel
                       value="NATURAL"
@@ -151,13 +181,24 @@ const DiamondPriceList = () => {
                   />
                 </RadioGroup>
               </FormControl>
-              <TextField label="Cut Score" id="cut-score" type="number" />
+              <TextField
+                  label="Cut Score"
+                  id="cut-score"
+                  type="number"
+                  name="cutScore"
+                  value={formData.cutScore}
+                  onChange={handleInputChange}
+                  fullWidth
+              />
             </Box>
             <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
               <TextField
                   label="Carat Weight"
                   id="carat-weight"
                   type="number"
+                  name="caratWeight"
+                  value={formData.caratWeight}
+                  onChange={handleInputChange}
                   sx={{ width: "50%" }}
                   InputProps={{
                     endAdornment: (
@@ -169,6 +210,9 @@ const DiamondPriceList = () => {
                   id="color-grade"
                   select
                   label="Color Grade"
+                  name="color"
+                  value={formData.color}
+                  onChange={handleInputChange}
                   sx={{ width: "50%" }}
               >
                 {color.map((option) => (
@@ -183,6 +227,9 @@ const DiamondPriceList = () => {
                   id="clarity-grade"
                   select
                   label="Clarity Grade"
+                  name="clarity"
+                  value={formData.clarity}
+                  onChange={handleInputChange}
                   sx={{ width: "50%" }}
               >
                 {clarity.map((option) => (
@@ -195,6 +242,9 @@ const DiamondPriceList = () => {
                   id="cut-grade"
                   select
                   label="Cut Grade"
+                  name="cut"
+                  value={formData.cut}
+                  onChange={handleInputChange}
                   sx={{ width: "50%" }}
               >
                 {cut.map((option) => (
@@ -205,7 +255,15 @@ const DiamondPriceList = () => {
               </TextField>
             </Box>
             <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
-              <TextField id="shape" select label="Shape" sx={{ width: "50%" }}>
+              <TextField
+                  id="shape"
+                  select
+                  label="Shape"
+                  name="shape"
+                  value={formData.shape}
+                  onChange={handleInputChange}
+                  sx={{ width: "50%" }}
+              >
                 {shape.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
@@ -216,6 +274,9 @@ const DiamondPriceList = () => {
                   id="symmetry"
                   select
                   label="Symmetry"
+                  name="symmetry"
+                  value={formData.symmetry}
+                  onChange={handleInputChange}
                   sx={{ width: "50%" }}
               >
                 {symmetry.map((option) => (
@@ -226,7 +287,15 @@ const DiamondPriceList = () => {
               </TextField>
             </Box>
             <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2.5 }}>
-              <TextField id="polish" select label="Polish" sx={{ width: "50%" }}>
+              <TextField
+                  id="polish"
+                  select
+                  label="Polish"
+                  name="polish"
+                  value={formData.polish}
+                  onChange={handleInputChange}
+                  sx={{ width: "50%" }}
+              >
                 {polish.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
@@ -237,6 +306,9 @@ const DiamondPriceList = () => {
                   id="fluorescence"
                   select
                   label="Fluorescence"
+                  name="fluorescence"
+                  value={formData.fluorescence}
+                  onChange={handleInputChange}
                   sx={{ width: "50%" }}
               >
                 {fluorescence.map((option) => (
@@ -251,6 +323,9 @@ const DiamondPriceList = () => {
                   id="supplier"
                   select
                   label="Supplier"
+                  name="supplierId"
+                  value={formData.supplierId}
+                  onChange={handleInputChange}
                   fullWidth
                   sx={{ width: "50%" }}
               >
@@ -264,6 +339,9 @@ const DiamondPriceList = () => {
                   label="Price"
                   id="price"
                   type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleInputChange}
                   sx={{ width: "50%" }}
                   InputProps={{
                     startAdornment: (

@@ -1,6 +1,4 @@
-import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,11 +20,8 @@ import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
 const RequestList = () => {
-  // const { data: requests, isFetching: isRequestPending } = useRequests();
-  // const { data: customers, isPending: isCustomerPending } = useCustomers();
-
   const queryClient = useQueryClient();
-
+  const common = useSelector((state) => state.filter);
   const { user: currentUser } = useSelector((state) => state.auth);
   const userRole = currentUser?.account.role;
 
@@ -37,6 +32,9 @@ const RequestList = () => {
     rowsPerPage,
     userRole,
     currentUser?.id,
+    common.startDate?.format("YYYY/MM/DD"),
+    common.endDate?.format("YYYY/MM/DD"),
+    common.searchValue,
   );
 
   const [selectedRequests, setSelectedRequests] = useState([]);
@@ -132,16 +130,7 @@ const RequestList = () => {
           count={requests?.totalElement}
           rowsPerPage={rowsPerPage}
           setRowsPerPage={setRowsPerPage}
-        >
-          <Button
-            onClick={handleAddValuationRequest}
-            variant="contained"
-            size="large"
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
-        </UITable>
+        />
       </UITabPanel>
 
       {valuationRequestStatus

@@ -1,13 +1,11 @@
 import {useSelector} from "react-redux";
-import {useQuery} from "@tanstack/react-query";
 import {useStaff} from "../../services/staffs.js";
-import {useState} from "react";
+//import {useState} from "react";
 import UICircularIndeterminate from "../UI/CircularIndeterminate.jsx";
 import {createTheme, Drawer, ThemeProvider} from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid";
 import ProfileCard from "./ProfileCard.jsx";
-import {useLocation} from "react-router-dom";
 
 const theme = createTheme();
 
@@ -23,8 +21,10 @@ export default function ProfilePage() {
         error: staffError,
     } = useStaff(id);
 
+    console.log(staff)
 
-    const [text, setText] = useState("");
+
+ //   const [text, setText] = useState("");
 
     if (isStaffLoading) {
         return <UICircularIndeterminate />;
@@ -71,7 +71,7 @@ export default function ProfilePage() {
                                 {/* SETTINGS CARD */}
                                 <Grid item xs={12}>
                                     <ProfileCard
-                                        expose={(v) => setText(v)}
+                                        // expose={(v) => setText(v)}
                                         firstName={mainUser.firstName}
                                         lastName={mainUser.lastName}
                                         experience={mainUser.experience}

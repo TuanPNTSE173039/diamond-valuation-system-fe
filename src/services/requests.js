@@ -19,19 +19,40 @@ export const useBriefRequests = (
   pageSize,
   userRole,
   userId,
-  status,
+  startDate = undefined,
+  endDate = undefined,
+  search = undefined,
+  status = undefined,
 ) => {
   let url;
   if (userRole === Role.CONSULTANT) {
-    url = `staffs/${userId}/valuation-requests??pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc`;
+    url = `staffs/${userId}/valuation-requests?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc`;
   } else {
     url = `valuation-requests/response?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc`;
   }
   if (status) {
     url += `&status=${status}`;
   }
+  if (startDate && endDate) {
+    url += `&startDate=${startDate}&endDate=${endDate}`;
+  }
+  if (search) {
+    url += `&search=${search}`;
+  }
   return useQuery({
-    queryKey: ["briefRequests", { pageNo, pageSize, userRole, userId, status }],
+    queryKey: [
+      "briefRequests",
+      {
+        pageNo,
+        pageSize,
+        userRole,
+        userId,
+        status,
+        startDate,
+        endDate,
+        search,
+      },
+    ],
     queryFn: async () => {
       const response = await axiosInstance.get(url);
       return response.data;

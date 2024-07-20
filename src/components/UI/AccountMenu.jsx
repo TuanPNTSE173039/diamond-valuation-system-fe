@@ -1,5 +1,4 @@
 import Logout from "@mui/icons-material/Logout";
-import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -40,7 +39,7 @@ export default function UIAccountMenu() {
   return (
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
-        <Typography sx={{ minWidth: 100, textAlign: "right", ml: 2 }}>
+        <Typography sx={{ minWidth: 100, textAlign: "right", ml: 1 }}>
           Welcome {currentUser?.account.role}
         </Typography>
         <Tooltip title="Account settings">
@@ -52,7 +51,7 @@ export default function UIAccountMenu() {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <Avatar sx={{ width: 40, height: 40 }}>M</Avatar>
+            <Avatar sx={{ width: 40, height: 40 }} />
           </IconButton>
         </Tooltip>
       </Box>

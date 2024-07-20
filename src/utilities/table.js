@@ -345,25 +345,17 @@ export const StaffHeadCells = [
     label: "Experience",
   },
   {
-    id: "totalProjects",
-    numeric: true,
-    disablePadding: false,
-    label: "Total Valuations",
-  },
-  {
-    id: "currentProjects",
-    numeric: true,
-    disablePadding: false,
-    label: "Current Valuations",
-  },
-  {
     id: "role",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "Role",
   },
-
-
+  {
+    id: "sta",
+    numeric: false,
+    disablePadding: false,
+    label: "Status",
+  }
 ];
 
 export const CustomerHeadCells = [
@@ -398,4 +390,3 @@ export const CustomerHeadCells = [
     label: "Identity Document",
   },
 ];
-

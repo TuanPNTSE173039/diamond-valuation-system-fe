@@ -1,4 +1,3 @@
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 
@@ -6,8 +5,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
@@ -54,6 +51,7 @@ export default function UIRequestHeader({ title }) {
         >
           {title}
         </Typography>
+        {/*
         <Button
           id="basic-button"
           aria-controls={open ? "basic-menu" : undefined}
@@ -79,6 +77,7 @@ export default function UIRequestHeader({ title }) {
           </MenuItem>
           <MenuItem onClick={handleClose}>Update Infor</MenuItem>
         </Menu>
+        */}
         <Dialog open={cancelDialogOpen} onClose={handleCancelDialogClose}>
           <DialogTitle>Cancel Request</DialogTitle>
           <DialogContent>
