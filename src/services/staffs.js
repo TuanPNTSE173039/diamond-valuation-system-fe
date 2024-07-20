@@ -49,7 +49,7 @@ export const useStaffList = (pageSize = 10, pageNo = 0 ) => {
   return useQuery({
     queryKey: ["staffList", { pageSize, pageNo }],
     queryFn: async () => {
-      const response = await axiosInstance.get(`staffs?pageSize=${pageSize}&pageNo=${pageNo}`);
+      const response = await axiosInstance.get(`staffs?pageSize=${pageSize}&pageNo=${pageNo}&sortDir=DESC`);
       return response.data;
     },
     keepPreviousData: true,
