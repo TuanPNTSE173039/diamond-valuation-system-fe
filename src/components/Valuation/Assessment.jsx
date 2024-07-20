@@ -353,6 +353,7 @@ const DiamondValuationAssessment = ({
               label="Shape"
               sx={{ width: "50%" }}
               disabled={assessState.current !== "DOING"}
+              value={diamondInfor.shape || ""}
               onChange={(e) => {
                 setDiamondInfor((prevState) => ({
                   ...prevState,

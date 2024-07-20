@@ -176,7 +176,7 @@ const ServicePriceList = () => {
     min_size: Yup.number()
       .required("Min Size is required")
       .positive("Min Size must be a positive number")
-      .min(1, "Min Size must be greater than 0"),
+      .min(1, "Min Size must be greater than or equal to 1"),
     max_size: Yup.number()
       .required("Max Size is required")
       .positive("Max Size must be a positive number")
