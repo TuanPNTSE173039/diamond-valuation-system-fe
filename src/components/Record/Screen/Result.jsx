@@ -78,7 +78,6 @@ const RecordScreenResult = () => {
     },
   });
 
-  console.log(request);
   const loadImage = async (imagePath, setLink) => {
     const imageRef = loadImageRef(storage, imagePath);
     try {
@@ -125,9 +124,7 @@ const RecordScreenResult = () => {
         <Stack direction="row" spacing={1}>
           <div
             onClick={() => {
-              console.log(proportionImages);
               toPDF();
-              console.log(proportionImages);
             }}
           >
             <IconButton color="primary" aria-label="download">
