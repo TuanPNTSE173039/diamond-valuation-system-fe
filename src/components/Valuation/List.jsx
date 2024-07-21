@@ -38,7 +38,13 @@ const DiamondValuationList = () => {
     isLoading: isValuationLoading,
     data: valuations,
     isFetching: isValuationFetching,
-  } = useValuations(page, rowsPerPage, userRole, currentUser?.id);
+  } = useValuations(
+    page,
+    rowsPerPage,
+    userRole,
+    currentUser?.id,
+    statusIndex === 0 ? null : statusIndex === 2,
+  );
 
   if (isValuationLoading || isValuationFetching) {
     return <UICircularIndeterminate />;

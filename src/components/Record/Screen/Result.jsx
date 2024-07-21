@@ -7,14 +7,14 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useQuery } from "@tanstack/react-query";
 import { getDownloadURL, ref as loadImageRef } from "firebase/storage";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Margin, Resolution, usePDF } from "react-to-pdf";
 import logo from "../../../assets/images/logo.png";
 import { getValuationRequest } from "../../../services/api.js";
 import { storage } from "../../../services/config/firebase.js";
 
-import { formattedMoney } from "../../../utilities/formatter.js";
+import { formattedDate, formattedMoney } from "../../../utilities/formatter.js";
 import { clarityCharacteristicConverter } from "../../../utilities/Status.jsx";
 import UICircularIndeterminate from "../../UI/CircularIndeterminate.jsx";
 
@@ -111,9 +111,18 @@ const RecordScreenResult = () => {
       }
     }
   }, [valuationRequestDetails]);
-  console.log(clarityCharacteristicImages);
 
-  const ref = useRef(); // Create a reference
+  const isValuated =
+    request?.status === "COMPLETED" ||
+    request?.status === "SEALED" ||
+    request?.status === "FINISHED";
+  if (!isValuated) {
+    return (
+      <Typography>
+        This request is not valuated. Please back to valuate it
+      </Typography>
+    );
+  }
 
   if (isValuationRequestLoading) {
     return <UICircularIndeterminate />;
@@ -162,6 +171,8 @@ const RecordScreenResult = () => {
                   <div className="flex gap-10">
                     <div className="flex w-1/2">
                       <div className="w-1/2">
+                        <p className="mb-1 p-0">Certificate Id</p>
+                        <p className="mb-1 p-0">Certificate Date</p>
                         <p className="mb-1 p-0">Diamond Origin</p>
                         <p className="mb-1 p-0">Carat</p>
                         <p className="mb-1 p-0">Color</p>
@@ -174,6 +185,14 @@ const RecordScreenResult = () => {
                         <p className="mb-1 p-0">Clarity Characteristics</p>
                       </div>
                       <div className="w-1/2 text-right">
+                        <p className="mb-1 p-0">
+                          {item.diamondValuationNote.certificateId}
+                        </p>
+                        <p className="mb-1 p-0">
+                          {formattedDate(
+                            item.diamondValuationNote.certificateDate,
+                          )}
+                        </p>
                         <p className="mb-1 p-0">
                           {item.diamondValuationNote.diamondOrigin}
                         </p>
@@ -375,9 +394,10 @@ const RecordScreenResult = () => {
                 </table>
               </div>
               <hr className="my-6" />
-              This is some additional content to to inform you that Acme Inc. is
-              a fake company and this is a fake receipt. This is just a demo to
-              show you how you can create a beautiful receipt with Onedoc.{" "}
+              Diamonds are valued based on the 4Cs: Carat (weight), Clarity
+              (clarity), Color, and Cut. This information helps determine the
+              accurate value of your diamond. Please note that this value is for
+              reference only and may change based on the market.
             </div>
           </main>
         ))}

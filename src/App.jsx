@@ -12,6 +12,8 @@ import CustomerList from "./components/Customer/List.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import DetailItem from "./components/Detail/Item.jsx";
 import DiamondPriceList from "./components/DiamondPrice/List.jsx";
+import NotFound from "./components/NotFound.jsx";
+import ProfilePage from "./components/Profile/Page.jsx";
 import RecordScreenCommitment from "./components/Record/Screen/Commitment.jsx";
 import RecordScreenReceipt from "./components/Record/Screen/Receipt.jsx";
 import RecordScreenResult from "./components/Record/Screen/Result.jsx";
@@ -19,18 +21,17 @@ import RecordScreenReturn from "./components/Record/Screen/Return.jsx";
 import RecordScreenSealing from "./components/Record/Screen/Sealing.jsx";
 import RequestItem from "./components/Request/Item.jsx";
 import RequestList from "./components/Request/List.jsx";
+import RequestResultPayment from "./components/Request/PaymentResult.jsx";
+import ServiceList from "./components/Service/List.jsx";
+import ServicePriceList from "./components/Service/ServicePriceList.jsx";
 import StaffDetail from "./components/Staff/Detail.jsx";
 import StaffList from "./components/Staff/List.jsx";
-import RequestResultPayment from "./components/Request/PaymentResult.jsx";
+import DiamondList from "./components/Supplier/DiamondList.jsx";
+import SupplierList from "./components/Supplier/List.jsx";
 import DiamondValuationItem from "./components/Valuation/Item.jsx";
 import DiamondValuationList from "./components/Valuation/List.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import Role from "./utilities/Role.js";
-import ServiceList from "./components/Service/List.jsx";
-import ServicePriceList from "./components/Service/ServicePriceList.jsx";
-import SupplierList from "./components/Supplier/List.jsx";
-import DiamondList from "./components/Supplier/DiamondList.jsx";
-import ProfilePage from "./components/Profile/Page.jsx";
 
 const router = createBrowserRouter([
   {
@@ -244,19 +245,19 @@ const router = createBrowserRouter([
           {
             index: true,
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                  <ServiceList />
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                <ServiceList />
+              </RoleBasedGuard>
             ),
           },
           {
             path: ":serviceId",
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                  <ServicePriceList />
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                <ServicePriceList />
+              </RoleBasedGuard>
             ),
-          }
+          },
         ],
       },
       {
@@ -265,19 +266,19 @@ const router = createBrowserRouter([
           {
             index: true,
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                  <SupplierList />
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                <SupplierList />
+              </RoleBasedGuard>
             ),
           },
           {
             path: ":supplierId",
             element: (
-                <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
-                  <DiamondList />
-                </RoleBasedGuard>
+              <RoleBasedGuard allowedRoles={[Role.MANAGER]}>
+                <DiamondList />
+              </RoleBasedGuard>
             ),
-          }
+          },
         ],
       },
       {
@@ -299,7 +300,10 @@ const router = createBrowserRouter([
       },
     ],
   },
-
+  {
+    path: "*",
+    element: <NotFound />,
+  },
 ]);
 
 export default function App() {

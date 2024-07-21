@@ -61,6 +61,9 @@ const RecordScreenReceipt = () => {
         queryKey: ["records", { requestId: requestId }],
       });
     },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Create receipt failed");
+    },
   });
   const { mutate: updateReceipt } = useMutation({
     mutationFn: (body) => {
@@ -71,6 +74,9 @@ const RecordScreenReceipt = () => {
       queryClient.invalidateQueries({
         queryKey: ["records", { requestId: requestId }],
       });
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message || "Update receipt failed");
     },
   });
   const { mutate: saveTransaction } = useMutation({

@@ -1,4 +1,3 @@
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import { InputAdornment } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -231,9 +230,9 @@ const DetailList = () => {
                     >
                       <EditIcon />
                     </IconButton>
-                    <IconButton color="secondary">
-                      <DeleteForeverIcon />
-                    </IconButton>
+                    {/*<IconButton color="secondary">*/}
+                    {/*  <DeleteForeverIcon />*/}
+                    {/*</IconButton>*/}
                   </StyledTableCell>
                 )}
               </StyledTableRow>

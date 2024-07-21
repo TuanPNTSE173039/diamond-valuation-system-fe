@@ -13,9 +13,12 @@ import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/authSlice.js";
+import { useStaff } from "../../services/staffs.js";
+import UICircularIndeterminate from "./CircularIndeterminate.jsx";
 
 export default function UIAccountMenu() {
   const { user: currentUser } = useSelector((state) => state.auth);
+  const { data: staff, isLoading } = useStaff(currentUser?.id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -36,6 +39,9 @@ export default function UIAccountMenu() {
     navigate("/auth/login", { replace: true });
   };
 
+  if (isLoading) {
+    return <UICircularIndeterminate />;
+  }
   return (
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
@@ -51,7 +57,7 @@ export default function UIAccountMenu() {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <Avatar sx={{ width: 40, height: 40 }} />
+            <Avatar sx={{ width: 40, height: 40 }} src={staff?.avatar} />
           </IconButton>
         </Tooltip>
       </Box>
@@ -91,7 +97,8 @@ export default function UIAccountMenu() {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem onClick={handleClose}>
-          <Avatar /> {currentUser?.firstName + " " + currentUser?.lastName}
+          <Avatar src={staff?.avatar} />{" "}
+          {currentUser?.firstName + " " + currentUser?.lastName}
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleProfile}>

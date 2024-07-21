@@ -256,7 +256,7 @@ const DiamondValuationAssignTable = ({ detailState }) => {
                   <TableCell align="center">
                     <Switch
                       checked={
-                        switches.find((sw) => sw.valuationId === row.id).value
+                        switches.find((sw) => sw.valuationId === row.id)?.value
                       }
                       onChange={() => handleSwitchChange(index, row.id)}
                       inputProps={{ "aria-label": "action" }}

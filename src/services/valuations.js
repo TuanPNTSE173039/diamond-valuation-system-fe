@@ -2,12 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import Role from "../utilities/Role.js";
 import { axiosInstance } from "./config/axiosInstance.js";
 
-export const useValuations = (pageNo, pageSize, userRole, userId, status) => {
+export const useValuations = (
+  pageNo,
+  pageSize,
+  userRole,
+  userId,
+  status = null,
+) => {
   let url;
   if (userRole === Role.VALUATION) {
     url = `staffs/${userId}/diamond-assigns?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc`;
   } else {
     url = `diamond-valuation-assigns?pageNo=${pageNo}&pageSize=${pageSize}&sortDir=desc`;
+  }
+  if (status !== null) {
+    url += `&status=${status}`;
   }
   return useQuery({
     queryKey: ["valuations", { pageNo, pageSize, userRole, userId, status }],

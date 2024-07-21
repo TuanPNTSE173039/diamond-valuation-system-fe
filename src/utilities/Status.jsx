@@ -165,10 +165,6 @@ export const diamondValuationStatus = [
     id: 3,
     name: "VALUATED",
   },
-  {
-    id: 4,
-    name: "MISSING",
-  },
 ];
 export const clarityCharacteristicList = [
   {
