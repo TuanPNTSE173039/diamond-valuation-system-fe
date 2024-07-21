@@ -5,7 +5,7 @@ export const useDiamondMarket = (pageNo = 1, pageSize = 10) => {
     return useQuery({
         queryKey: ["diamondMarket", { pageNo, pageSize }],
         queryFn: async () => {
-            const response = await axiosInstance.get('diamond-market', {
+            const response = await axiosInstance.get('diamond-market?sortDir=DESC', {
                 params: { pageNo, pageSize }
             });
             return response.data;
