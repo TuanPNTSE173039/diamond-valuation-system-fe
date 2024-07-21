@@ -20,6 +20,12 @@ import UITable from "../UI/Table.jsx";
 import UITabPanel from "../UI/TabPanel.jsx";
 
 const RequestList = () => {
+  //Tab control
+  const [statusIndex, setStatusIndex] = useState(0);
+  const handleChange = (event, newValue) => {
+    setStatusIndex(newValue);
+  };
+
   const queryClient = useQueryClient();
   const common = useSelector((state) => state.filter);
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -35,15 +41,12 @@ const RequestList = () => {
     common.startDate?.format("YYYY/MM/DD"),
     common.endDate?.format("YYYY/MM/DD"),
     common.searchValue,
+    valuationRequestStatus[statusIndex].name === "ALL"
+      ? null
+      : valuationRequestStatus[statusIndex].name,
   );
 
   const [selectedRequests, setSelectedRequests] = useState([]);
-
-  //Tab control
-  const [statusIndex, setStatusIndex] = useState(0);
-  const handleChange = (event, newValue) => {
-    setStatusIndex(newValue);
-  };
 
   //Showing
   const requestRows =

@@ -686,7 +686,7 @@ const RecordScreenReturn = () => {
                 <Button
                   onClick={() => {
                     saveTransaction({
-                      amount: request.totalServicePrice * 0.6,
+                      amount: total,
                       paymentMethod: {
                         id: paymentMethod === "Bank" ? 2 : 1,
                       },
