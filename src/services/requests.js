@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import Role from "../utilities/Role.js";
 import { axiosInstance } from "./config/axiosInstance.js";
 
@@ -61,11 +62,16 @@ export const useBriefRequests = (
 };
 
 export const useRequest = (id) => {
+  const navigate = useNavigate();
   return useQuery({
     queryKey: ["request", { requestId: id }],
     queryFn: async () => {
-      const response = await axiosInstance.get(`valuation-requests/${id}`);
-      return response.data;
+      try {
+        const response = await axiosInstance.get(`valuation-requests/${id}`);
+        return response.data;
+      } catch (error) {
+        navigate("/not-found");
+      }
     },
     enabled: id !== undefined && id !== null,
   });

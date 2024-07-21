@@ -18,8 +18,9 @@ const NotFound = () => {
       <Box>
         <Box
           sx={{
-            height: 45,
-            width: 45,
+            height: 70,
+            width: 70,
+            ml: -1,
             bgcolor: "white",
             borderRadius: "50%",
             position: "relative",
@@ -45,9 +46,12 @@ const NotFound = () => {
           variant="h6"
           noWrap
           component="div"
-          sx={{ ml: 2, fontWeight: 800 }}
+          sx={{ fontWeight: 800 }}
         >
           H&T Diamond
+        </Typography>
+        <Typography>
+          Sorry, the resource you are looking for could not be found.
         </Typography>
       </Box>
       <CardMedia

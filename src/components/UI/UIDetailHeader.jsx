@@ -34,6 +34,9 @@ export default function UIDetailHeader({ title, detail }) {
       });
       toast.success("Request has been canceled");
     },
+    onError: (error) => {
+      toast.error(error.response.data.message || "An error occurred");
+    },
   });
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -115,7 +118,9 @@ export default function UIDetailHeader({ title, detail }) {
             Cancel request detail
           </MenuItem>
           <MenuItem>
-            <Link to={`/records/result/${detailId}`}>View Record Result</Link>
+            <Link to={`/requests/${requestId}/results`}>
+              View Record Result
+            </Link>
           </MenuItem>
         </Menu>
         <Dialog

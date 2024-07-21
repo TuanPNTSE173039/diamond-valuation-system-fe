@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import Role from "../utilities/Role.js";
 import { axiosInstance } from "./config/axiosInstance.js";
 
@@ -28,13 +29,18 @@ export const useValuations = (
 };
 
 export const useValuation = (id) => {
+  const navigate = useNavigate();
   return useQuery({
     queryKey: ["valuation", { valuationId: id }],
     queryFn: async () => {
-      const { data } = await axiosInstance.get(
-        `diamond-valuation-assigns/${id}`,
-      );
-      return data;
+      try {
+        const { data } = await axiosInstance.get(
+          `diamond-valuation-assigns/${id}`,
+        );
+        return data;
+      } catch (error) {
+        navigate("/not-found");
+      }
     },
     enabled: id !== null && id !== undefined,
   });

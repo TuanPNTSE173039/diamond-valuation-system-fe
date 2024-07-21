@@ -117,6 +117,9 @@ const DetailItem = () => {
       dispatch(setCurrent("ASSESSING"));
       dispatch(setPrevious("DOING"));
     },
+    onError: (error) => {
+      toast.error(error.response.data.message || "An error occurred");
+    },
   });
 
   //DiamondInfor

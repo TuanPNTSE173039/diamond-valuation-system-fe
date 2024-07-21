@@ -304,6 +304,10 @@ const router = createBrowserRouter([
     path: "*",
     element: <NotFound />,
   },
+  {
+    path: "/not-found",
+    element: <NotFound />,
+  },
 ]);
 
 export default function App() {

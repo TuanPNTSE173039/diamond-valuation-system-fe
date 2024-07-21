@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "./config/axiosInstance.js";
 
 export const useRecord = (requestId, recordType) => {
@@ -14,13 +15,18 @@ export const useRecord = (requestId, recordType) => {
 };
 
 export const useRecords = (requestId) => {
+  const navigate = useNavigate();
   return useQuery({
     queryKey: ["records", { requestId: requestId }],
     queryFn: async () => {
-      const response = await axiosInstance.get(
-        `records/by-request-id/${requestId}`,
-      );
-      return response.data;
+      try {
+        const response = await axiosInstance.get(
+          `records/by-request-id/${requestId}`,
+        );
+        return response.data;
+      } catch (er) {
+        navigate("/not-found");
+      }
     },
   });
 };

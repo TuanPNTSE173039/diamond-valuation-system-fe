@@ -51,7 +51,6 @@ const DetailList = () => {
     },
     onError: (error) => {
       toast.error(error.response.data.message || "Add size failed");
-      console.log(error);
     },
   });
 
