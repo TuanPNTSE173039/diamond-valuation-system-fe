@@ -114,8 +114,8 @@ const SupplierList = () => {
     const handleCrawlClick = async (id) => {
         setLoading(true);
         try {
-            console.log(id)
-            await crawlDiamondBaseOnSupplier(id);
+            const response = await crawlDiamondBaseOnSupplier(id);
+            toast.success(response.data);
         } catch (error) {
             toast.error("Something error. Try again");
         } finally {

@@ -48,12 +48,12 @@ const DiamondList = () => {
     supplierId: ""
   });
   console.log(supplierId)
-  const { data: diamondPriceList = {}, isFetching, refetch } = useDiamondsOfSupplier(page, rowsPerPage, 1);
+  const { data: diamondPriceList = {}, isLoading, refetch } = useDiamondsOfSupplier(page, rowsPerPage, supplierId);
   const { data: supplier } = useSuppliers(0, 1000);
   const location = useLocation();
   const pathNames = location.pathname.split("/").filter((x) => x);
 
-  if (isFetching) {
+  if (isLoading) {
     return <UICircularIndeterminate />;
   }
 

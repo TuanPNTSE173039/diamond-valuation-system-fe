@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./config/axiosInstance.js";
 
-export const useCustomers = () => {
+export const useCustomers = (pageSize = 10, pageNo = 0) => {
   return useQuery({
-    queryKey: ["customers"],
+    queryKey: ["customers", pageSize, pageNo],
     queryFn: async () => {
-      const response = await axiosInstance.get("customers");
+      const response = await axiosInstance.get(`customers?pageSize=${pageSize}&pageNo=${pageNo}`);
       return response.data;
     },
   });

@@ -95,18 +95,6 @@ const StaffList = () => {
 
     return (
         <Box sx={{ width: "100%" }}>
-            <Box
-                sx={{
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                }}
-            >
-                <UISearch />
-                <Box sx={{ flexGrow: 1 }} />
-            </Box>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <Tabs
                     value={statusIndex}
