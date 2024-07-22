@@ -66,7 +66,7 @@ const Dashboard = () => {
     },
     user: {
       total: overral?.user.total,
-      percent: overral?.appointment.percent,
+      percent: formattedPercent(overral?.user.percent),
       status: overral?.user.status === "true",
     },
     appointment: {
@@ -80,6 +80,7 @@ const Dashboard = () => {
       status: overral?.valuation.status === "true",
     },
   };
+  console.log(overral);
 
   const { data: revenueChart, isLoading: isRevenueChartLoading } = useRevenue();
   const revenueDataSet = dataMapping(revenueChart);
